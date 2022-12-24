@@ -73,7 +73,7 @@ func (s *Server) initRouter() {
 
 func (s *Server) Run() {
 	go s.handleSubscriptions()
-	fullAddr := flag.String("addr", ":8080", "http service address")
+	fullAddr := flag.String("addr", s.port, "http service address")
 	// flag.Parse()
 	log.Println("Start run server")
 	log.Println(s.app.Listen(*fullAddr))
@@ -108,6 +108,7 @@ func (s *Server) initWebsocket() {
 					Connection: c,
 					Params:     params,
 				}
+
 			case "leave":
 				log.Println("Unsubscription")
 				s.unregister <- subEvent{
