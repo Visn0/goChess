@@ -10,7 +10,13 @@
         "function-call-argument-newline": ["error", "consistent"],
         "new-cap": "off",
         "line-comment-position": "off",
-        "indent": ["error", 4],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
         "brace-style": ["error", "1tbs"],
         "no-multiple-empty-lines": [
             "error",

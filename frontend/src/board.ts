@@ -9,7 +9,7 @@ class Board {
         this.squares = new Array<Array<Square>>()
     }
 
-    reset() {
+    public reset() {
         this.squares = new Array<Array<Square>>(8)
         let board = '<table class="board"'
 
