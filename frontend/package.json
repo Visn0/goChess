@@ -1,0 +1,29 @@
+{
+    "name": "chess",
+    "version": "1.0.0",
+    "description": "Chess",
+    "main": "server.js",
+    "scripts": {
+        "fmt": "npx prettier --write .",
+        "lint": "npx eslint .",
+        "check": "tsc && rm -rf js/",
+        "dev": "npm run check && parcel index.html -p 8080 --no-cache --lazy"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Visn0/goChess.git"
+    },
+    "author": "Anton Chernysh & Carlos Eduardo Arismendi Sanchez",
+    "license": "MIT",
+    "homepage": "https://github.com/Visn0/goChess",
+    "devDependencies": {
+        "@parcel/transformer-typescript-tsc": "^2.7.0",
+        "@types/node": "^18.7.14",
+        "@typescript-eslint/eslint-plugin": "^5.36.1",
+        "@typescript-eslint/parser": "^5.36.1",
+        "eslint": "^8.23.0",
+        "parcel": "^2.7.0",
+        "prettier": "2.7.1",
+        "typescript": "^4.8.2"
+    }
+}
