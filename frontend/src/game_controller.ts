@@ -1,3 +1,4 @@
+import { Color, constants } from './constants'
 import { MovePiece } from './actions/move_piece'
 import { Board } from './board'
 
@@ -17,7 +18,8 @@ class GameController {
 
     public start() {
         this.openWebSocketConnetion()
-        this.board.reset()
+        this.board.initFromFenNotation(constants.StartingPosition)
+        this.board.render(Color.WHITE)
     }
 
     private openWebSocketConnetion() {

@@ -1,4 +1,5 @@
-import { File, Rank } from './utils'
+import { Color, File, Rank } from './constants'
+import { Piece } from './piece'
 
 class Square {
     readonly id: string
@@ -6,18 +7,22 @@ class Square {
     readonly file: File
     readonly rank: Rank
 
-    constructor(file: File, rank: Rank) {
+    piece: Piece | null
+
+    constructor(file: File, rank: Rank, piece: Piece | null) {
         this.file = file
         this.rank = rank
+        this.piece = piece
 
         this.id = `${String.fromCharCode(65 + file)}${rank + 1}`
-        this.color = (file + rank) % 2 === 0 ? 'black-square' : 'white-square'
+        this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
     }
 
     toTableCellHTML(): string {
-        const board = `<td id="${this.id}" class="board-square ${this.color}">${this.id}</td>`
-        return board
+        const piece = this.piece?.toDivHTMLString() || ''
+        const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece} ${this.id}</td>`
+        return cell
     }
 }
 
-export { Square, File, Rank }
+export { Square }

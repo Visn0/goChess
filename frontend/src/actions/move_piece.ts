@@ -1,5 +1,5 @@
 import { Board } from '../board'
-import { File, Rank } from '../utils'
+import { File, Rank } from '../constants'
 
 class MovePieceParams {
     src: CoordinateParams
