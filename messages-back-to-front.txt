@@ -41,10 +41,28 @@ Example: {
 MovePiece => 
 {
 	"action": string,
-	"httpCode": int
+	"body": {
+		src: {
+            file: int
+            rank: int
+        }
+        dst: {
+            file: int
+            rank: int
+        }
+	}
 }
 
 Example: {
 	"action": "piece-moved",
-	"httpCode": 200
+	"body": {
+		src: {
+            file: 1
+            rank: 4
+        }
+        dst: {
+            file: 1
+            rank: 5
+        }
+	}
 }
