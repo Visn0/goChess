@@ -25,7 +25,6 @@ class Board {
                 if (this.isNumber(c)) {
                     for (let amount = parseInt(c); amount > 0; amount--, f++) {
                         rank[f] = new Square(f, r, null)
-                        console.log(c, f)
                     }
                     f--
                     continue
@@ -48,12 +47,12 @@ class Board {
     }
 
     public render(colorDown: Color) {
-        let board = '<table>'
+        let board = '<table id="board-table">'
         if (colorDown === Color.WHITE) {
             for (let r = Rank._8; r >= Rank._1; --r) {
                 board += '<tr>'
                 for (let f = File.A; f <= File.H; ++f) {
-                    board += this.squares[r][f].toTableCellHTML()
+                    board += this.getSquare(f, r).toTableCellHTML()
                 }
                 board += '</tr>\n'
             }
@@ -61,7 +60,7 @@ class Board {
             for (let r = Rank._1; r <= Rank._8; ++r) {
                 board += '<tr>'
                 for (let f = File.H; f >= File.A; --f) {
-                    board += this.squares[r][f].toTableCellHTML()
+                    board += this.getSquare(f, r).toTableCellHTML()
                 }
                 board += '</tr>\n'
             }
@@ -69,7 +68,17 @@ class Board {
 
         board += '</table>'
         this.container.innerHTML = board
-        console.log(this.squares)
+        this.addOnClickEventListeners()
+    }
+
+    private addOnClickEventListeners() {
+        this.squares.forEach((rank) => {
+            rank.forEach((square) => square.addOnClickEventListener())
+        })
+    }
+
+    public getSquare(file: File, rank: Rank): Square {
+        return this.squares[rank][file]
     }
 }
 

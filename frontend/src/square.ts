@@ -1,4 +1,4 @@
-import { Color, File, Rank } from './constants'
+import { Color, File, Rank, eventTopics } from './constants'
 import { Piece } from './piece'
 
 class Square {
@@ -18,10 +18,30 @@ class Square {
         this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
     }
 
-    toTableCellHTML(): string {
+    public toTableCellHTML(): string {
         const piece = this.piece?.toDivHTMLString() || ''
         const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece}</td>`
         return cell
+    }
+
+    public addOnClickEventListener() {
+        const element = document.getElementById(this.id) as HTMLElement
+        const file = this.file
+        const rank = this.rank
+        element.onclick = () => {
+            const payload = {
+                detail: {
+                    file: file,
+                    rank: rank
+                }
+            }
+
+            document.dispatchEvent(new CustomEvent(eventTopics.OnSquareClick, payload))
+        }
+    }
+
+    public isEmpty(): boolean {
+        return this.piece === null
     }
 }
 

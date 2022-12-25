@@ -39,4 +39,8 @@ const constants = {
     StartingPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 }
 
-export { File, Rank, Color, PieceType, constants }
+const eventTopics = {
+    OnSquareClick: 'onSquareClick'
+}
+
+export { File, Rank, Color, PieceType, constants, eventTopics }

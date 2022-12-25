@@ -14,7 +14,7 @@ class CoordinateParams {
 function MovePiece(board: Board, body: string): void {
     const params: MovePieceParams = JSON.parse(body)
 
-    console.log(params)
+    console.log('Move piece: ', params)
 }
 
 export { MovePiece }

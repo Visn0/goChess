@@ -36,7 +36,7 @@
         "array-element-newline": ["error", "consistent"],
         "array-bracket-newline": ["error", "consistent"],
         "multiline-comment-style": "off",
-        "max-classes-per-file": ["error", 2],
+        "max-classes-per-file": ["error", 3],
         "dot-notation": "error",
         "eqeqeq": ["error", "smart"],
         "curly": ["error", "all"],
