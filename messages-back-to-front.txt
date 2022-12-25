@@ -1,0 +1,50 @@
+###############################################
+### Messages sent from Backend to Frontend: ###
+###############################################
+
+CreateRoom => 
+{
+	"action": string,
+	"httpCode": int
+}
+
+Example: {
+	"action": "room-created",
+	"httpCode": 201 
+}
+
+###############################################
+
+RequestMoves => 
+{
+	"action": string,
+	"validMoves": Array<Coordinates>
+}
+
+Coordinates {
+	file: int
+	rank: int
+}
+
+Example: {
+	"action": "moves-received",
+	"validMoves": [
+		{ file: 1, rank: 1},
+		{ file: 2, rank: 1},
+		{ file: 3, rank: 1},
+		{ file: 1, rank: 2},
+		{ file: 1, rank: 3}
+	]
+}
+
+###############################################
+MovePiece => 
+{
+	"action": string,
+	"httpCode": int
+}
+
+Example: {
+	"action": "piece-moved",
+	"httpCode": 200
+}

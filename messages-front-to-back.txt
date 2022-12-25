@@ -1,0 +1,70 @@
+###############################################
+### Messages sent from Frontend to Backend: ###
+###############################################
+
+CreateRoom => 
+{
+	"action": string,
+	"body": {
+		"name": string,
+		"password": string
+	}
+}
+
+Example: {
+	"action": "create-room",
+	"body": {
+		"name": "roomName",
+		"password": "roomPassword"
+	}
+}
+
+###############################################
+RequestMoves => 
+{
+	"action": string,
+	"body": {
+		file: int,
+		rank: int,
+		piece: string
+	}
+}
+
+Example: {
+	"action": "request-moves",
+	"body": {
+		file: 1,
+		rank: 4,
+		piece: "pawn"	
+	}
+}
+
+###############################################
+MovePiece => 
+{
+	"action": string,
+	"body": {
+		src: {
+            file: int
+            rank: int
+        }
+        dst: {
+            file: int
+            rank: int
+        }
+	}
+}
+
+Example: {
+	"action": "move-piece",
+	"body": {
+		src: {
+            file: 1
+            rank: 4
+        }
+        dst: {
+            file: 1
+            rank: 5
+        }
+	}
+}
