@@ -64,7 +64,6 @@ class GameController {
 
         const p: Params = JSON.parse(body)
         const action = this.receiveActions.get(p.action)
-        console.log(p.action, action)
 
         action?.Invoke(body)
     }
@@ -90,10 +89,10 @@ class GameController {
     private selectSquare(square: Square) {
         this._srcSquare = new SrcSquare(square)
         RequestMovesAction(this.repository, square)
-        console.log(this.isSrcSquareSelected())
     }
 
     private unselectSrcSquare() {
+        this._srcSquare?.removeValidMoves()
         this._srcSquare = null
     }
 
@@ -113,6 +112,11 @@ class SrcSquare {
 
     public setValidMoves(moves: Array<Square>) {
         this.validMoves = moves
+        moves.forEach((m) => m.setAsValidMove())
+    }
+
+    public removeValidMoves() {
+        this.validMoves.forEach((m) => m.unsetAsValidMove())
     }
 
     public canInnerPieceMoveTo(dst: Square): boolean {
