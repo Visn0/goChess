@@ -5,7 +5,7 @@ import { File, Rank } from './constants'
 import { Square } from './square'
 
 class SrcSquare {
-    private square: Square
+    public square: Square
     private validMoves: Array<Square>
 
     constructor(square: Square) {
@@ -18,10 +18,11 @@ class SrcSquare {
     }
 
     public canInnerPieceMoveTo(dst: Square): boolean {
-        const found = this.validMoves.find(m => (m.file === dst.file && m.rank === dst.rank))
+        const found = this.validMoves.find((m) => m.file === dst.file && m.rank === dst.rank)
         return found !== undefined
     }
 }
+
 class GameController {
     private serverURL: string
     private wsConn: WebSocket | null
@@ -90,8 +91,14 @@ class GameController {
         if (this.isSrcSquareSelected()) {
             if (this.srcSquare?.canInnerPieceMoveTo(square)) {
                 const body = {
-                    src: this.srcSquare,
-                    dst: square
+                    src: {
+                        file: this.srcSquare.square.file,
+                        rank: this.srcSquare.square.rank
+                    },
+                    dst: {
+                        file: square.file,
+                        rank: square.rank
+                    }
                 }
 
                 MovePiece(this.board, JSON.stringify(body))
@@ -110,7 +117,6 @@ class GameController {
 
     private selectSquare(square: Square) {
         this.srcSquare = new SrcSquare(square)
-        console.log('SRC selected: ', square)
     }
 
     private unselectSrcSquare() {

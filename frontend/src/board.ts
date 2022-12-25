@@ -1,10 +1,10 @@
 import { Color, File, Rank, constants } from './constants'
-import { PieceFactory } from './piece'
+import { Piece, PieceFactory } from './piece'
 import { Square } from './square'
 
 class Board {
-    container: HTMLElement
-    squares: Array<Array<Square>>
+    private container: HTMLElement
+    private squares: Array<Array<Square>>
 
     constructor(container: HTMLElement) {
         this.container = container
@@ -79,6 +79,11 @@ class Board {
 
     public getSquare(file: File, rank: Rank): Square {
         return this.squares[rank][file]
+    }
+
+    public setSquarePiece(file: File, rank: Rank, piece: Piece | null) {
+        const square = this.squares[rank][file]
+        square.setPiece(piece)
     }
 }
 

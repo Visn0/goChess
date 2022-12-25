@@ -2,24 +2,27 @@ import { Color, File, Rank, eventTopics } from './constants'
 import { Piece } from './piece'
 
 class Square {
-    readonly id: string
-    readonly color: string
-    readonly file: File
-    readonly rank: Rank
+    public readonly id: string
+    public readonly color: string
+    public readonly file: File
+    public readonly rank: Rank
 
-    piece: Piece | null
+    private _piece: Piece | null
+    public get piece(): Piece | null {
+        return this._piece
+    }
 
     constructor(file: File, rank: Rank, piece: Piece | null) {
         this.file = file
         this.rank = rank
-        this.piece = piece
+        this._piece = piece
 
         this.id = `${String.fromCharCode(65 + file)}${rank + 1}`
         this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
     }
 
     public toTableCellHTML(): string {
-        const piece = this.piece?.toDivHTMLString() || ''
+        const piece = this._piece?.toDivHTMLString() || ''
         const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece}</td>`
         return cell
     }
@@ -41,7 +44,18 @@ class Square {
     }
 
     public isEmpty(): boolean {
-        return this.piece === null
+        return this._piece === null
+    }
+
+    private updateRender() {
+        const piece = this._piece?.toDivHTMLString() || ''
+        const element = document.getElementById(this.id) as HTMLElement
+        element.innerHTML = piece
+    }
+
+    public setPiece(piece: Piece | null) {
+        this._piece = piece
+        this.updateRender()
     }
 }
 
