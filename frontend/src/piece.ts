@@ -1,8 +1,8 @@
 import { Color, PieceType } from './constants'
 
 class Piece {
-    private color: Color
-    private type: PieceType
+    readonly color: Color
+    readonly type: PieceType
 
     constructor(color: Color, type: PieceType) {
         this.color = color
