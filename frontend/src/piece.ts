@@ -10,7 +10,7 @@ class Piece {
     }
 
     public toDivHTMLString(): string {
-        const str = `<div class="${this.color}-${this.type}"></div>`
+        const str = `<div class="piece ${this.color}-${this.type}"></div>`
         return str
     }
 }

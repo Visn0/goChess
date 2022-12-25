@@ -20,7 +20,7 @@ class Square {
 
     toTableCellHTML(): string {
         const piece = this.piece?.toDivHTMLString() || ''
-        const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece} ${this.id}</td>`
+        const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece}</td>`
         return cell
     }
 }

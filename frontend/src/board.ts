@@ -53,7 +53,7 @@ class Board {
             for (let r = Rank._8; r >= Rank._1; --r) {
                 board += '<tr>'
                 for (let f = File.A; f <= File.H; ++f) {
-                    board += this.squares[f][r].toTableCellHTML()
+                    board += this.squares[r][f].toTableCellHTML()
                 }
                 board += '</tr>\n'
             }
@@ -61,7 +61,7 @@ class Board {
             for (let r = Rank._1; r <= Rank._8; ++r) {
                 board += '<tr>'
                 for (let f = File.H; f >= File.A; --f) {
-                    board += this.squares[f][r].toTableCellHTML()
+                    board += this.squares[r][f].toTableCellHTML()
                 }
                 board += '</tr>\n'
             }
