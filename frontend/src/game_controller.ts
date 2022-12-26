@@ -40,9 +40,9 @@ class GameController {
 
     private registerReceiveActions() {
         this.receiveActions = new Map<string, ReceiveAction>([
-            ['room-created', new RoomCreatedAction()],
-            ['moves-received', new MovesReceivedAction(this)],
-            ['piece-moved', new PieceMovedAction(this.board)]
+            ['create-room', new RoomCreatedAction()],
+            ['request-moves', new MovesReceivedAction(this)],
+            ['move-piece', new PieceMovedAction(this)]
         ])
     }
 
@@ -56,8 +56,7 @@ class GameController {
     }
 
     private onWebSocketMessage(event: MessageEvent) {
-        const body = JSON.stringify(event.data)
-
+        const body = event.data
         class Params {
             action: string
         }
@@ -91,7 +90,7 @@ class GameController {
         RequestMovesAction(this.repository, square)
     }
 
-    private unselectSrcSquare() {
+    public unselectSrcSquare() {
         this._srcSquare?.removeValidMoves()
         this._srcSquare = null
     }

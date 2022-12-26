@@ -27,7 +27,7 @@ class MockConnectionRepository implements ConnectionRepository {
     private messageEventFactory(message: Message): MessageEvent {
         switch (message.action) {
             case 'create-room':
-                return new MessageEvent(this.onMessageEventTopic, { data: { action: 'room-created' } })
+                return new MessageEvent(this.onMessageEventTopic, { data: { action: 'create-room' } })
             case 'request-moves':
                 return this.createMovesReceivedMessage()
             case 'move-piece':
@@ -47,14 +47,14 @@ class MockConnectionRepository implements ConnectionRepository {
             }
         }
 
-        const data = { action: 'moves-received', validMoves: moves }
+        const data = { action: 'request-moves', validMoves: moves }
         return new MessageEvent(this.onMessageEventTopic, { data: data })
     }
 
     private createPieceMovedMessage(message: Message): MessageEvent {
         const m = message as MovePieceMessage
         const data = {
-            action: 'piece-moved',
+            action: 'move-piece',
             src: {
                 file: m.body.src.file,
                 rank: m.body.src.rank

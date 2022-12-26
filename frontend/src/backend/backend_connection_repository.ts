@@ -11,6 +11,7 @@ class BackendConnectionRepository implements ConnectionRepository {
         if (path !== '') {
             this.url += `/${path}`
         }
+        this.connection = null
     }
 
     public openConnection() {

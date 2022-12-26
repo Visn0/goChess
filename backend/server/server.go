@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"sync"
@@ -15,7 +14,7 @@ type wsConn = websocket.Conn
 
 type subEvent struct {
 	Connection *wsConn
-	Params     map[string]interface{} // TODO
+	Body       map[string]interface{} // TODO
 }
 
 type Server struct {
@@ -96,26 +95,23 @@ func (s *Server) initWebsocket() {
 			}
 			log.Println("Get message.")
 
-			reqType, _ := jsonparser.GetString(message, "type")
-			reqParams, _, _, _ := jsonparser.Get(message, "params")
-			params := make(map[string]interface{})
-			json.Unmarshal(reqParams, &params)
+			reqAction, _ := jsonparser.GetString(message, "action")
+			reqBody, _, _, _ := jsonparser.Get(message, "body")
 
-			switch reqType {
-			case "join":
+			switch reqAction {
+			case "create-room":
 				log.Println("New subscription")
 				s.register <- subEvent{
 					Connection: c,
-					Params:     params,
+					Body:       map[string]interface{}{},
 				}
+			case "request-moves":
+				s.handleRequestMoves(reqBody, c)
 
-			case "leave":
-				log.Println("Unsubscription")
-				s.unregister <- subEvent{
-					Connection: c,
-					Params:     params,
-				}
+			case "move-piece":
+				s.handleMovePiece(reqBody, c)
 			}
+
 		}
 	}))
 }
