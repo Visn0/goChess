@@ -27,6 +27,8 @@ type Server struct {
 
 	register   chan subEvent
 	unregister chan subEvent
+
+	rooms map[string]*Room
 }
 
 func NewServer(addr, port string) *Server {
@@ -38,13 +40,10 @@ func NewServer(addr, port string) *Server {
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
 		unregister:         make(chan subEvent),
+		rooms: map[string]*Room{
+			"room1": NewRoom(),
+		},
 	}
-}
-
-func (s *Server) Init() {
-	s.initMiddleware()
-	s.initRouter()
-	log.Println("Init server")
 }
 
 // The server instantiates the middleware (the proxy)
@@ -71,6 +70,10 @@ func (s *Server) initRouter() {
 }
 
 func (s *Server) Run() {
+	s.initMiddleware()
+	s.initRouter()
+	log.Println("Init server")
+
 	go s.handleSubscriptions()
 	fullAddr := flag.String("addr", s.port, "http service address")
 	// flag.Parse()
