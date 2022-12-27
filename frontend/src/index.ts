@@ -6,8 +6,8 @@ import { Color, constants } from './constants'
 import { GameController } from './game_controller'
 
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
-// const repository: ConnectionRepository = new MockConnectionRepository()
-const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
+const repository: ConnectionRepository = new MockConnectionRepository()
+// const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const gameController: GameController = new GameController(board, repository)
 
 window.onload = () => {
