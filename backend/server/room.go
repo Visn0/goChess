@@ -3,6 +3,9 @@ package server
 import (
 	"chess/server/game"
 	"fmt"
+	"log"
+
+	"github.com/buger/jsonparser"
 )
 
 type Room struct {
@@ -46,4 +49,33 @@ func (r *Room) GetRoomSize() int {
 		size++
 	}
 	return size
+}
+
+func (r *Room) HandleGame() {
+	log.Println("Room activated")
+	for {
+		if r.player1 == nil {
+			continue
+		}
+		messageType, message, err := r.player1.ws.ReadMessage()
+		log.Println(messageType)
+		if err != nil {
+			log.Println("Some error:", err)
+			r.player1 = nil
+			return
+		}
+		log.Println("Get message.")
+
+		reqAction, _ := jsonparser.GetString(message, "action")
+		reqBody, _, _, _ := jsonparser.Get(message, "body")
+
+		switch reqAction {
+		case "request-moves":
+			log.Println("Request moves")
+			r.handleRequestMoves(reqBody, r.player1.ws)
+		case "move-piece":
+			log.Println("Move piece")
+			r.handleMovePiece(reqBody, r.player1.ws)
+		}
+	}
 }

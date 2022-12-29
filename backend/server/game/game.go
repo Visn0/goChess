@@ -10,13 +10,13 @@ func NewGame() *Game {
 	return &Game{Board: NewBoard()}
 }
 
-func (g *Game) Move(fromRank, fromFile, toRank, toFile int) {
-	p := g.Board.GetPiece(fromRank, fromFile)
-	g.Board.SetPiece(toRank, toFile, p)
-	g.Board.SetPiece(fromRank, fromFile, nil)
+func (g *Game) Move(src, dst *Move) {
+	p := g.Board.GetPiece(src.Rank, src.File)
+	g.Board.SetPiece(dst.Rank, dst.File, p)
+	g.Board.RemovePiece(src.Rank, src.File)
 }
 
-func (g *Game) GetValidMoves(rank, file int) []*Move {
+func (g *Game) GetValidMoves(rank Rank, file File) []*Move {
 	fmt.Println("Getting valid moves for", rank, file)
 	p := g.Board.GetPiece(rank, file)
 	if p == nil {
@@ -30,7 +30,8 @@ func (g *Game) GetValidMoves(rank, file int) []*Move {
 	moves := []*Move{}
 	for _, d := range p.ValidDirections {
 		for {
-			move := &Move{Rank: rank + d.x, File: file + d.y}
+			move := &Move{Rank: rank, File: file}
+			move.Add(d)
 			if !move.Valid() {
 				break
 			}

@@ -4,11 +4,6 @@ type Board struct {
 	board [][]*Piece
 }
 
-const (
-	INIT_BOARD  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-	EMPTY_BOARD = "8/8/8/8/8/8/8/8"
-)
-
 func NewBoard() *Board {
 	return NewBoardFromFEN(INIT_BOARD)
 }
@@ -21,18 +16,18 @@ func NewBoardFromFEN(fen string) *Board {
 	for i := range b.board {
 		b.board[i] = make([]*Piece, 8)
 	}
-	rank, file := 0, 0
+	rank, file := _8, A
 	for _, piece := range fen {
 		if piece == ' ' { // TODO: handle other parts of FEN
 			break
 		}
 		if piece == '/' {
-			rank++
+			rank--
 			file = 0
 			continue
 		}
 		if piece >= '1' && piece <= '8' {
-			file += int(piece - '0')
+			file += File(int(piece - '0'))
 			continue
 		}
 		p := fenCharToPiece(string(piece))
@@ -44,12 +39,16 @@ func NewBoardFromFEN(fen string) *Board {
 	return b
 }
 
-func (b *Board) GetPiece(rank, file int) *Piece {
+func (b *Board) GetPiece(rank Rank, file File) *Piece {
 	return b.board[rank][file]
 }
 
-func (b *Board) SetPiece(rank, file int, p *Piece) {
+func (b *Board) SetPiece(rank Rank, file File, p *Piece) {
 	b.board[rank][file] = p
+}
+
+func (b *Board) RemovePiece(rank Rank, file File) {
+	b.board[rank][file] = nil
 }
 
 func fenCharToPiece(fen string) *Piece {

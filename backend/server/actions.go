@@ -17,7 +17,7 @@ type ResponseMoves struct {
 	ValidMoves []*game.Move `json:"validMoves"`
 }
 
-func (s *Server) handleRequestMoves(body []byte, c *wsConn) {
+func (r *Room) handleRequestMoves(body []byte, c *wsConn) {
 	log.Println("handle request moves")
 	req := RequestMoves{}
 	err := json.Unmarshal(body, &req)
@@ -26,13 +26,7 @@ func (s *Server) handleRequestMoves(body []byte, c *wsConn) {
 		return
 	}
 
-	fmt.Println("Searching room")
-	room, ok := s.rooms["room1"]
-	if !ok {
-		fmt.Println("Room not found")
-		return
-	}
-	validMoves := room.game.GetValidMoves(req.Rank, req.File)
+	validMoves := r.game.GetValidMoves(req.Rank, req.File)
 	for _, move := range validMoves {
 		fmt.Println(move)
 	}
@@ -56,16 +50,17 @@ type ResponseMovePiece struct {
 	Dst    *game.Move `json:"dst"`
 }
 
-func (s *Server) handleMovePiece(body []byte, c *wsConn) {
+func (r *Room) handleMovePiece(body []byte, c *wsConn) {
 	log.Println("handle move piece")
 	req := RequestMovePiece{}
 	json.Unmarshal(body, &req)
 
-	// game.movePiece(req.Src, req.Dst)
+	r.game.Move(req.Src, req.Dst)
 	resp := ResponseMovePiece{
 		Action: "move-piece",
 		Src:    req.Src,
 		Dst:    req.Dst,
 	}
+
 	c.WriteJSON(resp)
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"sync"
@@ -14,7 +15,7 @@ type wsConn = websocket.Conn
 
 type subEvent struct {
 	Connection *wsConn
-	Body       map[string]interface{} // TODO
+	Body       []byte
 }
 
 type Server struct {
@@ -87,34 +88,49 @@ func (s *Server) initWebsocket() {
 	s.app.Get("/ws", websocket.New(func(c *wsConn) {
 
 		log.Println("New ws connection")
-		for {
-			messageType, message, err := c.ReadMessage()
-			log.Println(messageType)
+
+		messageType, message, err := c.ReadMessage()
+		log.Println(messageType)
+		if err != nil {
+			// Error reading because of an unexpected disconnect (probably)
+			log.Println("Some error:", err)
+			// TODO: remove connection from our lists
+			return
+		}
+		log.Println("Get message.")
+
+		reqAction, _ := jsonparser.GetString(message, "action")
+		reqBody, _, _, _ := jsonparser.Get(message, "body")
+
+		switch reqAction {
+		case "create-room":
+			log.Println("New subscription")
+			s.register <- subEvent{
+				Connection: c,
+				Body:       reqBody,
+			}
+			req := RequestCreateRoom{}
+			err := json.Unmarshal(reqBody, &req)
 			if err != nil {
-				// Error reading because of an unexpected disconnect (probably)
-				log.Println("Some error:", err)
-				// TODO: remove connection from our lists
+				log.Println("Error unmarshalling request create room:", err)
 				return
 			}
-			log.Println("Get message.")
 
-			reqAction, _ := jsonparser.GetString(message, "action")
-			reqBody, _, _, _ := jsonparser.Get(message, "body")
-
-			switch reqAction {
-			case "create-room":
-				log.Println("New subscription")
-				s.register <- subEvent{
-					Connection: c,
-					Body:       map[string]interface{}{},
+			room, ok := s.rooms[req.Name]
+			if !ok {
+				room = NewRoom()
+				player := &Player{
+					ws:   c,
+					name: "player1",
 				}
-			case "request-moves":
-				s.handleRequestMoves(reqBody, c)
-
-			case "move-piece":
-				s.handleMovePiece(reqBody, c)
+				room.AddPlayer(player)
+				s.rooms[req.Name] = room
+				log.Println("Room created")
+				go room.HandleGame()
+			} else {
+				_ = room
+				log.Println("Room already exists")
 			}
-
 		}
 	}))
 }
@@ -131,6 +147,11 @@ func (s *Server) removeSubscription(event subEvent) {
 	defer s.wsConnectionsMutex.Unlock()
 	delete(s.wsConnections, event.Connection)
 	log.Println("connection unregistered")
+}
+
+type RequestCreateRoom struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 func (s *Server) handleSubscriptions() {

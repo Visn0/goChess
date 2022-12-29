@@ -8,7 +8,7 @@ type Direction struct {
 type Piece struct {
 	Name            string
 	Black           bool
-	ValidDirections []*Direction
+	ValidDirections []Direction
 	ValidMoves      []*Move
 }
 
@@ -17,13 +17,13 @@ func NewPawn(black bool) *Piece {
 		return &Piece{
 			Name:            "pawn",
 			Black:           black,
-			ValidDirections: []*Direction{{1, 0}},
+			ValidDirections: []Direction{{1, 0}},
 		}
 	}
 	return &Piece{
 		Name:            "pawn",
 		Black:           black,
-		ValidDirections: []*Direction{{-1, 0}},
+		ValidDirections: []Direction{{-1, 0}},
 	}
 }
 
@@ -31,7 +31,7 @@ func NewRook(black bool) *Piece {
 	return &Piece{
 		Name:            "rook",
 		Black:           black,
-		ValidDirections: []*Direction{{1, 0}, {0, 1}},
+		ValidDirections: []Direction{{1, 0}, {0, 1}},
 	}
 }
 
@@ -39,7 +39,7 @@ func NewKnight(black bool) *Piece {
 	return &Piece{
 		Name:  "knight",
 		Black: black,
-		ValidDirections: []*Direction{
+		ValidDirections: []Direction{
 			{1, -2}, {1, 2},
 			{-1, -2}, {-1, 2},
 			{2, -1}, {2, 1},
@@ -52,7 +52,7 @@ func NewBishop(black bool) *Piece {
 	return &Piece{
 		Name:  "bishop",
 		Black: black,
-		ValidDirections: []*Direction{
+		ValidDirections: []Direction{
 			{-1, -1},
 			{-1, 1},
 			{1, 1},
@@ -65,7 +65,7 @@ func NewQueen(black bool) *Piece {
 	return &Piece{
 		Name:  "queen",
 		Black: black,
-		ValidDirections: []*Direction{
+		ValidDirections: []Direction{
 			{-1, -1},
 			{-1, 1},
 			{1, 1},
@@ -82,7 +82,7 @@ func NewKing(black bool) *Piece {
 	return &Piece{
 		Name:  "king",
 		Black: black,
-		ValidDirections: []*Direction{
+		ValidDirections: []Direction{
 			{-1, -1},
 			{-1, 1},
 			{1, 1},
