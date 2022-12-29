@@ -38,7 +38,7 @@ function MovePieceAction(repository: ConnectionRepository, gameController: GameC
     }
 
     const m = new MovePieceMessage(srcSquare.square, dst)
-    repository.sendMessage(m)
+    repository.sendWebSocketMessage(m)
 }
 
 export { MovePieceAction, MovePieceMessage }

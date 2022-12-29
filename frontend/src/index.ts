@@ -19,6 +19,8 @@ window.onload = () => {
 const btnCreateRoom = document.getElementById('btn-create-room') as HTMLElement
 btnCreateRoom.onclick = () => {
     gameController.createRoom('room', 'pass')
+    repository.sendHTTPRequest("GET", "rooms", null)
 }
 
-export {}
+
+export { }
