@@ -1,4 +1,4 @@
-import { ConnectionRepository, Message } from '../../backend/connection_repository'
+import { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
 
 class CreateRoomMessage implements Message {
     action: string

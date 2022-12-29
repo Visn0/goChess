@@ -1,4 +1,4 @@
-import { ConnectionRepository, Message } from '../../backend/connection_repository'
+import { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
 import { File, Rank } from '../../constants'
 import { GameController } from '../../game_controller'
 import { Square } from '../../square'

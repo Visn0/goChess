@@ -25,7 +25,9 @@ class Square {
         const piece = this._piece?.toDivHTMLString() || ''
         const cell = `
             <td id="${this.id}" class="board-square ${this.color}">
-                ${piece}
+                <div id="${this.id}-piece" class="piece">
+                    ${piece}
+                </div>
                 <div id="${this.id}-valid-move" class="board-square valid-move" hidden>                    
                 </div>                
             </td>
@@ -53,15 +55,15 @@ class Square {
         return this._piece === null
     }
 
-    private updateRender() {
+    private updatePieceRender() {
         const piece = this._piece?.toDivHTMLString() || ''
-        const element = document.getElementById(this.id) as HTMLElement
+        const element = document.getElementById(`${this.id}-piece`) as HTMLElement
         element.innerHTML = piece
     }
 
     public setPiece(piece: Piece | null) {
         this._piece = piece
-        this.updateRender()
+        this.updatePieceRender()
     }
 
     public setAsValidMove() {
