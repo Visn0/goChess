@@ -5,21 +5,21 @@ import { ConnectionRepository, Message } from './connection_repository'
 class MockConnectionRepository implements ConnectionRepository {
     private readonly onMessageEventTopic: string = 'mock-repository-onMessageEvent-topic'
 
-    public openConnection() {
+    public openWebSocketConnection() {
         console.log('=> Connection opened')
     }
 
-    public closeConnection() {
+    public closeWebSocketConnection() {
         console.log('=> Connection closed')
     }
 
-    public addOnMessageEventListener(fn: (e: MessageEvent) => void) {
+    public addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void) {
         document.addEventListener(this.onMessageEventTopic, (e: Event) => {
             fn(e as MessageEvent)
         })
     }
 
-    public sendMessage(message: Message) {
+    public sendWebSocketMessage(message: Message) {
         const me = this.messageEventFactory(message)
         document.dispatchEvent(me)
     }
@@ -66,6 +66,10 @@ class MockConnectionRepository implements ConnectionRepository {
         })
 
         return new MessageEvent(this.onMessageEventTopic, { data: data })
+    }
+
+    public sendHTTPRequest(method: string, path: string, body: any): any {
+        return null
     }
 }
 

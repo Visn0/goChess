@@ -8,6 +8,7 @@ import (
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	websocket "github.com/gofiber/websocket/v2"
 )
 
@@ -49,6 +50,8 @@ func NewServer(addr, port string) *Server {
 
 // The server instantiates the middleware (the proxy)
 func (s *Server) initMiddleware() {
+	s.app.Use(cors.New())
+
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
 		if !c.IsFromLocal() {
@@ -60,14 +63,18 @@ func (s *Server) initMiddleware() {
 			return c.Next()
 		}
 		log.Println("HTTP request")
-		// Don't accept not websockets connections
-		return c.SendStatus(fiber.StatusUpgradeRequired)
+		return c.SendStatus(fiber.StatusAccepted)
 	})
 }
 
 // The server instantiates the router (routes for http and ws conections).
 func (s *Server) initRouter() {
 	s.initWebsocket()
+
+	s.app.Get("/", func(ctx *fiber.Ctx) error {
+		log.Println("############# ROOMS endpoint")
+		return ctx.JSON(s)
+	})
 }
 
 func (s *Server) Run() {

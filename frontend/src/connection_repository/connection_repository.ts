@@ -4,10 +4,12 @@ interface Message {
 }
 
 interface ConnectionRepository {
-    openConnection(): void
-    closeConnection(): void
-    addOnMessageEventListener(fn: (e: MessageEvent) => void): void
-    sendMessage(message: Message): void
+    openWebSocketConnection(): void
+    closeWebSocketConnection(): void
+    addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void): void
+    sendWebSocketMessage(message: Message): void
+
+    sendHTTPRequest(method: string, path: string, body: any): any
 }
 
 export { ConnectionRepository, Message }

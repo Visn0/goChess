@@ -51,8 +51,8 @@ class GameController {
     }
 
     public openWebSocketConnetion() {
-        this.repository.openConnection()
-        this.repository.addOnMessageEventListener(this.onWebSocketMessage.bind(this))
+        this.repository.openWebSocketConnection()
+        this.repository.addOnWebSocketMessageEventListener(this.onWebSocketMessage.bind(this))
     }
 
     private onWebSocketMessage(event: MessageEvent) {
