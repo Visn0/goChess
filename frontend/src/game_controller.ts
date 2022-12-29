@@ -73,6 +73,11 @@ class GameController {
 
         const square = this._board.getSquare(file, rank)
         if (this.isSrcSquareSelected()) {
+            if (this._srcSquare?.equals(square)) {
+                this.unselectSrcSquare()
+                return
+            }
+
             MovePieceAction(this.repository, this, square)
             this.unselectSrcSquare()
             return
@@ -121,6 +126,10 @@ class SrcSquare {
     public canInnerPieceMoveTo(dst: Square): boolean {
         const found = this.validMoves.find((m: Square) => m.file === dst.file && m.rank === dst.rank)
         return found !== undefined
+    }
+
+    public equals(s: Square): boolean {
+        return this.square.equals(s)
     }
 }
 

@@ -83,6 +83,10 @@ class Square {
 
         element.hidden = true
     }
+
+    public equals(s: Square): boolean {
+        return this.file === s.file && this.rank === s.rank
+    }
 }
 
 export { Square }
