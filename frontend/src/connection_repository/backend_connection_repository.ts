@@ -44,30 +44,32 @@ class BackendConnectionRepository implements ConnectionRepository {
         this.connection?.send(JSON.stringify(message))
     }
 
-    public sendHTTPRequest(method: string, path: string, body: any): any {
+    public sendHTTPRequest(method: string, path: string, body: any): Promise<Response> {
         const protocol = window.location.protocol.includes('s') ? 'https' : 'http'
         let url = `${protocol}://${this.host}:${this.port}`
         if (path !== '') {
             url += `/${path}`
         }
 
-        const params = {
-            headers: {
-                // 'content-type': 'application/json; charset=UTF-8',
-            },
-            body: body,
-            method: method
+        const headers = {
+            'Content-Type': 'application/json; charset=UTF-8'
         }
 
+        let params = null
+        if (method === 'GET' || body === null || body === '' || body === undefined) {
+            params = {
+                headers: headers,
+                method: method
+            }
+        } else {
+            params = {
+                headers: headers,
+                method: method,
+                body: JSON.stringify(body)
+            }
+        }
 
-        console.log(url, params)
-        fetch(url, params)
-            .then((res) => {
-                console.log(res)
-                return res.body
-            })
-            .then((res) => console.log(res))
-            .catch((error) => console.log(error))
+        return fetch(url, params)
     }
 }
 

@@ -4,6 +4,7 @@ import { MockConnectionRepository } from './connection_repository/mock_connectio
 import { Board } from './board'
 import { Color, constants } from './constants'
 import { GameController } from './game_controller'
+import { RequestRoomsAction } from './actions/send/request_rooms'
 
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
 const repository: ConnectionRepository = new MockConnectionRepository()
@@ -14,6 +15,9 @@ window.onload = () => {
     board.initFromFenNotation(constants.StartingPosition)
     board.render(Color.WHITE)
     gameController.openWebSocketConnetion()
+
+    RequestRoomsAction(repository, 'modal-list-rooms-body')
+    setInterval(() => RequestRoomsAction(repository, 'modal-list-rooms-body'), 10000)
 }
 
 const btnCreateRoom = document.getElementById('btn-create-room') as HTMLElement
