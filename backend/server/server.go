@@ -3,10 +3,8 @@ package server
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
@@ -73,38 +71,7 @@ func (s *Server) initMiddleware() {
 // The server instantiates the router (routes for http and ws conections).
 func (s *Server) initRouter() {
 	s.initWebsocket()
-
-	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
-		log.Println("############# ROOMS endpoint")
-		type Player struct {
-			ID string `json:"id"`
-		}
-		type Room struct {
-			ID      string    `json:"id"`
-			Players []*Player `json:"players"`
-		}
-
-		rooms := make([]*Room, 0, 2)
-		for i := 0; i < 2; i++ {
-			p1 := &Player{
-				ID: fmt.Sprintf("%v", time.Now().Unix()),
-			}
-			p2 := &Player{
-				ID: fmt.Sprintf("%v", time.Now().Unix()+1),
-			}
-
-			rooms = append(rooms, &Room{
-				ID:      fmt.Sprintf("%v", time.Now().Unix()+2),
-				Players: []*Player{p1, p2},
-			})
-		}
-
-		b, err := json.Marshal(rooms)
-		if err != nil {
-			return ctx.SendStatus(500)
-		}
-		return ctx.Send(b)
-	})
+	s.initHttp()
 }
 
 func (s *Server) Run() {
@@ -158,13 +125,76 @@ func (s *Server) initWebsocket() {
 	}))
 }
 
+type PlayerPublicInfo struct {
+	ID string `json:"id"`
+}
+type RoomPublicInfo struct {
+	ID      string              `json:"id"`
+	Players []*PlayerPublicInfo `json:"players"`
+}
+type ResponseHttpRooms struct {
+	Rooms []*RoomPublicInfo `json:"rooms"`
+}
+
+func (s *Server) initHttp() {
+	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
+		log.Println("############# ROOMS endpoint")
+		/////////////////////////////////////////
+		roomTest1 := &Room{
+			player1: &Player{
+				ws: nil,
+				id: "player1",
+			},
+			player2: &Player{
+				ws: nil,
+				id: "player2",
+			},
+			game: nil,
+		}
+		roomTest2 := &Room{
+			player1: &Player{
+				ws: nil,
+				id: "player3",
+			},
+			player2: &Player{
+				ws: nil,
+				id: "player4",
+			},
+			game: nil,
+		}
+		s.rooms["roomTest1"] = roomTest1
+		s.rooms["roomTest2"] = roomTest2
+		/////////////////////////////////////////
+		rooms := make([]*RoomPublicInfo, 0, len(s.rooms))
+		idx := 0
+		for id, room := range s.rooms {
+			players := make([]*PlayerPublicInfo, 0, 2)
+			if room.player1 != nil {
+				players = append(players, &PlayerPublicInfo{ID: room.player1.id})
+			}
+			if room.player2 != nil {
+				players = append(players, &PlayerPublicInfo{ID: room.player2.id})
+			}
+			rooms[idx] = &RoomPublicInfo{
+				ID:      id,
+				Players: players,
+			}
+			idx++
+		}
+		resp := ResponseHttpRooms{
+			Rooms: rooms,
+		}
+		return ctx.JSON(resp)
+	})
+}
+
 func (s *Server) createRoom(req RequestCreateRoom, ws *wsConn) error {
 	room, ok := s.rooms[req.Name]
 	if !ok {
 		room = NewRoom()
 		player := &Player{
-			ws:   ws,
-			name: "player1",
+			ws: ws,
+			id: "player1",
 		}
 		room.AddPlayer(player)
 		s.rooms[req.Name] = room
@@ -191,11 +221,6 @@ func (s *Server) removeSubscription(event subEvent) {
 	log.Println("connection unregistered")
 }
 
-type RequestCreateRoom struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
-}
-
 func (s *Server) handleSubscriptions() {
 	defer func() {
 		close(s.register)
@@ -211,4 +236,9 @@ func (s *Server) handleSubscriptions() {
 			s.removeSubscription(event)
 		}
 	}
+}
+
+type RequestCreateRoom struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }

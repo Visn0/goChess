@@ -7,32 +7,28 @@
 	}
 	Response
 	{
-		"action": "get-rooms-info",
-		"body": {
-			"rooms": [
-				{
-					"id": "roomName",
-					"players": [
-                        {
-                            "id": "player1",
-                        },
-                        {
-                            "id": "player2",
-                        }
-                    ]
-				},
-				{
-					"id": "roomName2",
-					"players": [
-                        {
-                            "id": "player1",
-                        },
-                        {
-                            "id": "player2",
-                        }
-                    ]
-				},
-			]
-		}
-	}
+		"rooms": [
+			{
+				"id": "roomName",
+				"players": [
+					{
+						"id": "player1",
+					},
+					{
+						"id": "player2",
+					}
+				]
+			},
+			{
+				"id": "roomName2",
+				"players": [
+					{
+						"id": "player1",
+					},
+					{
+						"id": "player2",
+					}
+				]
+			},
+		]
 }
