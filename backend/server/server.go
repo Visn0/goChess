@@ -93,7 +93,6 @@ func (s *Server) Run() {
 // Configures the route for ws requests and handles them
 func (s *Server) initWebsocket() {
 	s.app.Get("/ws", websocket.New(func(c *wsConn) {
-
 		log.Println("New ws connection")
 
 		messageType, message, err := c.ReadMessage()
@@ -123,23 +122,29 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			room, ok := s.rooms[req.Name]
-			if !ok {
-				room = NewRoom()
-				player := &Player{
-					ws:   c,
-					name: "player1",
-				}
-				room.AddPlayer(player)
-				s.rooms[req.Name] = room
-				log.Println("Room created")
-				go room.HandleGame()
-			} else {
-				_ = room
-				log.Println("Room already exists")
-			}
+			_ = s.createRoom(req, c)
+			// case "join-room":
 		}
 	}))
+}
+
+func (s *Server) createRoom(req RequestCreateRoom, ws *wsConn) error {
+	room, ok := s.rooms[req.Name]
+	if !ok {
+		room = NewRoom()
+		player := &Player{
+			ws:   ws,
+			name: "player1",
+		}
+		room.AddPlayer(player)
+		s.rooms[req.Name] = room
+		log.Println("Room created")
+		go room.HandleGame()
+	} else { // TODO: generate name from server side
+		_ = room
+		log.Println("Room already exists")
+	}
+	return nil
 }
 
 func (s *Server) addSubscription(event subEvent) {

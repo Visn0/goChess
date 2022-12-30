@@ -1,0 +1,94 @@
+
+############################################
+## CreateRoom
+{
+	Request
+	{
+		"action": "create-room",
+		"body": {
+			"name": "roomName",
+			"password": "roomPassword"
+		}
+	}
+	Response
+	{
+		"action": "create-room",
+		"httpCode": 200
+	}
+}
+############################################
+## JoinRoom
+{
+    Request
+    {
+        "action": "join-room",
+        "body": {
+            "name": "roomName",
+            "password": "roomPassword"
+        }
+    }
+    Response
+    {
+        "action": "join-room",
+        "httpCode": 200
+    }
+}
+
+###############################################
+## RequestMoves
+{
+	Request
+	{
+		"action": "request-moves",
+		"body": {
+			file: 1,
+			rank: 4,
+			piece: "pawn",
+		}
+	}
+	Response
+	{
+		"action": "request-moves",
+		"validMoves": [
+			{ file: 1, rank: 1},
+			{ file: 2, rank: 1},
+		]
+	}
+}
+###############################################
+## MovePiece
+{
+	Request
+	{
+		"action": "move-piece",
+		"body": {
+			src: {
+				file: 1
+				rank: 4
+			}
+			dst: {
+				file: 1
+				rank: 5
+			}
+		}
+	}
+	Response
+	{
+		"action": "move-piece",
+		"body": {
+			src: {
+				file: 1
+				rank: 4
+			}
+			dst: {
+				file: 1
+				rank: 5
+			}
+		}
+	}
+}
+
+
+
+
+
