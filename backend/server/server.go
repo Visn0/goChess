@@ -3,8 +3,10 @@ package server
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
@@ -63,7 +65,8 @@ func (s *Server) initMiddleware() {
 			return c.Next()
 		}
 		log.Println("HTTP request")
-		return c.SendStatus(fiber.StatusAccepted)
+		log.Println(c.BaseURL(), c.OriginalURL())
+		return c.Next()
 	})
 }
 
@@ -71,9 +74,36 @@ func (s *Server) initMiddleware() {
 func (s *Server) initRouter() {
 	s.initWebsocket()
 
-	s.app.Get("/", func(ctx *fiber.Ctx) error {
+	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
 		log.Println("############# ROOMS endpoint")
-		return ctx.JSON(s)
+		type Player struct {
+			ID string `json:"id"`
+		}
+		type Room struct {
+			ID      string    `json:"id"`
+			Players []*Player `json:"players"`
+		}
+
+		rooms := make([]*Room, 0, 2)
+		for i := 0; i < 2; i++ {
+			p1 := &Player{
+				ID: fmt.Sprintf("%v", time.Now().Unix()),
+			}
+			p2 := &Player{
+				ID: fmt.Sprintf("%v", time.Now().Unix()+1),
+			}
+
+			rooms = append(rooms, &Room{
+				ID:      fmt.Sprintf("%v", time.Now().Unix()+2),
+				Players: []*Player{p1, p2},
+			})
+		}
+
+		b, err := json.Marshal(rooms)
+		if err != nil {
+			return ctx.SendStatus(500)
+		}
+		return ctx.Send(b)
 	})
 }
 

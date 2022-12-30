@@ -9,7 +9,7 @@ interface ConnectionRepository {
     addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void): void
     sendWebSocketMessage(message: Message): void
 
-    sendHTTPRequest(method: string, path: string, body: any): any
+    sendHTTPRequest(method: string, path: string, body: any): Promise<Response>
 }
 
 export { ConnectionRepository, Message }
