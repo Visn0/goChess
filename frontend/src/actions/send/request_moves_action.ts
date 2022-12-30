@@ -1,4 +1,4 @@
-import { ConnectionRepository, Message } from '../../backend/connection_repository'
+import { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
 import { PieceType, File, Rank } from '../../constants'
 import { Square } from '../../square'
 
@@ -22,7 +22,7 @@ class RequestMovesMessage implements Message {
 
 function RequestMovesAction(repository: ConnectionRepository, square: Square) {
     const m = new RequestMovesMessage(square.file, square.rank, square.piece?.type as PieceType)
-    repository.sendMessage(m)
+    repository.sendWebSocketMessage(m)
 }
 
 export { RequestMovesAction, RequestMovesMessage }

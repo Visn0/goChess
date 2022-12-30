@@ -5,21 +5,21 @@ import { ConnectionRepository, Message } from './connection_repository'
 class MockConnectionRepository implements ConnectionRepository {
     private readonly onMessageEventTopic: string = 'mock-repository-onMessageEvent-topic'
 
-    public openConnection() {
+    public openWebSocketConnection() {
         console.log('=> Connection opened')
     }
 
-    public closeConnection() {
+    public closeWebSocketConnection() {
         console.log('=> Connection closed')
     }
 
-    public addOnMessageEventListener(fn: (e: MessageEvent) => void) {
+    public addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void) {
         document.addEventListener(this.onMessageEventTopic, (e: Event) => {
             fn(e as MessageEvent)
         })
     }
 
-    public sendMessage(message: Message) {
+    public sendWebSocketMessage(message: Message) {
         const me = this.messageEventFactory(message)
         document.dispatchEvent(me)
     }
@@ -27,7 +27,7 @@ class MockConnectionRepository implements ConnectionRepository {
     private messageEventFactory(message: Message): MessageEvent {
         switch (message.action) {
             case 'create-room':
-                return new MessageEvent(this.onMessageEventTopic, { data: { action: 'create-room' } })
+                return new MessageEvent(this.onMessageEventTopic, { data: JSON.stringify({ action: 'create-room' }) })
             case 'request-moves':
                 return this.createMovesReceivedMessage()
             case 'move-piece':
@@ -47,13 +47,13 @@ class MockConnectionRepository implements ConnectionRepository {
             }
         }
 
-        const data = { action: 'request-moves', validMoves: moves }
+        const data = JSON.stringify({ action: 'request-moves', validMoves: moves })
         return new MessageEvent(this.onMessageEventTopic, { data: data })
     }
 
     private createPieceMovedMessage(message: Message): MessageEvent {
         const m = message as MovePieceMessage
-        const data = {
+        const data = JSON.stringify({
             action: 'move-piece',
             src: {
                 file: m.body.src.file,
@@ -63,8 +63,13 @@ class MockConnectionRepository implements ConnectionRepository {
                 file: m.body.dst.file,
                 rank: m.body.dst.rank
             }
-        }
+        })
+
         return new MessageEvent(this.onMessageEventTopic, { data: data })
+    }
+
+    public sendHTTPRequest(method: string, path: string, body: any): any {
+        return null
     }
 }
 

@@ -1,4 +1,4 @@
-import { ConnectionRepository, Message } from '../../backend/connection_repository'
+import { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
 
 class CreateRoomMessage implements Message {
     action: string
@@ -18,7 +18,7 @@ class CreateRoomMessage implements Message {
 
 function CreateRoomAction(repository: ConnectionRepository, roomName: string, roomPassword: string) {
     const m = new CreateRoomMessage(roomName, roomPassword)
-    repository.sendMessage(m)
+    repository.sendWebSocketMessage(m)
 }
 
 export { CreateRoomAction, CreateRoomMessage }

@@ -2,7 +2,7 @@ import { eventTopics } from './constants'
 import { Board } from './board'
 import { File, Rank } from './constants'
 import { Square } from './square'
-import { ConnectionRepository } from './backend/connection_repository'
+import { ConnectionRepository } from './connection_repository/connection_repository'
 import { ReceiveAction } from './actions/receive/receive_action'
 import { CreateRoomAction } from './actions/send/create_room_action'
 import { RoomCreatedAction } from './actions/receive/room_created_action'
@@ -51,8 +51,8 @@ class GameController {
     }
 
     public openWebSocketConnetion() {
-        this.repository.openConnection()
-        this.repository.addOnMessageEventListener(this.onWebSocketMessage.bind(this))
+        this.repository.openWebSocketConnection()
+        this.repository.addOnWebSocketMessageEventListener(this.onWebSocketMessage.bind(this))
     }
 
     private onWebSocketMessage(event: MessageEvent) {
@@ -73,6 +73,11 @@ class GameController {
 
         const square = this._board.getSquare(file, rank)
         if (this.isSrcSquareSelected()) {
+            if (this._srcSquare?.equals(square)) {
+                this.unselectSrcSquare()
+                return
+            }
+
             MovePieceAction(this.repository, this, square)
             this.unselectSrcSquare()
             return
@@ -121,6 +126,10 @@ class SrcSquare {
     public canInnerPieceMoveTo(dst: Square): boolean {
         const found = this.validMoves.find((m: Square) => m.file === dst.file && m.rank === dst.rank)
         return found !== undefined
+    }
+
+    public equals(s: Square): boolean {
+        return this.square.equals(s)
     }
 }
 

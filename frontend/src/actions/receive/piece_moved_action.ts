@@ -1,4 +1,3 @@
-import { Board } from '../../board'
 import { File, Rank } from '../../constants'
 import { GameController } from '../../game_controller'
 import { Square } from '../../square'
