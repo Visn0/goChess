@@ -7,6 +7,60 @@ import (
 	"log"
 )
 
+type RequestCreateRoom struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
+	req := RequestCreateRoom{}
+	err := json.Unmarshal(body, &req)
+	if err != nil {
+		log.Println("Error unmarshalling request create room:", err)
+		return err
+	}
+	_, ok := s.rooms[req.Name]
+	if ok {
+		return fmt.Errorf("room already exists")
+	}
+	room := NewRoom()
+	player := &Player{
+		ws: c,
+		id: "player1",
+	}
+	room.AddPlayer(player)
+	s.rooms[req.Name] = room
+	log.Println("Room created")
+	go room.HandleGame(true)
+	return nil
+}
+
+type RequestJoinRoom struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
+	req := RequestJoinRoom{}
+	err := json.Unmarshal(body, &req)
+	if err != nil {
+		log.Println("Error unmarshalling request join room:", err)
+		return err
+	}
+	room, ok := s.rooms[req.Name]
+	if !ok {
+		return fmt.Errorf("room does not exist")
+	}
+	player := &Player{
+		ws: c,
+		id: "player2",
+	}
+	room.AddPlayer(player)
+	log.Println("Player joined room")
+	go room.HandleGame(false)
+	return nil
+}
+
 type RequestMoves struct {
 	*game.Move
 	Piece string `json:"piece"`

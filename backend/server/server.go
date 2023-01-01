@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"sync"
@@ -107,20 +106,25 @@ func (s *Server) initWebsocket() {
 
 		switch reqAction {
 		case "create-room":
-			log.Println("New subscription")
+			log.Println("Request create room")
 			s.register <- subEvent{
 				Connection: c,
 				Body:       reqBody,
 			}
-			req := RequestCreateRoom{}
-			err := json.Unmarshal(reqBody, &req)
+			err = s.handleCreateRoom(reqBody, c)
 			if err != nil {
-				log.Println("Error unmarshalling request create room:", err)
-				return
+				c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 			}
-
-			_ = s.createRoom(req, c)
-			// case "join-room":
+		case "join-room":
+			log.Println("Request join room")
+			s.register <- subEvent{
+				Connection: c,
+				Body:       reqBody,
+			}
+			err = s.handleJoinRoom(reqBody, c)
+			if err != nil {
+				c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			}
 		}
 	}))
 }
@@ -188,25 +192,6 @@ func (s *Server) initHttp() {
 	})
 }
 
-func (s *Server) createRoom(req RequestCreateRoom, ws *wsConn) error {
-	room, ok := s.rooms[req.Name]
-	if !ok {
-		room = NewRoom()
-		player := &Player{
-			ws: ws,
-			id: "player1",
-		}
-		room.AddPlayer(player)
-		s.rooms[req.Name] = room
-		log.Println("Room created")
-		go room.HandleGame()
-	} else { // TODO: generate name from server side
-		_ = room
-		log.Println("Room already exists")
-	}
-	return nil
-}
-
 func (s *Server) addSubscription(event subEvent) {
 	s.wsConnectionsMutex.Lock()
 	defer s.wsConnectionsMutex.Unlock()
@@ -236,9 +221,4 @@ func (s *Server) handleSubscriptions() {
 			s.removeSubscription(event)
 		}
 	}
-}
-
-type RequestCreateRoom struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
 }

@@ -51,17 +51,23 @@ func (r *Room) GetRoomSize() int {
 	return size
 }
 
-func (r *Room) HandleGame() {
+func (r *Room) HandleGame(isHost bool) {
 	log.Println("Room activated")
+	var player *Player
+	if isHost {
+		player = r.player1
+	} else {
+		player = r.player2
+	}
 	for {
-		if r.player1 == nil {
-			continue
+		if player == nil {
+			return
 		}
-		messageType, message, err := r.player1.ws.ReadMessage()
+		messageType, message, err := player.ws.ReadMessage()
 		log.Println(messageType)
 		if err != nil {
 			log.Println("Some error:", err)
-			r.player1 = nil
+			player = nil
 			return
 		}
 		log.Println("Get message.")
@@ -72,10 +78,12 @@ func (r *Room) HandleGame() {
 		switch reqAction {
 		case "request-moves":
 			log.Println("Request moves")
-			r.handleRequestMoves(reqBody, r.player1.ws)
+			r.handleRequestMoves(reqBody, player.ws)
 		case "move-piece":
 			log.Println("Move piece")
-			r.handleMovePiece(reqBody, r.player1.ws)
+			r.handleMovePiece(reqBody, player.ws)
+		default:
+			log.Println("Unknown action")
 		}
 	}
 }
