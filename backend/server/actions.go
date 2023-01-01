@@ -12,15 +12,28 @@ type RequestCreateRoom struct {
 	Password string `json:"password"`
 }
 
+type ResponseCreateRoom struct {
+	Action   string `json:"action"`
+	HttpCode int    `json:"httpCode"`
+}
+
 func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	req := RequestCreateRoom{}
+	resp := ResponseCreateRoom{
+		Action:   "create-room",
+		HttpCode: 200,
+	}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("Error unmarshalling request create room:", err)
+		resp.HttpCode = 400
+		c.WriteJSON(resp)
 		return err
 	}
 	_, ok := s.rooms[req.Name]
 	if ok {
+		resp.HttpCode = 400
+		c.WriteJSON(resp)
 		return fmt.Errorf("room already exists")
 	}
 	room := NewRoom()
@@ -32,6 +45,8 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	s.rooms[req.Name] = room
 	log.Println("Room created")
 	go room.HandleGame(true)
+
+	c.WriteJSON(resp)
 	return nil
 }
 
@@ -40,15 +55,28 @@ type RequestJoinRoom struct {
 	Password string `json:"password"`
 }
 
+type ResponseJoinRoom struct {
+	Action   string `json:"action"`
+	HttpCode int    `json:"httpCode"`
+}
+
 func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
 	req := RequestJoinRoom{}
+	resp := ResponseJoinRoom{
+		Action:   "join-room",
+		HttpCode: 200,
+	}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("Error unmarshalling request join room:", err)
+		resp.HttpCode = 400
+		c.WriteJSON(resp)
 		return err
 	}
 	room, ok := s.rooms[req.Name]
 	if !ok {
+		resp.HttpCode = 400
+		c.WriteJSON(resp)
 		return fmt.Errorf("room does not exist")
 	}
 	player := &Player{
@@ -58,6 +86,8 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
 	room.AddPlayer(player)
 	log.Println("Player joined room")
 	go room.HandleGame(false)
+
+	c.WriteJSON(resp)
 	return nil
 }
 

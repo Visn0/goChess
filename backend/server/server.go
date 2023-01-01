@@ -107,13 +107,12 @@ func (s *Server) initWebsocket() {
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
-			s.register <- subEvent{
-				Connection: c,
-				Body:       reqBody,
-			}
 			err = s.handleCreateRoom(reqBody, c)
-			if err != nil {
-				c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			if err == nil {
+				s.register <- subEvent{
+					Connection: c,
+					Body:       reqBody,
+				}
 			}
 		case "join-room":
 			log.Println("Request join room")
@@ -122,8 +121,11 @@ func (s *Server) initWebsocket() {
 				Body:       reqBody,
 			}
 			err = s.handleJoinRoom(reqBody, c)
-			if err != nil {
-				c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			if err == nil {
+				s.register <- subEvent{
+					Connection: c,
+					Body:       reqBody,
+				}
 			}
 		}
 	}))

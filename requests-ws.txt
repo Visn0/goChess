@@ -13,7 +13,7 @@
 	Response
 	{
 		"action": "create-room",
-		"httpCode": 200
+		"httpCode": 200 // 200 = OK, 400 = Error
 	}
 }
 ############################################
@@ -30,7 +30,7 @@
     Response
     {
         "action": "join-room",
-        "httpCode": 200
+        "httpCode": 200 // 200 = OK, 400 = Error
     }
 }
 
