@@ -18,6 +18,7 @@ class CreateRoomMessage implements Message {
 
 function CreateRoomAction(repository: ConnectionRepository, roomName: string, roomPassword: string) {
     const m = new CreateRoomMessage(roomName, roomPassword)
+
     repository.sendWebSocketMessage(m)
 }
 

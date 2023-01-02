@@ -13,7 +13,17 @@
 	Response
 	{
 		"action": "create-room",
-		"httpCode": 200 // 200 = OK, 400 = Error
+		"room": {			
+			"id": "roomName",
+			"players": [
+				{
+					"id": "player1",
+				},
+				{
+					"id": "player2",
+				}
+			]			
+		}
 	}
 }
 ############################################
@@ -30,7 +40,17 @@
     Response
     {
         "action": "join-room",
-        "httpCode": 200 // 200 = OK, 400 = Error
+        "room": {
+            "id": "roomName",
+			"players": [
+				{
+					"id": "player1",
+				},
+				{
+					"id": "player2",
+				}
+			]           
+        }
     }
 }
 

@@ -2,7 +2,6 @@ package server
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"sync"
 
@@ -89,7 +88,7 @@ func (s *Server) Run() {
 
 // Configures the route for ws requests and handles them
 func (s *Server) initWebsocket() {
-	s.app.Get("/ws", websocket.New(func(c *wsConn) {
+	s.app.All("/ws", websocket.New(func(c *wsConn) {
 		log.Println("New ws connection")
 
 		messageType, message, err := c.ReadMessage()

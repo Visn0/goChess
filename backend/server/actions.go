@@ -13,15 +13,24 @@ type RequestCreateRoom struct {
 }
 
 type ResponseCreateRoom struct {
-	Action   string `json:"action"`
-	HttpCode int    `json:"httpCode"`
+	HttpCode int           `json:"httpCode"`
+	Action   string        `json:"action"`
+	Room     *ResponseRoom `json:"room"`
+}
+
+type ResponseRoom struct {
+	ID      string            `json:"id"`
+	Players []*ResponsePlayer `json:"players"`
+}
+
+type ResponsePlayer struct {
+	ID string `json:"id"`
 }
 
 func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	req := RequestCreateRoom{}
 	resp := ResponseCreateRoom{
-		Action:   "create-room",
-		HttpCode: 200,
+		Action: "create-room",
 	}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
@@ -33,8 +42,7 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	_, ok := s.rooms[req.Name]
 	if ok {
 		resp.HttpCode = 400
-		c.WriteJSON(resp)
-		return fmt.Errorf("room already exists")
+		return c.WriteJSON(resp)
 	}
 	room := NewRoom()
 	player := &Player{
@@ -46,6 +54,14 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	log.Println("Room created")
 	go room.HandleGame(true)
 
+	resp.Room = &ResponseRoom{
+		ID: req.Name,
+		Players: []*ResponsePlayer{
+			{
+				ID: player.id,
+			},
+		},
+	}
 	c.WriteJSON(resp)
 	return nil
 }

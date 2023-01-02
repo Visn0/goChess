@@ -10,10 +10,13 @@ import { MovesReceivedAction } from './actions/receive/moves_received_action'
 import { RequestMovesAction } from './actions/send/request_moves_action'
 import { MovePieceAction } from './actions/send/move_piece_action'
 import { PieceMovedAction } from './actions/receive/piece_moved_action'
+import { Rooms } from './room'
 
 class GameController {
     private repository: ConnectionRepository
     private _board: Board
+    private rooms: Rooms
+
     public get board(): Board {
         return this._board
     }
@@ -25,7 +28,8 @@ class GameController {
 
     private receiveActions: Map<string, ReceiveAction>
 
-    constructor(board: Board, repository: ConnectionRepository) {
+    constructor(rooms: Rooms, board: Board, repository: ConnectionRepository) {
+        this.rooms = rooms
         this._board = board
         this.repository = repository
 
@@ -40,7 +44,7 @@ class GameController {
 
     private registerReceiveActions() {
         this.receiveActions = new Map<string, ReceiveAction>([
-            ['create-room', new RoomCreatedAction()],
+            ['create-room', new RoomCreatedAction(this.rooms)],
             ['request-moves', new MovesReceivedAction(this)],
             ['move-piece', new PieceMovedAction(this)]
         ])
@@ -50,7 +54,7 @@ class GameController {
         CreateRoomAction(this.repository, name, password)
     }
 
-    public openWebSocketConnetion() {
+    public openWebSocketConnection() {
         this.repository.openWebSocketConnection()
         this.repository.addOnWebSocketMessageEventListener(this.onWebSocketMessage.bind(this))
     }
