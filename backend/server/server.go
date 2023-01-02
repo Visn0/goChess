@@ -2,6 +2,7 @@ package server
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"sync"
 
@@ -47,7 +48,7 @@ func NewServer(addr, port string) *Server {
 	}
 }
 
-// The server instantiates the middleware (the proxy)
+// The server instantiates the middleware (Sthe proxy)
 func (s *Server) initMiddleware() {
 	s.app.Use(cors.New())
 
@@ -172,7 +173,6 @@ func (s *Server) initHttp() {
 		s.rooms["roomTest2"] = roomTest2
 		/////////////////////////////////////////
 		rooms := make([]*RoomPublicInfo, 0, len(s.rooms))
-		idx := 0
 		for id, room := range s.rooms {
 			players := make([]*PlayerPublicInfo, 0, 2)
 			if room.player1 != nil {
@@ -181,11 +181,10 @@ func (s *Server) initHttp() {
 			if room.player2 != nil {
 				players = append(players, &PlayerPublicInfo{ID: room.player2.id})
 			}
-			rooms[idx] = &RoomPublicInfo{
+			rooms = append(rooms, &RoomPublicInfo{
 				ID:      id,
 				Players: players,
-			}
-			idx++
+			})
 		}
 		resp := ResponseHttpRooms{
 			Rooms: rooms,

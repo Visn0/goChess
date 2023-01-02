@@ -29,7 +29,11 @@ class Room {
             <ul class="list-group list-group-flush">
         `
 
-        this.players.forEach((p) => (room += p.toDivHTML()))
+        if (this.players.length > 0) {
+            this.players.forEach((p) => (room += p.toDivHTML()))
+        } else {
+            room += '<li class="list-group-item">No players yet.</li>'
+        }
         return (room += '</ul>\n</div>')
     }
 
@@ -40,12 +44,16 @@ class Room {
     }
 }
 
+class RequestRoomsReponse {
+    public rooms: Array<Room>
+}
 function RequestRoomsAction(repository: ConnectionRepository, modalBodyID: string) {
     repository
         .sendHTTPRequest('GET', 'rooms', null)
         .then((response) => response.json())
-        .then((jsonBody: Array<Room>) => {
-            const rooms: Array<Room> = jsonBody.map((i) => Room.createFromJSON(i))
+        .then((jsonBody: RequestRoomsReponse) => {
+            let rooms: Array<Room> = jsonBody.rooms.map((i) => Room.createFromJSON(i))
+            rooms = rooms.sort((r1, r2) => r1.id > r2.id ? 1 : -1)
             renderRooms(rooms, modalBodyID)
         })
         .catch((err) => console.log(err))
