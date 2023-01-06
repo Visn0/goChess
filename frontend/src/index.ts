@@ -1,6 +1,8 @@
 import { BackendConnectionRepository } from './connection_repository/backend_connection_repository'
 import { ConnectionRepository } from './connection_repository/connection_repository'
+/* eslint-disable  @typescript-eslint/no-unused-vars */
 import { MockConnectionRepository } from './connection_repository/mock_connection_repository'
+/* eslint-enable  @typescript-eslint/no-unused-vars */
 import { Board } from './board'
 import { Color, constants } from './constants'
 import { GameController } from './game_controller'
@@ -9,7 +11,9 @@ import { Rooms } from './room'
 
 const rooms = new Rooms('modal-list-rooms-body')
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
+/* eslint-disable capitalized-comments */
 // const repository: ConnectionRepository = new MockConnectionRepository()
+/* eslint-enable capitalized-comments */
 const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const gameController: GameController = new GameController(rooms, board, repository)
 
@@ -22,9 +26,11 @@ window.onload = () => {
     setInterval(() => RequestRoomsAction(repository, rooms), 10000)
 }
 
-const btnCreateRoom = document.getElementById('btn-create-room') as HTMLElement
-btnCreateRoom.onclick = () => {
-    gameController.createRoom('paquito', 'lepass')
-}
+const btnsCreateRoom = document.getElementsByName('btn-create-room')
+btnsCreateRoom.forEach((btn) => {
+    btn.onclick = () => {
+        gameController.createRoom('paquito', 'lepass')
+    }
+})
 
-export {}
+export { }

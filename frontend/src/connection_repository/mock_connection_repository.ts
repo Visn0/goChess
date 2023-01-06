@@ -68,9 +68,11 @@ class MockConnectionRepository implements ConnectionRepository {
         return new MessageEvent(this.onMessageEventTopic, { data: data })
     }
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     public sendHTTPRequest(method: string, path: string, body: any): any {
         return null
     }
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
 export { MockConnectionRepository }
