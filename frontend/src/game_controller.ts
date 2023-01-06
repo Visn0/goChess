@@ -50,8 +50,8 @@ class GameController {
         ])
     }
 
-    public createRoom(name: string, password: string) {
-        CreateRoomAction(this.repository, name, password)
+    public createRoom(playerID: string, roomID: string, password: string) {
+        CreateRoomAction(this.repository, playerID, roomID, password)
     }
 
     public openWebSocketConnection() {

@@ -6,6 +6,7 @@ class RequestRoomsReponse {
 }
 
 function RequestRoomsAction(repository: ConnectionRepository, rooms: Rooms) {
+    console.log("this")
     repository
         .sendHTTPRequest('GET', 'rooms', null)
         .then((response) => response.json())

@@ -12,9 +12,9 @@ import { Rooms } from './room'
 const rooms = new Rooms('modal-list-rooms-body')
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
 /* eslint-disable capitalized-comments */
-// const repository: ConnectionRepository = new MockConnectionRepository()
+const repository: ConnectionRepository = new MockConnectionRepository()
 /* eslint-enable capitalized-comments */
-const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
+// const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const gameController: GameController = new GameController(rooms, board, repository)
 
 window.onload = () => {
@@ -29,7 +29,7 @@ window.onload = () => {
 const btnsCreateRoom = document.getElementsByName('btn-create-room')
 btnsCreateRoom.forEach((btn) => {
     btn.onclick = () => {
-        gameController.createRoom('paquito', 'lepass')
+        gameController.createRoom('userID', 'roomID', 'roomPassword')
     }
 })
 

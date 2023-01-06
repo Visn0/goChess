@@ -1,3 +1,5 @@
+import { CreateRoomMessage } from '../actions/send/create_room_action'
+import { JoinRoomMessage } from '../actions/send/join_room_action'
 import { MovePieceMessage } from '../actions/send/move_piece_action'
 import { File, Rank } from '../constants'
 import { ConnectionRepository, Message } from './connection_repository'
@@ -27,7 +29,9 @@ class MockConnectionRepository implements ConnectionRepository {
     private messageEventFactory(message: Message): MessageEvent {
         switch (message.action) {
             case 'create-room':
-                return new MessageEvent(this.onMessageEventTopic, { data: JSON.stringify({ action: 'create-room' }) })
+                return this.createRoomCreatedMessage(message)
+            case 'join-room':
+                return this.createRoomJoinedMessage(message)
             case 'request-moves':
                 return this.createMovesReceivedMessage()
             case 'move-piece':
@@ -38,6 +42,48 @@ class MockConnectionRepository implements ConnectionRepository {
                 })
         }
     }
+
+    private createRoomCreatedMessage(message: Message): MessageEvent {
+        const m = message as CreateRoomMessage
+        const data = JSON.stringify({
+            action: 'create-room',
+            httpCode: 200,
+            room: {
+                id: m.body.roomID,
+                players: [
+                    {
+                        id: "mockUser"
+                    }
+                ]
+            }
+
+        })
+
+        return new MessageEvent(this.onMessageEventTopic, { data: data })
+    }
+
+    private createRoomJoinedMessage(message: Message): MessageEvent {
+        const m = message as JoinRoomMessage
+        const data = JSON.stringify({
+            action: 'create-room',
+            httpCode: 200,
+            room: {
+                roomID: m.body.roomID,
+                players: [
+                    {
+                        id: "mockUser"
+                    },
+                    {
+                        id: m.body.playerID
+                    }
+                ]
+            }
+
+        })
+
+        return new MessageEvent(this.onMessageEventTopic, { data: data })
+    }
+
 
     private createMovesReceivedMessage(): MessageEvent {
         const moves = []
@@ -69,8 +115,40 @@ class MockConnectionRepository implements ConnectionRepository {
     }
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public sendHTTPRequest(method: string, path: string, body: any): any {
-        return null
+    public sendHTTPRequest(method: string, path: string, body: any): Promise<Response> {
+        switch (path) {
+            case 'rooms':
+                return new Promise<Response>((resolve, reject): Response => {
+                    const bodyStr = JSON.stringify({
+                        rooms: [
+                            {
+                                "id": "room1",
+                                "players": []
+                            },
+                            {
+                                "id": "room2",
+                                "players": [
+                                    { "id": "player1" },
+                                ]
+                            }
+                        ]
+                    })
+                    const bodyRes = new Blob([bodyStr], {
+                        type: 'application/json'
+                    });
+                    const options = { status: 200 }
+                    const res = new Response(
+                        bodyRes,
+                        options
+                    )
+
+                    resolve(res)
+                    return res
+                })
+
+            default:
+                return new Promise<Response>(() => null)
+        }
     }
     /* eslint-enable @typescript-eslint/no-unused-vars */
 }
