@@ -52,11 +52,10 @@ class MockConnectionRepository implements ConnectionRepository {
                 id: m.body.roomID,
                 players: [
                     {
-                        id: "mockUser"
+                        id: 'mockUser'
                     }
                 ]
             }
-
         })
 
         return new MessageEvent(this.onMessageEventTopic, { data: data })
@@ -71,14 +70,13 @@ class MockConnectionRepository implements ConnectionRepository {
                 id: m.body.roomID,
                 players: [
                     {
-                        id: "mockUser"
+                        id: 'mockUser'
                     },
                     {
                         id: m.body.playerID
                     }
                 ]
             }
-
         })
 
         return new MessageEvent(this.onMessageEventTopic, { data: data })
@@ -121,25 +119,20 @@ class MockConnectionRepository implements ConnectionRepository {
                     const bodyStr = JSON.stringify({
                         rooms: [
                             {
-                                "id": "room1",
-                                "players": []
+                                id: 'room1',
+                                players: []
                             },
                             {
-                                "id": "room2",
-                                "players": [
-                                    { "id": "player1" },
-                                ]
+                                id: 'room2',
+                                players: [{ id: 'player1' }]
                             }
                         ]
                     })
                     const bodyRes = new Blob([bodyStr], {
                         type: 'application/json'
-                    });
+                    })
                     const options = { status: 200 }
-                    const res = new Response(
-                        bodyRes,
-                        options
-                    )
+                    const res = new Response(bodyRes, options)
 
                     resolve(res)
                     return res
