@@ -14,9 +14,9 @@ const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
 /* eslint-disable capitalized-comments */
-const repository: ConnectionRepository = new MockConnectionRepository()
+// const repository: ConnectionRepository = new MockConnectionRepository()
 /* eslint-enable capitalized-comments */
-// const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
+const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const gameController: GameController = new GameController(rooms, board, repository)
 
 window.onload = () => {

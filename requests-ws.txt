@@ -6,7 +6,8 @@
 	{
 		"action": "create-room",
 		"body": {
-			"name": "roomName",
+			"roomID": "roomID",
+			"playerID": "playerID",
 			"password": "roomPassword"
 		}
 	}
@@ -19,9 +20,6 @@
 				{
 					"id": "player1",
 				},
-				{
-					"id": "player2",
-				}
 			]			
 		}
 	}

@@ -9,7 +9,8 @@ import (
 )
 
 type RequestCreateRoom struct {
-	Name     string `json:"name"`
+	RoomID   string `json:"roomID"`
+	PlayerID string `json:"playerID"`
 	Password string `json:"password"`
 }
 
@@ -41,29 +42,31 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) {
 		if err != nil {
 			log.Println("Error sending error response unmarshalling:", err)
 		}
+		return
 	}
-	_, ok := s.rooms[req.Name]
+	_, ok := s.rooms[req.RoomID]
 	if ok {
 		resp.HttpCode = 400
 		err = c.WriteJSON(resp)
 		if err != nil {
 			log.Println("Error sending error response room exists:", err)
 		}
+		return
 	}
 	room := NewRoom()
 	player := &Player{
 		ws: c,
-		id: "player1",
+		id: req.PlayerID,
 	}
 	room.AddPlayer(player)
-	s.rooms[req.Name] = room
+	s.rooms[req.RoomID] = room
 	log.Println("Room created")
 
 	roomWG := &sync.WaitGroup{}
 	go room.HandleGame(true, roomWG)
 
 	resp.Room = &ResponseRoom{
-		ID: req.Name,
+		ID: req.RoomID,
 		Players: []*ResponsePlayer{
 			{
 				ID: player.id,
@@ -75,13 +78,15 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) {
 }
 
 type RequestJoinRoom struct {
-	Name     string `json:"name"`
+	RoomID   string `json:"roomID"`
+	PlayerID string `json:"playerID"`
 	Password string `json:"password"`
 }
 
 type ResponseJoinRoom struct {
-	Action   string `json:"action"`
-	HttpCode int    `json:"httpCode"`
+	HttpCode int           `json:"httpCode"`
+	Action   string        `json:"action"`
+	Room     *ResponseRoom `json:"room"`
 }
 
 func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
@@ -89,6 +94,7 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
 	resp := ResponseJoinRoom{
 		Action:   "join-room",
 		HttpCode: 200,
+		Room:     nil,
 	}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
@@ -98,24 +104,43 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
 		if err != nil {
 			log.Println("Error sending error response unmarshalling:", err)
 		}
+		return
 	}
-	room, ok := s.rooms[req.Name]
+	room, ok := s.rooms[req.RoomID]
 	if !ok {
 		resp.HttpCode = 400
 		err = c.WriteJSON(resp)
 		if err != nil {
 			log.Println("Error sending error response room exists:", err)
 		}
+		return
 	}
 	player := &Player{
 		ws: c,
-		id: "player2",
+		id: req.PlayerID,
 	}
 	room.AddPlayer(player)
 	log.Println("Player joined room")
 	roomWG := &sync.WaitGroup{}
 	go room.HandleGame(false, roomWG)
 
+	playersInfo := []*ResponsePlayer{}
+	if room.player1 != nil {
+		playersInfo = append(playersInfo, &ResponsePlayer{
+			ID: room.player1.id,
+		})
+	}
+	if room.player2 != nil {
+		playersInfo = append(playersInfo, &ResponsePlayer{
+			ID: room.player2.id,
+		})
+	}
+	resp.Room = &ResponseRoom{
+		ID:      req.RoomID,
+		Players: playersInfo,
+	}
+	j, _ := json.Marshal(resp)
+	log.Println(string(j))
 	c.WriteJSON(resp)
 	roomWG.Wait()
 }
