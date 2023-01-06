@@ -3,21 +3,23 @@ import { ConnectionRepository, Message } from '../../connection_repository/conne
 class JoinRoomMessage implements Message {
     action: string
     body: {
-        roomID: string
         playerID: string
+        roomID: string
+        password: string
     }
 
-    constructor(roomID: string, playerID: string) {
+    constructor(playerID: string, roomID: string, password: string) {
         this.action = 'join-room'
         this.body = {
+            playerID: playerID,
             roomID: roomID,
-            playerID: playerID
+            password: password
         }
     }
 }
 
-function JoinRoomAction(repository: ConnectionRepository, roomID: string, playerID: string) {
-    const m = new JoinRoomMessage(roomID, playerID)
+function JoinRoomAction(repository: ConnectionRepository, playerID: string, roomID: string, password: string) {
+    const m = new JoinRoomMessage(playerID, roomID, password)
 
     repository.sendWebSocketMessage(m)
 }

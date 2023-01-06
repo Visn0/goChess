@@ -8,7 +8,9 @@ import { Color, constants } from './constants'
 import { GameController } from './game_controller'
 import { RequestRoomsAction } from './actions/send/request_rooms'
 import { Rooms } from './room'
+import { JoinRoomAction } from './actions/send/join_room_action'
 
+const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
 const board: Board = new Board(document.getElementById('chess-board') as HTMLElement)
 /* eslint-disable capitalized-comments */
@@ -31,6 +33,11 @@ btnsCreateRoom.forEach((btn) => {
     btn.onclick = () => {
         gameController.createRoom('userID', 'roomID', 'roomPassword')
     }
+})
+
+document.addEventListener('join-room-event', (e: Event) => {
+    const ce = e as CustomEvent
+    JoinRoomAction(repository, playerID, ce.detail, 'roomPassword')
 })
 
 export {}

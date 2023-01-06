@@ -13,14 +13,14 @@ class Room {
 
     public toDivHTML(): string {
         let room = `
-            <div id="room-${this.id}" class="card w-100 bg-dark text-white">
+            <div id="${this.id}" class="card w-100 bg-dark text-white">
                 <div class="card-header bg-green mx-1">                                        
         `
 
         if (!this.myRoom) {
             room += `
                     <div class="position-absolute" style="margin-top: -5px;">
-                        <button class="btn btn-success btn-sm text-left">
+                        <button id="join-btn-${this.id}" class="btn btn-success btn-sm text-left">
                             Join
                         </button>
                     </div>
@@ -52,6 +52,19 @@ class Room {
     public setMyRoom() {
         this.myRoom = true
     }
+
+    public addJoinRoomEventListener() {
+        if (this.myRoom) {
+            return
+        }
+
+        const element = document.getElementById(`join-btn-${this.id}`) as HTMLElement
+        element.onclick = () => {
+            const data = this.id
+            const event = new CustomEvent('join-room-event', { detail: data })
+            document.dispatchEvent(event)
+        }
+    }
 }
 
 class Rooms {
@@ -80,10 +93,11 @@ class Rooms {
         }
 
         this.container.innerHTML = rooms
+        this.addJoinRoomEventListeners()
     }
 
-    private addEventListeners() {
-        this.rooms.forEach
+    private addJoinRoomEventListeners() {
+        this.rooms.forEach((r) => r.addJoinRoomEventListener())
     }
 
     public setRooms(rooms: Array<Room>) {
