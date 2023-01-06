@@ -3,7 +3,7 @@ import { ConnectionRepository, Message } from '../../connection_repository/conne
 class JoinRoomMessage implements Message {
     action: string
     body: {
-        roomID: string,
+        roomID: string
         playerID: string
     }
 

@@ -33,4 +33,4 @@ btnsCreateRoom.forEach((btn) => {
     }
 })
 
-export { }
+export {}
