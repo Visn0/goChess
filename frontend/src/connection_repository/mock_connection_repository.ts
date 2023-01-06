@@ -68,7 +68,7 @@ class MockConnectionRepository implements ConnectionRepository {
             action: 'create-room',
             httpCode: 200,
             room: {
-                roomID: m.body.roomID,
+                id: m.body.roomID,
                 players: [
                     {
                         id: "mockUser"
@@ -83,7 +83,6 @@ class MockConnectionRepository implements ConnectionRepository {
 
         return new MessageEvent(this.onMessageEventTopic, { data: data })
     }
-
 
     private createMovesReceivedMessage(): MessageEvent {
         const moves = []

@@ -50,7 +50,7 @@ class Rooms {
         let rooms = this.myRoom ? this.myRoom.toDivHTML() : ''
 
         if (rooms !== '' && this.rooms.length > 0) {
-            rooms += '\n<br>'
+            rooms += '\n<li class="list-group-item border-top border-secondary my-4"></li>'
         }
 
         for (let i = 0; i < this.rooms.length; i++) {
