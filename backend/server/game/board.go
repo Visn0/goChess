@@ -54,29 +54,29 @@ func (b *Board) RemovePiece(rank Rank, file File) {
 func fenCharToPiece(fen string) *Piece {
 	switch fen {
 	case "P":
-		return &Piece{Name: "pawn", Black: false}
+		return NewPawn(false)
 	case "p":
-		return &Piece{Name: "pawn", Black: true}
-	case "R":
-		return &Piece{Name: "rook", Black: false}
-	case "r":
-		return &Piece{Name: "rook", Black: true}
+		return NewPawn(true)
 	case "N":
-		return &Piece{Name: "knight", Black: false}
+		return NewKnight(false)
 	case "n":
-		return &Piece{Name: "knight", Black: true}
+		return NewKnight(true)
 	case "B":
-		return &Piece{Name: "bishop", Black: false}
+		return NewBishop(false)
 	case "b":
-		return &Piece{Name: "bishop", Black: true}
+		return NewBishop(true)
+	case "R":
+		return NewRook(false)
+	case "r":
+		return NewRook(true)
 	case "Q":
-		return &Piece{Name: "queen", Black: false}
+		return NewQueen(false)
 	case "q":
-		return &Piece{Name: "queen", Black: true}
+		return NewQueen(true)
 	case "K":
-		return &Piece{Name: "king", Black: false}
+		return NewKing(false)
 	case "k":
-		return &Piece{Name: "king", Black: true}
+		return NewKing(true)
 	default:
 		return nil
 	}

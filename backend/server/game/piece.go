@@ -1,5 +1,7 @@
 package game
 
+import "encoding/json"
+
 type Direction struct {
 	x int
 	y int
@@ -17,13 +19,13 @@ func NewPawn(black bool) *Piece {
 		return &Piece{
 			Name:            "pawn",
 			Black:           black,
-			ValidDirections: []Direction{{1, 0}},
+			ValidDirections: []Direction{{-1, 0}},
 		}
 	}
 	return &Piece{
 		Name:            "pawn",
 		Black:           black,
-		ValidDirections: []Direction{{-1, 0}},
+		ValidDirections: []Direction{{1, 0}},
 	}
 }
 
@@ -31,7 +33,7 @@ func NewRook(black bool) *Piece {
 	return &Piece{
 		Name:            "rook",
 		Black:           black,
-		ValidDirections: []Direction{{1, 0}, {0, 1}},
+		ValidDirections: []Direction{{1, 0}, {0, 1}, {-1, 0}, {0, -1}},
 	}
 }
 
@@ -93,4 +95,9 @@ func NewKing(black bool) *Piece {
 			{0, -1},
 		},
 	}
+}
+
+func (p *Piece) String() string {
+	j, _ := json.MarshalIndent(p, "", " ")
+	return string(j)
 }

@@ -148,7 +148,8 @@ func (r *Room) handleRequestMoves(body []byte, c *wsConn) {
 		Action:     "request-moves",
 		ValidMoves: validMoves,
 	}
-
+	j, _ := json.Marshal(resp)
+	log.Println(string(j))
 	c.WriteJSON(resp)
 }
 

@@ -23,21 +23,31 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Move {
 		fmt.Println("No piece at", rank, file)
 		return nil
 	}
-	if p.ValidMoves != nil {
-		fmt.Println("Returning cached moves")
-		return p.ValidMoves
-	}
+	fmt.Println("Piece at", rank, file, "is", p.String())
+	// if p.ValidMoves != nil {
+	// 	fmt.Println("Returning cached moves")
+	// 	return p.ValidMoves
+	// }
 	moves := []*Move{}
+	fromMove := &Move{Rank: rank, File: file}
 	for _, d := range p.ValidDirections {
+		dCum := Direction{0, 0}
 		for {
-			move := &Move{Rank: rank, File: file}
-			move.Add(d)
+			dCum.x += d.x
+			dCum.y += d.y
+			move := &Move{Rank: fromMove.Rank + Rank(dCum.x), File: fromMove.File + File(dCum.y)}
 			if !move.Valid() {
+				fmt.Println("Invalid move", move.Rank, move.File, d)
 				break
 			}
-			fmt.Println("Checking", move)
+			fmt.Println("Checking", move.Rank, move.File, d)
 			if g.Board.GetPiece(move.Rank, move.File) == nil {
 				moves = append(moves, move)
+			} else {
+				break
+			}
+			if p.Name == "king" || p.Name == "knight" {
+				break
 			}
 		}
 	}
