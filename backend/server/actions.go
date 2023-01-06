@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 )
 
 type RequestCreateRoom struct {
@@ -27,7 +28,7 @@ type ResponsePlayer struct {
 	ID string `json:"id"`
 }
 
-func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
+func (s *Server) handleCreateRoom(body []byte, c *wsConn) {
 	req := RequestCreateRoom{}
 	resp := ResponseCreateRoom{
 		Action: "create-room",
@@ -36,13 +37,18 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	if err != nil {
 		log.Println("Error unmarshalling request create room:", err)
 		resp.HttpCode = 400
-		c.WriteJSON(resp)
-		return err
+		err = c.WriteJSON(resp)
+		if err != nil {
+			log.Println("Error sending error response unmarshalling:", err)
+		}
 	}
 	_, ok := s.rooms[req.Name]
 	if ok {
 		resp.HttpCode = 400
-		return c.WriteJSON(resp)
+		err = c.WriteJSON(resp)
+		if err != nil {
+			log.Println("Error sending error response room exists:", err)
+		}
 	}
 	room := NewRoom()
 	player := &Player{
@@ -52,7 +58,9 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 	room.AddPlayer(player)
 	s.rooms[req.Name] = room
 	log.Println("Room created")
-	go room.HandleGame(true)
+
+	roomWG := &sync.WaitGroup{}
+	go room.HandleGame(true, roomWG)
 
 	resp.Room = &ResponseRoom{
 		ID: req.Name,
@@ -63,7 +71,7 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) error {
 		},
 	}
 	c.WriteJSON(resp)
-	return nil
+	roomWG.Wait()
 }
 
 type RequestJoinRoom struct {
@@ -76,7 +84,7 @@ type ResponseJoinRoom struct {
 	HttpCode int    `json:"httpCode"`
 }
 
-func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
+func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
 	req := RequestJoinRoom{}
 	resp := ResponseJoinRoom{
 		Action:   "join-room",
@@ -86,14 +94,18 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
 	if err != nil {
 		log.Println("Error unmarshalling request join room:", err)
 		resp.HttpCode = 400
-		c.WriteJSON(resp)
-		return err
+		err = c.WriteJSON(resp)
+		if err != nil {
+			log.Println("Error sending error response unmarshalling:", err)
+		}
 	}
 	room, ok := s.rooms[req.Name]
 	if !ok {
 		resp.HttpCode = 400
-		c.WriteJSON(resp)
-		return fmt.Errorf("room does not exist")
+		err = c.WriteJSON(resp)
+		if err != nil {
+			log.Println("Error sending error response room exists:", err)
+		}
 	}
 	player := &Player{
 		ws: c,
@@ -101,10 +113,11 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) error {
 	}
 	room.AddPlayer(player)
 	log.Println("Player joined room")
-	go room.HandleGame(false)
+	roomWG := &sync.WaitGroup{}
+	go room.HandleGame(false, roomWG)
 
 	c.WriteJSON(resp)
-	return nil
+	roomWG.Wait()
 }
 
 type RequestMoves struct {

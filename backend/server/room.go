@@ -4,6 +4,7 @@ import (
 	"chess/server/game"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/buger/jsonparser"
 )
@@ -51,7 +52,10 @@ func (r *Room) GetRoomSize() int {
 	return size
 }
 
-func (r *Room) HandleGame(isHost bool) {
+func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
+	roomsWG.Add(1)
+	defer roomsWG.Done()
+
 	log.Println("Room activated")
 	var player *Player
 	if isHost {
