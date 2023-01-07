@@ -53,7 +53,6 @@ func (r *Room) GetRoomSize() int {
 }
 
 func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
-	roomsWG.Add(1)
 	defer roomsWG.Done()
 
 	log.Println("Room activated")
@@ -63,10 +62,12 @@ func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
 	} else {
 		player = r.player2
 	}
+
 	for {
 		if player == nil {
 			return
 		}
+
 		messageType, message, err := player.ws.ReadMessage()
 		log.Println(messageType)
 		if err != nil {
