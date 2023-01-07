@@ -9,6 +9,12 @@ import { GameController } from './game_controller'
 import { RequestRoomsAction } from './actions/send/request_rooms'
 import { Rooms } from './room'
 import { JoinRoomAction } from './actions/send/join_room_action'
+import { RouteActions } from './actions/receive/route_actions'
+import { MovesReceivedAction } from './actions/receive/moves_received_action'
+import { PieceMovedAction } from './actions/receive/piece_moved_action'
+import { RoomCreatedAction } from './actions/receive/room_created_action'
+import { ReceiveAction } from './actions/receive/receive_action'
+import { CreateRoomAction } from './actions/send/create_room_action'
 
 const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
@@ -19,11 +25,19 @@ const board: Board = new Board(document.getElementById('chess-board') as HTMLEle
 const repository: ConnectionRepository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const gameController: GameController = new GameController(rooms, board, repository)
 
+const routeActions: RouteActions = new RouteActions(
+    new Map<string, ReceiveAction>([
+        ['create-room', new RoomCreatedAction(rooms)],
+        ['request-moves', new MovesReceivedAction(gameController)],
+        ['move-piece', new PieceMovedAction(gameController)]
+    ])
+)
+repository.addOnWebSocketMessageEventListener(routeActions.route())
+
 window.onload = () => {
     board.initFromFenNotation(constants.StartingPosition)
     board.render(Color.WHITE)
 
-    gameController.openWebSocketConnection()
     RequestRoomsAction(repository, rooms)
     setInterval(() => RequestRoomsAction(repository, rooms), 10000)
 }
@@ -31,7 +45,7 @@ window.onload = () => {
 const btnsCreateRoom = document.getElementsByName('btn-create-room')
 btnsCreateRoom.forEach((btn) => {
     btn.onclick = () => {
-        gameController.createRoom('userID', 'roomID', 'roomPassword')
+        CreateRoomAction(repository, 'userID', 'roomID', 'roomPassword')
     }
 })
 

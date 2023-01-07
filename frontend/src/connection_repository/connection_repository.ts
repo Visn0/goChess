@@ -4,7 +4,7 @@ interface Message {
 }
 
 interface ConnectionRepository {
-    openWebSocketConnection(): void
+    openWebSocketConnection(onOpenListener?: (e: Event) => any | null): void
     closeWebSocketConnection(): void
     addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void): void
     sendWebSocketMessage(message: Message): void

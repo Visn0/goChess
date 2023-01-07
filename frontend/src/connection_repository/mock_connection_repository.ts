@@ -7,8 +7,11 @@ import { ConnectionRepository, Message } from './connection_repository'
 class MockConnectionRepository implements ConnectionRepository {
     private readonly onMessageEventTopic: string = 'mock-repository-onMessageEvent-topic'
 
-    public openWebSocketConnection() {
+    public openWebSocketConnection(onOpenListener?: (e: Event) => any | null) {
         console.log('=> Connection opened')
+        if (onOpenListener) {
+            onOpenListener(new CustomEvent(''))
+        }
     }
 
     public closeWebSocketConnection() {

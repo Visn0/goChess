@@ -6,6 +6,7 @@ class BackendConnectionRepository implements ConnectionRepository {
     private wsPath: string
 
     private connection: WebSocket | null
+    private onWebSocketMessageListener: (e: MessageEvent) => void
 
     constructor(host: string, port: string, wsPath: string) {
         this.host = host
@@ -14,7 +15,7 @@ class BackendConnectionRepository implements ConnectionRepository {
         this.connection = null
     }
 
-    public openWebSocketConnection() {
+    public openWebSocketConnection(onOpenListener?: (e: Event) => any | null) {
         this.closeWebSocketConnection()
 
         const protocol = window.location.protocol.includes('s') ? 'wss' : 'ws'
@@ -24,6 +25,11 @@ class BackendConnectionRepository implements ConnectionRepository {
         }
 
         this.connection = new WebSocket(url)
+        if (onOpenListener) {
+            this.connection.onopen = onOpenListener
+        }
+
+        this.addOnWebSocketMessageEventListener(this.onWebSocketMessageListener)
     }
 
     public closeWebSocketConnection() {
@@ -34,6 +40,7 @@ class BackendConnectionRepository implements ConnectionRepository {
 
     public addOnWebSocketMessageEventListener(fn: (e: MessageEvent) => void) {
         if (this.connection === null) {
+            this.onWebSocketMessageListener = fn
             return
         }
 
