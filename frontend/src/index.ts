@@ -15,6 +15,8 @@ import { PieceMovedAction } from './actions/receive/piece_moved_action'
 import { RoomCreatedAction } from './actions/receive/room_created_action'
 import { ReceiveAction } from './actions/receive/receive_action'
 import { CreateRoomAction } from './actions/send/create_room_action'
+import { RoomJoinedAction } from './actions/receive/room_joined_action'
+import { time } from 'console'
 
 const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
@@ -28,6 +30,7 @@ const gameController: GameController = new GameController(rooms, board, reposito
 const routeActions: RouteActions = new RouteActions(
     new Map<string, ReceiveAction>([
         ['create-room', new RoomCreatedAction(rooms)],
+        ['join-room', new RoomJoinedAction(rooms)],
         ['request-moves', new MovesReceivedAction(gameController)],
         ['move-piece', new PieceMovedAction(gameController)]
     ])
@@ -45,7 +48,7 @@ window.onload = () => {
 const btnsCreateRoom = document.getElementsByName('btn-create-room')
 btnsCreateRoom.forEach((btn) => {
     btn.onclick = () => {
-        CreateRoomAction(repository, 'userID', 'roomID', 'roomPassword')
+        CreateRoomAction(repository, 'userID', `room-${Date.now().toString()}`, 'roomPassword')
     }
 })
 
@@ -54,4 +57,4 @@ document.addEventListener('join-room-event', (e: Event) => {
     JoinRoomAction(repository, playerID, ce.detail, 'roomPassword')
 })
 
-export {}
+export { }
