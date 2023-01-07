@@ -48,7 +48,7 @@ window.onload = () => {
 const btnsCreateRoom = document.getElementsByName('btn-create-room')
 btnsCreateRoom.forEach((btn) => {
     btn.onclick = () => {
-        CreateRoomAction(repository, 'userID', `room-${Date.now().toString()}`, 'roomPassword')
+        CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
     }
 })
 

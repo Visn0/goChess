@@ -127,8 +127,6 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
 	}
 	room.AddPlayer(player)
 	log.Println("Player joined room")
-	roomWG := &sync.WaitGroup{}
-	go room.HandleGame(false, roomWG)
 
 	playersInfo := []*ResponsePlayer{}
 	if room.player1 != nil {
@@ -148,6 +146,11 @@ func (s *Server) handleJoinRoom(body []byte, c *wsConn) {
 	j, _ := json.Marshal(resp)
 	log.Println(string(j))
 	c.WriteJSON(resp)
+
+	var roomWG sync.WaitGroup
+	roomWG.Add(1)
+	go room.HandleGame(false, &roomWG)
+
 	roomWG.Wait()
 }
 
