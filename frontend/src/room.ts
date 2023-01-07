@@ -20,7 +20,8 @@ class Room {
         if (!this.myRoom) {
             room += `
                     <div class="position-absolute" style="margin-top: -5px;">
-                        <button id="join-btn-${this.id}" class="btn btn-success btn-sm text-left">
+                        <button id="join-btn-${this.id}" class="btn btn-success btn-sm text-left"
+                            onclick="document.dispatchEvent(new CustomEvent('join-room-event', { detail: '${this.id}' }))">
                             Join
                         </button>
                     </div>
@@ -52,19 +53,6 @@ class Room {
     public setMyRoom() {
         this.myRoom = true
     }
-
-    public addJoinRoomEventListener() {
-        if (this.myRoom) {
-            return
-        }
-
-        const element = document.getElementById(`join-btn-${this.id}`) as HTMLElement
-        element.onclick = () => {
-            const data = this.id
-            const event = new CustomEvent('join-room-event', { detail: data })
-            document.dispatchEvent(event)
-        }
-    }
 }
 
 class Rooms {
@@ -93,11 +81,6 @@ class Rooms {
         }
 
         this.container.innerHTML = rooms
-        this.addJoinRoomEventListeners()
-    }
-
-    private addJoinRoomEventListeners() {
-        this.rooms.forEach((r) => r.addJoinRoomEventListener())
     }
 
     public setRooms(rooms: Array<Room>) {

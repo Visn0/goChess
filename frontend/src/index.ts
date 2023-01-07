@@ -15,6 +15,7 @@ import { PieceMovedAction } from './actions/receive/piece_moved_action'
 import { RoomCreatedAction } from './actions/receive/room_created_action'
 import { ReceiveAction } from './actions/receive/receive_action'
 import { CreateRoomAction } from './actions/send/create_room_action'
+import { RoomJoinedAction } from './actions/receive/room_joined_action'
 
 const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
@@ -28,6 +29,7 @@ const gameController: GameController = new GameController(rooms, board, reposito
 const routeActions: RouteActions = new RouteActions(
     new Map<string, ReceiveAction>([
         ['create-room', new RoomCreatedAction(rooms)],
+        ['join-room', new RoomJoinedAction(rooms)],
         ['request-moves', new MovesReceivedAction(gameController)],
         ['move-piece', new PieceMovedAction(gameController)]
     ])
