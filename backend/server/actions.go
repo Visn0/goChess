@@ -62,9 +62,6 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) {
 	s.rooms[req.RoomID] = room
 	log.Println("Room created")
 
-	roomWG := &sync.WaitGroup{}
-	go room.HandleGame(true, roomWG)
-
 	resp.Room = &ResponseRoom{
 		ID: req.RoomID,
 		Players: []*ResponsePlayer{
@@ -74,6 +71,9 @@ func (s *Server) handleCreateRoom(body []byte, c *wsConn) {
 		},
 	}
 	c.WriteJSON(resp)
+
+	roomWG := &sync.WaitGroup{}
+	go room.HandleGame(true, roomWG)
 	roomWG.Wait()
 }
 

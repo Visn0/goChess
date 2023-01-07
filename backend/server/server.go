@@ -91,8 +91,7 @@ func (s *Server) initWebsocket() {
 	s.app.All("/ws", websocket.New(func(c *wsConn) {
 		log.Println("New ws connection")
 
-		messageType, message, err := c.ReadMessage()
-		log.Println(messageType)
+		_, message, err := c.ReadMessage()
 		if err != nil {
 			// Error reading because of an unexpected disconnect (probably)
 			log.Println("Some error:", err)
@@ -101,8 +100,16 @@ func (s *Server) initWebsocket() {
 		}
 		log.Println("Get message.")
 
-		reqAction, _ := jsonparser.GetString(message, "action")
-		reqBody, _, _, _ := jsonparser.Get(message, "body")
+		reqAction, err := jsonparser.GetString(message, "action")
+		if err != nil {
+			log.Println("Error getting action:", err)
+			return
+		}
+		reqBody, _, _, err := jsonparser.Get(message, "body")
+		if err != nil {
+			log.Println("Error getting body:", err)
+			return
+		}
 
 		switch reqAction {
 		case "create-room":
