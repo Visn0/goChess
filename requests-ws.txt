@@ -1,0 +1,112 @@
+
+############################################
+## CreateRoom
+{
+	Request
+	{
+		"action": "create-room",
+		"body": {
+			"roomID": "roomID",
+			"playerID": "playerID",
+			"password": "roomPassword"
+		}
+	}
+	Response
+	{
+		"action": "create-room",
+		"room": {			
+			"id": "roomName",
+			"players": [
+				{
+					"id": "player1",
+				},
+			]			
+		}
+	}
+}
+############################################
+## JoinRoom
+{
+    Request
+    {
+        "action": "join-room",
+        "body": {
+            "name": "roomName",
+            "password": "roomPassword"
+        }
+    }
+    Response
+    {
+        "action": "join-room",
+        "room": {
+            "id": "roomName",
+			"players": [
+				{
+					"id": "player1",
+				},
+				{
+					"id": "player2",
+				}
+			]           
+        }
+    }
+}
+
+###############################################
+## RequestMoves
+{
+	Request
+	{
+		"action": "request-moves",
+		"body": {
+			file: 1,
+			rank: 4,
+			piece: "pawn",
+		}
+	}
+	Response
+	{
+		"action": "request-moves",
+		"validMoves": [
+			{ file: 1, rank: 1},
+			{ file: 2, rank: 1},
+		]
+	}
+}
+###############################################
+## MovePiece
+{
+	Request
+	{
+		"action": "move-piece",
+		"body": {
+			src: {
+				file: 1
+				rank: 4
+			}
+			dst: {
+				file: 1
+				rank: 5
+			}
+		}
+	}
+	Response
+	{
+		"action": "move-piece",
+		"body": {
+			src: {
+				file: 1
+				rank: 4
+			}
+			dst: {
+				file: 1
+				rank: 5
+			}
+		}
+	}
+}
+
+
+
+
+

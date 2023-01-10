@@ -19,4 +19,6 @@ frontend-lint:
 
 up:
 	npm --prefix frontend/ run dev
-	
+
+up.backend:
+	cd backend; go run main.go

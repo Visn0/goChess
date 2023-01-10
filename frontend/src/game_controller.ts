@@ -1,109 +1,53 @@
-import { Color, constants, eventTopics } from './constants'
-import { MovePiece } from './actions/move_piece'
+import { eventTopics } from './constants'
 import { Board } from './board'
 import { File, Rank } from './constants'
 import { Square } from './square'
-
-class SrcSquare {
-    public square: Square
-    private validMoves: Array<Square>
-
-    constructor(square: Square) {
-        this.square = square
-        this.validMoves = new Array<Square>(0)
-    }
-
-    public setValidMoves(moves: Array<Square>) {
-        this.validMoves = moves
-    }
-
-    public canInnerPieceMoveTo(dst: Square): boolean {
-        const found = this.validMoves.find((m) => m.file === dst.file && m.rank === dst.rank)
-        return found !== undefined
-    }
-}
+import { ConnectionRepository } from './connection_repository/connection_repository'
+import { ReceiveAction } from './actions/receive/receive_action'
+import { RequestMovesAction } from './actions/send/request_moves_action'
+import { MovePieceAction } from './actions/send/move_piece_action'
+import { Rooms } from './room'
 
 class GameController {
-    private serverURL: string
-    private wsConn: WebSocket | null
+    private repository: ConnectionRepository
+    private _board: Board
+    private rooms: Rooms
 
-    private board: Board
+    public get board(): Board {
+        return this._board
+    }
 
-    private srcSquare: SrcSquare | null
+    private _srcSquare: SrcSquare | null
+    public get srcSquare(): SrcSquare | null {
+        return this._srcSquare
+    }
 
-    constructor(board: Board, host: string, path: string) {
-        this.wsConn = null
-        this.board = board
+    private receiveActions: Map<string, ReceiveAction>
 
-        const protocol = window.location.protocol.includes('s') ? 'wss' : 'ws'
-        this.serverURL = `${protocol}://${host}/${path}`
+    constructor(rooms: Rooms, board: Board, repository: ConnectionRepository) {
+        this.rooms = rooms
+        this._board = board
+        this.repository = repository
 
         document.addEventListener(eventTopics.OnSquareClick, (e: Event) => {
             this.onSquareClick(e as CustomEvent)
         })
 
-        this.srcSquare = null
-    }
-
-    public start() {
-        this.openWebSocketConnetion()
-        this.board.initFromFenNotation(constants.StartingPosition)
-        this.board.render(Color.WHITE)
-    }
-
-    private openWebSocketConnetion() {
-        if (this.wsConn !== null) {
-            this.wsConn.close()
-        }
-
-        this.wsConn = new WebSocket(this.serverURL)
-        this.wsConn.onmessage = this.onWebSocketMessage.bind(this)
-    }
-
-    private onWebSocketMessage(event: MessageEvent) {
-        const body = event.data
-        class Params {
-            action: string
-        }
-
-        const params: Params = JSON.parse(body)
-        this.router(params.action, body)
-    }
-
-    private router(action: string, body: string) {
-        switch (action) {
-            case 'move-piece':
-                MovePiece(this.board, body)
-                break
-            default:
-                console.log('################')
-                console.log('ACTION: ' + action)
-                console.log('BODY: ' + action)
-                console.log('################')
-        }
+        this._srcSquare = null
     }
 
     private onSquareClick(event: CustomEvent) {
         const file: File = event.detail.file
         const rank: Rank = event.detail.rank
 
-        const square = this.board.getSquare(file, rank)
+        const square = this._board.getSquare(file, rank)
         if (this.isSrcSquareSelected()) {
-            if (this.srcSquare?.canInnerPieceMoveTo(square)) {
-                const body = {
-                    src: {
-                        file: this.srcSquare.square.file,
-                        rank: this.srcSquare.square.rank
-                    },
-                    dst: {
-                        file: square.file,
-                        rank: square.rank
-                    }
-                }
-
-                MovePiece(this.board, JSON.stringify(body))
+            if (this._srcSquare?.equals(square)) {
+                this.unselectSrcSquare()
+                return
             }
 
+            MovePieceAction(this.repository, this, square)
             this.unselectSrcSquare()
             return
         }
@@ -116,15 +60,45 @@ class GameController {
     }
 
     private selectSquare(square: Square) {
-        this.srcSquare = new SrcSquare(square)
+        this._srcSquare = new SrcSquare(square)
+        RequestMovesAction(this.repository, square)
     }
 
-    private unselectSrcSquare() {
-        this.srcSquare = null
+    public unselectSrcSquare() {
+        this._srcSquare?.removeValidMoves()
+        this._srcSquare = null
     }
 
     private isSrcSquareSelected(): boolean {
-        return this.srcSquare !== null
+        return this._srcSquare !== null
+    }
+}
+
+class SrcSquare {
+    public square: Square
+    private validMoves: Array<Square>
+
+    constructor(square: Square) {
+        this.square = square
+        this.validMoves = new Array<Square>(0)
+    }
+
+    public setValidMoves(moves: Array<Square>) {
+        this.validMoves = moves
+        moves.forEach((m) => m.setAsValidMove())
+    }
+
+    public removeValidMoves() {
+        this.validMoves.forEach((m) => m.unsetAsValidMove())
+    }
+
+    public canInnerPieceMoveTo(dst: Square): boolean {
+        const found = this.validMoves.find((m: Square) => m.file === dst.file && m.rank === dst.rank)
+        return found !== undefined
+    }
+
+    public equals(s: Square): boolean {
+        return this.square.equals(s)
     }
 }
 

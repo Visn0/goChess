@@ -23,7 +23,15 @@ class Square {
 
     public toTableCellHTML(): string {
         const piece = this._piece?.toDivHTMLString() || ''
-        const cell = `<td id="${this.id}" class="board-square ${this.color}">${piece}</td>`
+        const cell = `
+            <td id="${this.id}" class="board-square ${this.color}">
+                <div id="${this.id}-piece" class="piece">
+                    ${piece}
+                </div>
+                <div id="${this.id}-valid-move" class="board-square valid-move" hidden>                    
+                </div>                
+            </td>
+        `
         return cell
     }
 
@@ -47,15 +55,37 @@ class Square {
         return this._piece === null
     }
 
-    private updateRender() {
+    private updatePieceRender() {
         const piece = this._piece?.toDivHTMLString() || ''
-        const element = document.getElementById(this.id) as HTMLElement
+        const element = document.getElementById(`${this.id}-piece`) as HTMLElement
         element.innerHTML = piece
     }
 
     public setPiece(piece: Piece | null) {
         this._piece = piece
-        this.updateRender()
+        this.updatePieceRender()
+    }
+
+    public setAsValidMove() {
+        const element = document.getElementById(`${this.id}-valid-move`)
+        if (element === null) {
+            return
+        }
+
+        element.hidden = false
+    }
+
+    public unsetAsValidMove() {
+        const element = document.getElementById(`${this.id}-valid-move`)
+        if (element === null) {
+            return
+        }
+
+        element.hidden = true
+    }
+
+    public equals(s: Square): boolean {
+        return this.file === s.file && this.rank === s.rank
     }
 }
 

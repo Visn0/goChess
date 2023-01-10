@@ -2,7 +2,10 @@
     margin: 0;
     padding: 0;
     border: none;
-    font-size: 15px;
+}
+
+html {
+    font-size: 1.7rem;
 }
 
 body {
@@ -19,4 +22,8 @@ body {
     height: 100%;
     margin: auto;
     margin-top: 50px;
+}
+
+.bg-green {
+    background-color: #7fa650;
 }

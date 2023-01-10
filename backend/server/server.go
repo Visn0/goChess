@@ -1,13 +1,13 @@
 package server
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"sync"
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	websocket "github.com/gofiber/websocket/v2"
 )
 
@@ -15,7 +15,7 @@ type wsConn = websocket.Conn
 
 type subEvent struct {
 	Connection *wsConn
-	Params     map[string]interface{} // TODO
+	Body       []byte
 }
 
 type Server struct {
@@ -28,6 +28,8 @@ type Server struct {
 
 	register   chan subEvent
 	unregister chan subEvent
+
+	rooms map[string]*Room
 }
 
 func NewServer(addr, port string) *Server {
@@ -39,17 +41,16 @@ func NewServer(addr, port string) *Server {
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
 		unregister:         make(chan subEvent),
+		rooms: map[string]*Room{
+			"room1": NewRoom(),
+		},
 	}
 }
 
-func (s *Server) Init() {
-	s.initMiddleware()
-	s.initRouter()
-	log.Println("Init server")
-}
-
-// The server instantiates the middleware (the proxy)
+// The server instantiates the middleware (Sthe proxy)
 func (s *Server) initMiddleware() {
+	s.app.Use(cors.New())
+
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
 		if !c.IsFromLocal() {
@@ -61,17 +62,22 @@ func (s *Server) initMiddleware() {
 			return c.Next()
 		}
 		log.Println("HTTP request")
-		// Don't accept not websockets connections
-		return c.SendStatus(fiber.StatusUpgradeRequired)
+		log.Println(c.BaseURL(), c.OriginalURL())
+		return c.Next()
 	})
 }
 
 // The server instantiates the router (routes for http and ws conections).
 func (s *Server) initRouter() {
 	s.initWebsocket()
+	s.initHttp()
 }
 
 func (s *Server) Run() {
+	s.initMiddleware()
+	s.initRouter()
+	log.Println("Init server")
+
 	go s.handleSubscriptions()
 	fullAddr := flag.String("addr", s.port, "http service address")
 	// flag.Parse()
@@ -82,42 +88,99 @@ func (s *Server) Run() {
 
 // Configures the route for ws requests and handles them
 func (s *Server) initWebsocket() {
-	s.app.Get("/ws", websocket.New(func(c *wsConn) {
-
+	s.app.All("/ws", websocket.New(func(c *wsConn) {
 		log.Println("New ws connection")
-		for {
-			messageType, message, err := c.ReadMessage()
-			log.Println(messageType)
-			if err != nil {
-				// Error reading because of an unexpected disconnect (probably)
-				log.Println("Some error:", err)
-				// TODO: remove connection from our lists
-				return
-			}
-			log.Println("Get message.")
 
-			reqType, _ := jsonparser.GetString(message, "type")
-			reqParams, _, _, _ := jsonparser.Get(message, "params")
-			params := make(map[string]interface{})
-			json.Unmarshal(reqParams, &params)
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			// Error reading because of an unexpected disconnect (probably)
+			log.Println("Some error:", err)
+			// TODO: remove connection from our lists
+			return
+		}
+		log.Println("Get message.")
 
-			switch reqType {
-			case "join":
-				log.Println("New subscription")
-				s.register <- subEvent{
-					Connection: c,
-					Params:     params,
-				}
+		reqAction, err := jsonparser.GetString(message, "action")
+		if err != nil {
+			log.Println("Error getting action:", err)
+			return
+		}
+		reqBody, _, _, err := jsonparser.Get(message, "body")
+		if err != nil {
+			log.Println("Error getting body:", err)
+			return
+		}
 
-			case "leave":
-				log.Println("Unsubscription")
-				s.unregister <- subEvent{
-					Connection: c,
-					Params:     params,
-				}
-			}
+		switch reqAction {
+		case "create-room":
+			log.Println("Request create room")
+			s.handleCreateRoom(reqBody, c)
+		case "join-room":
+			log.Println("Request join room")
+			s.handleJoinRoom(reqBody, c)
 		}
 	}))
+}
+
+type PlayerPublicInfo struct {
+	ID string `json:"id"`
+}
+type RoomPublicInfo struct {
+	ID      string              `json:"id"`
+	Players []*PlayerPublicInfo `json:"players"`
+}
+type ResponseHttpRooms struct {
+	Rooms []*RoomPublicInfo `json:"rooms"`
+}
+
+func (s *Server) initHttp() {
+	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
+		log.Println("############# ROOMS endpoint")
+		/////////////////////////////////////////
+		roomTest1 := &Room{
+			player1: &Player{
+				ws: nil,
+				id: "player1",
+			},
+			player2: &Player{
+				ws: nil,
+				id: "player2",
+			},
+			game: nil,
+		}
+		roomTest2 := &Room{
+			player1: &Player{
+				ws: nil,
+				id: "player3",
+			},
+			player2: &Player{
+				ws: nil,
+				id: "player4",
+			},
+			game: nil,
+		}
+		s.rooms["roomTest1"] = roomTest1
+		s.rooms["roomTest2"] = roomTest2
+		/////////////////////////////////////////
+		rooms := make([]*RoomPublicInfo, 0, len(s.rooms))
+		for id, room := range s.rooms {
+			players := make([]*PlayerPublicInfo, 0, 2)
+			if room.player1 != nil {
+				players = append(players, &PlayerPublicInfo{ID: room.player1.id})
+			}
+			if room.player2 != nil {
+				players = append(players, &PlayerPublicInfo{ID: room.player2.id})
+			}
+			rooms = append(rooms, &RoomPublicInfo{
+				ID:      id,
+				Players: players,
+			})
+		}
+		resp := ResponseHttpRooms{
+			Rooms: rooms,
+		}
+		return ctx.JSON(resp)
+	})
 }
 
 func (s *Server) addSubscription(event subEvent) {

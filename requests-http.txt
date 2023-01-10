@@ -1,0 +1,34 @@
+###############################################
+## GetRoomsInfo
+{
+	Request
+	{
+		"action": "get-rooms-info",
+	}
+	Response
+	{
+		"rooms": [
+			{
+				"id": "roomName",
+				"players": [
+					{
+						"id": "player1",
+					},
+					{
+						"id": "player2",
+					}
+				]
+			},
+			{
+				"id": "roomName2",
+				"players": [
+					{
+						"id": "player1",
+					},
+					{
+						"id": "player2",
+					}
+				]
+			},
+		]
+}
