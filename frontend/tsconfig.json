@@ -1,21 +1,33 @@
 {
-    // TypeScript configuration file: provides options to the TypeScript
-    // compiler (tsc) and makes VSCode recognize this folder as a TS project,
-    // enabling the VSCode build tasks "tsc: build" and "tsc: watch".
-    "compilerOptions": {
-        "target": "es2022", // Compatible with older browsers
-        "outDir": "js",
-        "module": "umd", // Compatible with both Node.js and browser
-        "moduleResolution": "node", // Tell tsc to look in node_modules for modules
-        "sourceMap": true, // Creates *.js.map files
-        "jsx": "react", // Causes inline XML (JSX code) to be expanded
-        "strict": true, // Strict types, eg. prohibits `var x=0; x=null`
-        "alwaysStrict": true, // Enable JavaScript's "use strict" mode
-        "strictNullChecks": true, // Enable null/undefined checks when you try to use a variable that might be null
-        "strictPropertyInitialization": false, // When set to true, TypeScript will raise an error when a class property was declared but not set in the constructor
-        "noUnusedLocals": false, // Report errors on unused local variables
-        "noUnusedParameters": false // Report errors on unused parameters in functions
+  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "exclude": ["node_modules"]
+    "target": "es2022", // Compatible with older browsers
+    "outDir": "js",
+    "module": "umd", // Compatible with both Node.js and browser
+    "moduleResolution": "node", // Tell tsc to look in node_modules for modules
+    "sourceMap": true, // Creates *.js.map files
+    "jsx": "react", // Causes inline XML (JSX code) to be expanded
+    "strict": true, // Strict types, eg. prohibits `var x=0; x=null`
+    "alwaysStrict": true, // Enable JavaScript's "use strict" mode
+    "strictNullChecks": true, // Enable null/undefined checks when you try to use a variable that might be null
+    "strictPropertyInitialization": false, // When set to true, TypeScript will raise an error when a class property was declared but not set in the constructor
+    "noUnusedLocals": false, // Report errors on unused local variables
+    "noUnusedParameters": false // Report errors on unused parameters in functions
+  },
+  "references": [
+    {
+      "path": "./tsconfig.config.json"
+    }
+  ]
 }
