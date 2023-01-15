@@ -18,8 +18,8 @@ class Square {
         return this._isValidMove.value
     }
 
-    private _updateRender: Ref<boolean>
-    public get updateRender(): boolean {
+    private _updateRender: Ref<number>
+    public get updateRender(): number {
         return this._updateRender.value
     }
 
@@ -28,8 +28,7 @@ class Square {
         this.rank = rank
         this._piece = piece
         this._isValidMove = ref(false)
-        this._updateRender = ref(false)
-        // this._key = ref(rank * 8 + file)
+        this._updateRender = ref(1)
 
         this.id = `${String.fromCharCode(65 + file)}${rank + 1}`
         this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
@@ -49,28 +48,12 @@ class Square {
         return cell
     }
 
-    public addOnClickEventListener() {
-        const element = document.getElementById(this.id) as HTMLElement
-        const file = this.file
-        const rank = this.rank
-        element.onclick = () => {
-            const payload = {
-                detail: {
-                    file: file,
-                    rank: rank
-                }
-            }
-
-            document.dispatchEvent(new CustomEvent(eventTopics.OnSquareClick, payload))
-        }
-    }
-
     public isEmpty(): boolean {
         return this._piece === null
     }
 
     private updatePieceRender() {
-        this._updateRender.value = !this._updateRender.value
+        this._updateRender.value++
     }
 
     public setPiece(piece: Piece | null) {

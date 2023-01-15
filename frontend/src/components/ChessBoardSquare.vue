@@ -18,7 +18,7 @@ function onSquareClickEvent() {
 
 <template>
     <td id="{{ props.square.id }}" class="board-square" :class="props.square.color" @click="onSquareClickEvent()">
-        <div id="{{ props.square.id }}-piece" class="piece" v-if="props.square.updateRender || true">
+        <div id="{{ props.square.id }}-piece" class="piece" :key="props.square.updateRender">
             <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
         </div>
         <div v-if="props.square.isValidMove" id="{{ props.square.id }}-valid-move" class="board-square valid-move">
