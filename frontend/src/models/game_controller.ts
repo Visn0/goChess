@@ -22,23 +22,15 @@ class GameController {
         return this._srcSquare
     }
 
-    private receiveActions: Map<string, ReceiveAction>
-
     constructor(rooms: Rooms, board: Board, repository: ConnectionRepository) {
         this.rooms = rooms
         this._board = board
         this.repository = repository
 
-        document.addEventListener(eventTopics.OnSquareClick, (e: Event) => {
-            this.onSquareClick(e as CustomEvent)
-        })
-
         this._srcSquare = null
     }
 
-    private onSquareClick(event: CustomEvent) {
-        const file: File = event.detail.file
-        const rank: Rank = event.detail.rank
+    public onSquareClick(file: File, rank: Rank) {
 
         const square = this._board.getSquare(file, rank)
         if (this.isSrcSquareSelected()) {
@@ -85,6 +77,7 @@ class SrcSquare {
 
     public setValidMoves(moves: Array<Square>) {
         this.validMoves = moves
+        console.log("Set valid moves:", moves)
         moves.forEach((m) => m.setAsValidMove())
     }
 

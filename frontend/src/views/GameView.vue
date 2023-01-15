@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ChessBoard from '@/components/ChessBoard.vue';
 import { MovesReceivedAction } from '@/models/actions/receive/moves_received_action';
 import { PieceMovedAction } from '@/models/actions/receive/piece_moved_action';
 import type { ReceiveAction } from '@/models/actions/receive/receive_action';
@@ -10,44 +11,33 @@ import { RequestRoomsAction } from '@/models/actions/send/request_rooms';
 import { Board } from '@/models/board';
 import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository';
 import type { ConnectionRepository } from '@/models/connection_repository/connection_repository';
-import { Color, constants } from '@/models/constants';
+import { Color, File, Rank, constants } from '@/models/constants';
 import { GameController } from '@/models/game_controller';
 import { Rooms } from '@/models/room';
-import { onMounted } from 'vue';
 
 const playerID = 'MiPlayerID'
 const rooms = new Rooms('modal-list-rooms-body')
-let board: Board
+const board = new Board()
+board.initFromFenNotation(constants.StartingPosition)
+
 /* eslint-disable capitalized-comments */
-// let repository: ConnectionRepository
+// const repository: ConnectionRepository = new MockConnectionRepository()
 /* eslint-enable capitalized-comments */
-let repository: ConnectionRepository
-let gameController: GameController
+const repository = new BackendConnectionRepository('localhost', '8081', 'ws')
+const gameController = new GameController(rooms, board, repository)
 
-onMounted(() => {
-    board = new Board(document.getElementById('chess-board') as HTMLElement)
-    /* eslint-disable capitalized-comments */
-    // const repository: ConnectionRepository = new MockConnectionRepository()
-    /* eslint-enable capitalized-comments */
-    repository = new BackendConnectionRepository('localhost', '8081', 'ws')
-    gameController = new GameController(rooms, board, repository)
+const routeActions: RouteActions = new RouteActions(
+    new Map<string, ReceiveAction>([
+        ['create-room', new RoomCreatedAction(rooms)],
+        ['join-room', new RoomJoinedAction(rooms)],
+        ['request-moves', new MovesReceivedAction(gameController)],
+        ['move-piece', new PieceMovedAction(gameController)]
+    ])
+)
+repository.addOnWebSocketMessageEventListener(routeActions.route())
 
-    const routeActions: RouteActions = new RouteActions(
-        new Map<string, ReceiveAction>([
-            ['create-room', new RoomCreatedAction(rooms)],
-            ['join-room', new RoomJoinedAction(rooms)],
-            ['request-moves', new MovesReceivedAction(gameController)],
-            ['move-piece', new PieceMovedAction(gameController)]
-        ])
-    )
-    repository.addOnWebSocketMessageEventListener(routeActions.route())
-
-    board.initFromFenNotation(constants.StartingPosition)
-    board.render(Color.WHITE)
-
-    RequestRoomsAction(repository, rooms)
-    setInterval(() => RequestRoomsAction(repository, rooms), 10000)
-})
+// RequestRoomsAction(repository, rooms)
+// setInterval(() => RequestRoomsAction(repository, rooms), 10000)
 
 function createRoom() {
     CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
@@ -60,7 +50,8 @@ function createRoom() {
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle">
                 <div class="my-2 text-light">{{ playerID }}</div>
-                <div id="chess-board" class="row"></div>
+                <ChessBoard :board="board" :color-down="Color.WHITE"
+                    @on-square-click="(f: File, r: Rank) => gameController.onSquareClick(f, r)" />
 
                 <!-- Buttons -->
                 <div class="row mt-3 text-center actions-btns">

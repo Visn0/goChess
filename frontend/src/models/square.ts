@@ -1,3 +1,4 @@
+import { ref, type Ref } from 'vue'
 import { Color, File, Rank, eventTopics } from './constants'
 import type { Piece } from './piece'
 
@@ -12,10 +13,23 @@ class Square {
         return this._piece
     }
 
+    private _isValidMove: Ref<boolean>
+    public get isValidMove(): boolean {
+        return this._isValidMove.value
+    }
+
+    private _updateRender: Ref<boolean>
+    public get updateRender(): boolean {
+        return this._updateRender.value
+    }
+
     constructor(file: File, rank: Rank, piece: Piece | null) {
         this.file = file
         this.rank = rank
         this._piece = piece
+        this._isValidMove = ref(false)
+        this._updateRender = ref(false)
+        // this._key = ref(rank * 8 + file)
 
         this.id = `${String.fromCharCode(65 + file)}${rank + 1}`
         this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
@@ -56,9 +70,7 @@ class Square {
     }
 
     private updatePieceRender() {
-        const piece = this._piece?.toDivHTMLString() || ''
-        const element = document.getElementById(`${this.id}-piece`) as HTMLElement
-        element.innerHTML = piece
+        this._updateRender.value = !this._updateRender.value
     }
 
     public setPiece(piece: Piece | null) {
@@ -67,21 +79,13 @@ class Square {
     }
 
     public setAsValidMove() {
-        const element = document.getElementById(`${this.id}-valid-move`)
-        if (element === null) {
-            return
-        }
-
-        element.hidden = false
+        this._isValidMove.value = true
+        this.updatePieceRender()
     }
 
     public unsetAsValidMove() {
-        const element = document.getElementById(`${this.id}-valid-move`)
-        if (element === null) {
-            return
-        }
-
-        element.hidden = true
+        this._isValidMove.value = false
+        this.updatePieceRender()
     }
 
     public equals(s: Square): boolean {

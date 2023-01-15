@@ -12,9 +12,9 @@
         "./src/*"
       ]
     },
-    "target": "es2022", // Compatible with older browsers
+    "target": "ES2022", // Compatible with older browsers
     "outDir": "js",
-    "module": "umd", // Compatible with both Node.js and browser
+    "module": "ES2022", // Compatible with both Node.js and browser
     "moduleResolution": "node", // Tell tsc to look in node_modules for modules
     "sourceMap": true, // Creates *.js.map files
     "jsx": "react", // Causes inline XML (JSX code) to be expanded

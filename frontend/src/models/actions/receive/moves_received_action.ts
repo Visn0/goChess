@@ -20,10 +20,12 @@ class MovesReceivedAction {
 
     public Invoke(body: string) {
         const p: MovesReceivedParams = JSON.parse(body)
+        console.log("Moves received:", p)
 
         const board = this.gameController.board
         const validMoves: Array<Square> = p.validMoves.map((m) => board.getSquare(m.file, m.rank))
 
+        console.log("srcSquare?.setValidMoves: ", this.gameController.srcSquare)
         this.gameController.srcSquare?.setValidMoves(validMoves)
     }
 }

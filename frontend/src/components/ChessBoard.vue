@@ -1,14 +1,51 @@
 <script setup lang="ts">
+import { Color, Rank, File } from '@/models/constants';
 import type { Board } from '../models/board'
+import ChessBoardSquare from './ChessBoardSquare.vue';
 
 defineProps<{
     board: Board
+    colorDown: Color
 }>()
+
+const emit = defineEmits(['onSquareClick'])
+function onSquareClickEvent(file: File, rank: Rank) {
+    emit('onSquareClick', file, rank)
+}
+
+const ascRanks = enumToArray(Rank)
+const descRanks = ascRanks.reverse()
+
+const ascFiles = enumToArray(File)
+const descFiles = ascFiles.reverse()
+
+function enumToArray(e: any): Array<any> {
+    const isNumber = (value: any) => isNaN(Number(value)) === false
+    const values: Array<any> = Object.keys(e)
+        .filter(isNumber)
+        .map(key => Number(key))
+
+    return values
+}
 
 </script>
 
 <template>
     <div class="chess-board">
+        <table id="board-table">
+            <template v-if="colorDown === Color.WHITE">
+                <tr v-for="r in descRanks">
+                    <ChessBoardSquare v-for="f in ascFiles" :square="board.getSquare(f, r)"
+                        @onSquareClick="onSquareClickEvent" />
+                </tr>
+            </template>
+            <template v-else>
+                <tr v-for="r in ascRanks">
+                    <ChessBoardSquare v-for="f in descFiles" :square="board.getSquare(f, r)"
+                        @onSquareClick="onSquareClickEvent" />
+                </tr>
+            </template>
+        </table>
     </div>
 </template>
 
@@ -21,94 +58,5 @@ defineProps<{
     height: 80vmin;
     display: flex;
     flex-wrap: wrap;
-}
-
-.board-square {
-    width: 10vmin;
-    height: 10vmin;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-}
-
-.board-square.valid-move {
-    position: absolute;
-    top: 0;
-    left: auto;
-
-    shape-outside: circle(100%);
-    clip-path: circle(40%);
-    background-color: rgba(45, 45, 45, 0.15);
-    border: 2px solid #000;
-}
-
-.board-square.white-square {
-    background-color: #fff;
-}
-
-.board-square.black-square {
-    background-color: #7fa650;
-}
-
-.piece {
-    margin: 0;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-
-    height: 100%;
-    width: 100%;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-}
-
-/*white pieces*/
-.piece.white-pawn {
-    background-image: url('../pieces/white/white-pawn.png');
-}
-
-.piece.white-rook {
-    background-image: url('../pieces/white/white-rook.png');
-}
-
-.piece.white-knight {
-    background-image: url('../pieces/white/white-knight.png');
-}
-
-.piece.white-bishop {
-    background-image: url('../pieces/white/white-bishop.png');
-}
-
-.piece.white-king {
-    background-image: url('../pieces/white/white-king.png');
-}
-
-.piece.white-queen {
-    background-image: url('../pieces/white/white-queen.png');
-}
-
-/*black pieces*/
-.piece.black-pawn {
-    background-image: url('../pieces/black/black-pawn.png');
-}
-
-.piece.black-rook {
-    background-image: url('../pieces/black/black-rook.png');
-}
-
-.piece.black-knight {
-    background-image: url('../pieces/black/black-knight.png');
-}
-
-.piece.black-bishop {
-    background-image: url('../pieces/black/black-bishop.png');
-}
-
-.piece.black-king {
-    background-image: url('../pieces/black/black-king.png');
-}
-
-.piece.black-queen {
-    background-image: url('../pieces/black/black-queen.png');
 }
 </style>
