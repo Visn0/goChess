@@ -10,10 +10,10 @@ class Square {
 
     private _piece: Ref<Piece | null>
     public get piece(): Piece | null {
-        return this._piece?.value
+        return this._piece.value
     }
     public getPiece(): Piece | null {
-        return this._piece?.value
+        return this._piece.value
     }
 
     private _isValidMove: Ref<boolean>
