@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Square } from '@/models/square';
-import ChessPiece from './ChessPiece.vue';
+import type { Square } from '@/models/square'
+import ChessPiece from './ChessPiece.vue'
 
 const props = defineProps<{
     square: Square
@@ -13,7 +13,6 @@ function onSquareClickEvent() {
 
     emit('onSquareClick', file, rank)
 }
-
 </script>
 
 <template>
@@ -21,8 +20,11 @@ function onSquareClickEvent() {
         <div id="{{ props.square.id }}-piece" class="piece" :key="props.square.updateRender">
             <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
         </div>
-        <div v-if="props.square.isValidMove" id="{{ props.square.id }}-valid-move" class="board-square valid-move">
-        </div>
+        <div
+            v-if="props.square.isValidMove"
+            id="{{ props.square.id }}-valid-move"
+            class="board-square valid-move"
+        ></div>
     </td>
 </template>
 

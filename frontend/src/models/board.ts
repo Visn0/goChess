@@ -1,4 +1,4 @@
-import { Color, File, Rank, constants } from './constants'
+import { File, Rank, constants } from './constants'
 import { Piece, PieceFactory } from './piece'
 import { Square } from './square'
 

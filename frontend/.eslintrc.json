@@ -1,23 +1,13 @@
 {
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": [
-            "./tsconfig.json"
-        ]
+        "project": ["./tsconfig.json"]
     },
-    "plugins": [
-        "@typescript-eslint"
-    ],
+    "plugins": ["@typescript-eslint"],
     "root": true,
     "rules": {
-        "function-call-argument-newline": [
-            "error",
-            "consistent"
-        ],
+        "function-call-argument-newline": ["error", "consistent"],
         "new-cap": "off",
         "line-comment-position": "off",
         "indent": [
@@ -27,10 +17,7 @@
                 "SwitchCase": 1
             }
         ],
-        "brace-style": [
-            "error",
-            "1tbs"
-        ],
+        "brace-style": ["error", "1tbs"],
         "no-multiple-empty-lines": [
             "error",
             {
@@ -46,42 +33,18 @@
                 "after": true
             }
         ],
-        "array-element-newline": [
-            "error",
-            "consistent"
-        ],
-        "array-bracket-newline": [
-            "error",
-            "consistent"
-        ],
+        "array-element-newline": ["error", "consistent"],
+        "array-bracket-newline": ["error", "consistent"],
         "multiline-comment-style": "off",
         "dot-notation": "error",
-        "eqeqeq": [
-            "error",
-            "smart"
-        ],
-        "curly": [
-            "error",
-            "all"
-        ],
+        "eqeqeq": ["error", "smart"],
+        "curly": ["error", "all"],
         "default-case-last": "error",
-        "arrow-body-style": [
-            "error",
-            "as-needed"
-        ],
-        "object-curly-spacing": [
-            "error",
-            "always"
-        ],
+        "arrow-body-style": ["error", "as-needed"],
+        "object-curly-spacing": ["error", "always"],
         "capitalized-comments": "error",
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "spaced-comment": [
-            "error",
-            "always"
-        ],
+        "quotes": ["error", "single"],
+        "spaced-comment": ["error", "always"],
         "comma-spacing": [
             "error",
             {

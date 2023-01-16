@@ -1,9 +1,7 @@
-import { eventTopics } from './constants'
 import type { Board } from './board'
 import type { File, Rank } from './constants'
 import type { Square } from './square'
 import type { ConnectionRepository } from './connection_repository/connection_repository'
-import type { ReceiveAction } from './actions/receive/receive_action'
 import { RequestMovesAction } from './actions/send/request_moves_action'
 import { MovePieceAction } from './actions/send/move_piece_action'
 import type { Rooms } from './room'
@@ -31,7 +29,6 @@ class GameController {
     }
 
     public onSquareClick(file: File, rank: Rank) {
-
         const square = this._board.getSquare(file, rank)
         if (this.isSrcSquareSelected()) {
             if (this._srcSquare?.equals(square)) {
@@ -77,7 +74,7 @@ class SrcSquare {
 
     public setValidMoves(moves: Array<Square>) {
         this.validMoves = moves
-        console.log("Set valid moves:", moves)
+        console.log('Set valid moves:', moves)
         moves.forEach((m) => m.setAsValidMove())
     }
 

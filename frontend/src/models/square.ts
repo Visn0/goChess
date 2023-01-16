@@ -1,5 +1,5 @@
 import { ref, type Ref } from 'vue'
-import { Color, File, Rank, eventTopics } from './constants'
+import { Color, File, Rank } from './constants'
 import type { Piece } from './piece'
 
 class Square {

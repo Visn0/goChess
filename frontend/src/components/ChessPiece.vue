@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { Piece } from '..//models/piece';
+import type { Piece } from '..//models/piece'
 
 const props = defineProps<{
     piece: Piece
 }>()
-
 </script>
 
 <template>
