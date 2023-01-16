@@ -16,7 +16,11 @@ function onSquareClickEvent() {
 }
 
 let componentKey = 0
-watch(props.square, () => {
+watch(props.square.isValidMove.bind(props.square), () => {
+    componentKey += 1
+})
+
+watch(props.square.getPiece.bind(props.square), () => {
     componentKey += 1
 })
 </script>
@@ -33,7 +37,7 @@ watch(props.square, () => {
             <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
         </div>
         <div
-            v-if="props.square.isValidMove"
+            v-if="props.square.isValidMove()"
             id="{{ props.square.id }}-valid-move"
             class="board-square valid-move"
         ></div>

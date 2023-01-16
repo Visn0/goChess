@@ -44,37 +44,6 @@ class Board {
         return !Number.isNaN(Number(s))
     }
 
-    // public render(colorDown: Color) {
-    //     let board = '<table id="board-table">'
-    //     if (colorDown === Color.WHITE) {
-    //         for (let r = Rank._8; r >= Rank._1; --r) {
-    //             board += '<tr>'
-    //             for (let f = File.A; f <= File.H; ++f) {
-    //                 board += this.getSquare(f, r).toTableCellHTML()
-    //             }
-    //             board += '</tr>\n'
-    //         }
-    //     } else {
-    //         for (let r = Rank._1; r <= Rank._8; ++r) {
-    //             board += '<tr>'
-    //             for (let f = File.H; f >= File.A; --f) {
-    //                 board += this.getSquare(f, r).toTableCellHTML()
-    //             }
-    //             board += '</tr>\n'
-    //         }
-    //     }
-
-    //     board += '</table>'
-    //     this.container.innerHTML = board
-    //     this.addOnClickEventListeners()
-    // }
-
-    private addOnClickEventListeners() {
-        this.squares.forEach((rank) => {
-            rank.forEach((square) => square.addOnClickEventListener())
-        })
-    }
-
     public getSquare(file: File, rank: Rank): Square {
         return this.squares[rank][file]
     }

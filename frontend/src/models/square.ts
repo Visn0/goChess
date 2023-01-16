@@ -12,9 +12,12 @@ class Square {
     public get piece(): Piece | null {
         return this._piece?.value
     }
+    public getPiece(): Piece | null {
+        return this._piece?.value
+    }
 
     private _isValidMove: Ref<boolean>
-    public get isValidMove(): boolean {
+    public isValidMove(): boolean {
         return this._isValidMove.value
     }
 
@@ -29,7 +32,7 @@ class Square {
     }
 
     public isEmpty(): boolean {
-        return this._piece === null
+        return this.piece === null
     }
 
     public setPiece(piece: Piece | null) {
