@@ -27,3 +27,7 @@ body {
 .bg-green {
     background-color: #7fa650;
 }
+
+.border-green {
+    border-color: #7fa650;
+}
