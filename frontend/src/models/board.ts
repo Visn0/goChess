@@ -34,6 +34,7 @@ class Board {
             this.squares[r] = rank
             notationIdx++ // Skip '/' char
         }
+        console.log(this.squares[Rank._1][File.A])
     }
 
     public reset() {

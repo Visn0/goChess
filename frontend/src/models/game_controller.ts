@@ -1,5 +1,4 @@
 import type { Board } from './board'
-import type { File, Rank } from './constants'
 import type { Square } from './square'
 import type { ConnectionRepository } from './connection_repository/connection_repository'
 import { RequestMovesAction } from './actions/send/request_moves_action'
@@ -28,10 +27,9 @@ class GameController {
         this._srcSquare = null
     }
 
-    public onSquareClick(file: File, rank: Rank) {
-        const square = this._board.getSquare(file, rank)
-        if (this.isSrcSquareSelected()) {
-            if (this._srcSquare?.equals(square)) {
+    public selectSquare(square: Square) {
+        if (this._srcSquare !== null) {
+            if (this._srcSquare.equals(square)) {
                 this.unselectSrcSquare()
                 return
             }
@@ -45,10 +43,6 @@ class GameController {
             return
         }
 
-        this.selectSquare(square)
-    }
-
-    private selectSquare(square: Square) {
         this._srcSquare = new SrcSquare(square)
         RequestMovesAction(this.repository, square)
     }
@@ -56,10 +50,6 @@ class GameController {
     public unselectSrcSquare() {
         this._srcSquare?.removeValidMoves()
         this._srcSquare = null
-    }
-
-    private isSrcSquareSelected(): boolean {
-        return this._srcSquare !== null
     }
 }
 

@@ -14,10 +14,10 @@ function onSquareClickEvent(file: File, rank: Rank) {
 }
 
 const ascRanks = enumToArray(Rank)
-const descRanks = ascRanks.reverse()
+const descRanks = ascRanks.slice().reverse()
 
 const ascFiles = enumToArray(File)
-const descFiles = ascFiles.reverse()
+const descFiles = ascFiles.slice().reverse()
 
 function enumToArray(e: any): Array<any> {
     const isNumber = (value: any) => isNaN(Number(value)) === false

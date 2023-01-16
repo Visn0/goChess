@@ -10,7 +10,7 @@ import { CreateRoomAction } from '@/models/actions/send/create_room_action'
 import { RequestRoomsAction } from '@/models/actions/send/request_rooms'
 import { Board } from '@/models/board'
 import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository'
-import { Color, constants } from '@/models/constants'
+import { Color, constants, type File, type Rank } from '@/models/constants'
 import { GameController } from '@/models/game_controller'
 import { Rooms } from '@/models/room'
 
@@ -41,6 +41,11 @@ setInterval(() => RequestRoomsAction(repository, rooms), 10000)
 function createRoom() {
     CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
 }
+
+function squareClick(file: File, rank: Rank) {
+    const square = board.getSquare(file, rank)
+    gameController.selectSquare(square)
+}
 </script>
 
 <template>
@@ -48,11 +53,7 @@ function createRoom() {
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle">
                 <div class="my-2 text-light">{{ playerID }}</div>
-                <ChessBoard
-                    :board="board"
-                    :color-down="Color.WHITE"
-                    @on-square-click="(f, r) => gameController.onSquareClick(f, r)"
-                />
+                <ChessBoard :board="board" :color-down="Color.WHITE" @on-square-click="squareClick" />
 
                 <!-- Buttons -->
                 <div class="row mt-3 text-center actions-btns">
