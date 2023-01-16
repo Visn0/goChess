@@ -1,7 +1,15 @@
 <script setup lang="ts">
-let playerID = ''
+import router from '@/router'
+import { usePlayerIDStore } from '@/stores/playerID'
+
+const playerIDStore = usePlayerIDStore()
+
+let playerID = playerIDStore.id
+
 function confirmNickname() {
     console.log('confirmNickname: ', playerID)
+    playerIDStore.set(playerID)
+    router.push('/game')
 }
 </script>
 

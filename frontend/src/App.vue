@@ -20,6 +20,9 @@ import { RouterLink, RouterView } from 'vue-router'
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
+                        <RouterLink :to="{ name: 'choose-nickname' }" class="nav-link">Choose nickname</RouterLink>
+                    </li>
+                    <li class="nav-item">
                         <button
                             id="btn-rooms"
                             type="button"

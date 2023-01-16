@@ -13,8 +13,11 @@ import { BackendConnectionRepository } from '@/models/connection_repository/back
 import { Color, constants, type File, type Rank } from '@/models/constants'
 import { GameController } from '@/models/game_controller'
 import { Rooms } from '@/models/room'
+import { usePlayerIDStore } from '@/stores/playerID'
 
-const playerID = 'MiPlayerID'
+const playerIDStore = usePlayerIDStore()
+
+const playerID = playerIDStore.id
 const rooms = new Rooms('modal-list-rooms-body')
 const board = new Board()
 board.initFromFenNotation(constants.StartingPosition)
