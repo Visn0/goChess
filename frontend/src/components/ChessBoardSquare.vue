@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Square } from '@/models/square'
 import ChessPiece from './ChessPiece.vue'
+import { watch } from 'vue'
 
 const props = defineProps<{
     square: Square
@@ -13,11 +14,22 @@ function onSquareClickEvent() {
 
     emit('onSquareClick', file, rank)
 }
+
+let componentKey = 0
+watch(props.square, () => {
+    componentKey += 1
+})
 </script>
 
 <template>
-    <td id="{{ props.square.id }}" class="board-square" :class="props.square.color" @click="onSquareClickEvent()">
-        <div id="{{ props.square.id }}-piece" class="piece" :key="props.square.updateRender">
+    <td
+        id="{{ props.square.id }}"
+        class="board-square"
+        :class="props.square.color"
+        @click="onSquareClickEvent()"
+        :key="componentKey"
+    >
+        <div id="{{ props.square.id }}-piece" class="piece">
             <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
         </div>
         <div
