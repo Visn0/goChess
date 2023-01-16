@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ChessBoard from '@/components/ChessBoard.vue'
 import { MovesReceivedAction } from '@/models/actions/receive/moves_received_action'
 import { PieceMovedAction } from '@/models/actions/receive/piece_moved_action'
 import type { ReceiveAction } from '@/models/actions/receive/receive_action'
@@ -10,10 +9,14 @@ import { CreateRoomAction } from '@/models/actions/send/create_room_action'
 import { RequestRoomsAction } from '@/models/actions/send/request_rooms'
 import { Board } from '@/models/board'
 import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository'
-import { Color, constants, type File, type Rank } from '@/models/constants'
+import { constants } from '@/models/constants'
 import { GameController } from '@/models/game_controller'
 import { Rooms } from '@/models/room'
 import { usePlayerIDStore } from '@/stores/playerID'
+import RoomListing from '@/components/RoomListing.vue'
+import RoomItem from '@/components/RoomItem.vue'
+import { watch } from 'vue'
+import { JoinRoomAction } from '@/models/actions/send/join_room_action'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -45,34 +48,40 @@ function createRoom() {
     CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
 }
 
-function squareClick(file: File, rank: Rank) {
-    const square = board.getSquare(file, rank)
-    gameController.selectSquare(square)
+function joinRoom(roomID: string) {
+    JoinRoomAction(repository, playerID, roomID, 'roomPassword')
 }
+
+let componentKey = 1
+watch(rooms.getRooms.bind(rooms), () => {
+    componentKey += 1
+})
+
+watch(rooms.getMyRoom.bind(rooms), () => {
+    componentKey += 1
+})
 </script>
 
 <template>
     <main>
-        <div class="vh-100 position-relative">
-            <div class="container h-auto position-absolute top-50 start-50 translate-middle">
-                <div class="my-2 text-light">{{ playerID }}</div>
-                <ChessBoard :board="board" :color-down="Color.WHITE" @on-square-click="squareClick" />
-
-                <!-- Buttons -->
-                <div class="row mt-3 text-center actions-btns">
-                    <button
-                        type="button"
-                        class="col-sm btn btn-dark border border-light m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal-list-rooms"
-                        @click="createRoom()"
-                    >
-                        Create room
-                    </button>
-                    <button type="button" class="col-sm btn btn-dark border border-light m-2">Abandon</button>
-                    <button type="button" class="col-sm btn btn-dark border border-light m-2">Draw</button>
+        <div class="container h-auto position-absolute top-30 start-50 translate-middle d-flex justify-content-center">
+            <div class="row w-100 d-flex justify-content-center">
+                <div class="col-sm-12 col-lg-6">
+                    <div class="d-flex justify-content-center my-2 text-light">{{ playerID }}</div>
+                    <template v-if="rooms.myRoom">
+                        <RoomItem :room="rooms.myRoom" />
+                        <div class="h-0 p-0 rounded border border-light my-2 mb-4"></div>
+                    </template>
+                    <RoomListing :rooms="rooms" @join-room="joinRoom" :key="componentKey" />
+                    <button type="button" class="w-100 btn bg-green" @click="createRoom">Create room</button>
                 </div>
             </div>
         </div>
     </main>
 </template>
+
+<style scoped>
+.top-30 {
+    top: 30% !important;
+}
+</style>

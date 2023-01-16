@@ -34,7 +34,6 @@ class RoomJoinedAction {
         const myRoom = new Room(p.room.id, players)
 
         this.rooms.setMyRoom(myRoom)
-        this.rooms.render()
     }
 }
 

@@ -23,15 +23,7 @@ import { RouterLink, RouterView } from 'vue-router'
                         <RouterLink :to="{ name: 'choose-nickname' }" class="nav-link">Choose nickname</RouterLink>
                     </li>
                     <li class="nav-item">
-                        <button
-                            id="btn-rooms"
-                            type="button"
-                            class="nav-link btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modal-list-rooms"
-                        >
-                            Rooms
-                        </button>
+                        <RouterLink :to="{ name: 'rooms' }" class="nav-link">Rooms</RouterLink>
                     </li>
                 </ul>
             </div>

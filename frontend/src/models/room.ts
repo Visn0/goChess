@@ -1,3 +1,4 @@
+import { type Ref, ref } from 'vue'
 import { RoomPlayer } from './room_player'
 
 class Room {
@@ -56,40 +57,35 @@ class Room {
 }
 
 class Rooms {
-    private container: HTMLElement
-    private rooms: Array<Room>
-    private myRoom: Room | null
-
-    constructor(containerID: string) {
-        this.container = document.getElementById(containerID) as HTMLElement
-        this.rooms = Array<Room>()
-        this.myRoom = null
+    private _rooms: Ref<Array<Room>>
+    public getRooms(): Array<Room> {
+        return this._rooms.value
+    }
+    private _myRoom: Ref<Room | null>
+    public get myRoom(): Room | null {
+        return this._myRoom.value
+    }
+    public getMyRoom(): Room | null {
+        return this._myRoom.value
     }
 
-    public render() {
-        let rooms = this.myRoom ? this.myRoom.toDivHTML() : ''
-
-        if (rooms !== '' && this.rooms.length > 0) {
-            rooms += '\n<li class="list-group-item border-top border-secondary my-4 p-0"></li>'
-        }
-
-        for (let i = 0; i < this.rooms.length; i++) {
-            rooms += this.rooms[i].toDivHTML()
-            if (i < this.rooms.length - 1) {
-                rooms += '\n<br>'
-            }
-        }
-
-        this.container.innerHTML = rooms
+    constructor() {
+        this._rooms = ref(Array<Room>())
+        this._myRoom = ref(null)
     }
 
     public setRooms(rooms: Array<Room>) {
-        this.rooms = rooms.map((i) => Room.createFromJSON(i))
-        this.rooms = this.rooms.sort((r1, r2) => (r1.id > r2.id ? 1 : -1))
+        if (!rooms || rooms.length === 0) {
+            this._rooms.value = Array<Room>()
+            return
+        }
+
+        this._rooms.value = rooms.map((i) => Room.createFromJSON(i))
+        this._rooms.value = this._rooms.value.sort((r1, r2) => (r1.id > r2.id ? 1 : -1))
     }
 
     public setMyRoom(myRoom: Room) {
-        this.myRoom = myRoom
+        this._myRoom.value = myRoom
         myRoom.setMyRoom()
     }
 }

@@ -11,7 +11,6 @@ function RequestRoomsAction(repository: ConnectionRepository, rooms: Rooms) {
         .then((response) => response.json())
         .then((jsonBody: RequestRoomsReponse) => {
             rooms.setRooms(jsonBody.rooms)
-            rooms.render()
         })
         .catch((err) => console.log(err))
 }

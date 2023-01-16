@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import GameView from '../views/GameView.vue'
+import RoomsView from '../views/RoomsView.vue'
 import ChooseNickname from '../views/ChooseNicknameView.vue'
 
 const router = createRouter({
@@ -9,6 +10,11 @@ const router = createRouter({
             path: '/',
             name: 'choose-nickname',
             component: ChooseNickname
+        },
+        {
+            path: '/rooms',
+            name: 'rooms',
+            component: RoomsView
         },
         {
             path: '/game',
