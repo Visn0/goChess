@@ -1,5 +1,5 @@
 import type { File, Rank } from '../../constants'
-import type { GameController } from '../../game_controller'
+import type { Game } from '../../game'
 import type { Square } from '../../square'
 
 class PieceMovedParams {
@@ -13,20 +13,20 @@ class CoordinateParams {
 }
 
 class PieceMovedAction {
-    private gameController: GameController
+    private game: Game
 
-    constructor(gameController: GameController) {
-        this.gameController = gameController
+    constructor(game: Game) {
+        this.game = game
     }
 
     public Invoke(body: string) {
         const p: PieceMovedParams = JSON.parse(body)
 
-        const srcSquare: Square = this.gameController.board.getSquare(p.src.file, p.src.rank)
+        const srcSquare: Square = this.game.board.getSquare(p.src.file, p.src.rank)
 
-        this.gameController.board.setSquarePiece(p.dst.file, p.dst.rank, srcSquare.piece)
-        this.gameController.board.setSquarePiece(srcSquare.file, srcSquare.rank, null)
-        this.gameController.unselectSrcSquare()
+        this.game.board.setSquarePiece(p.dst.file, p.dst.rank, srcSquare.piece)
+        this.game.board.setSquarePiece(srcSquare.file, srcSquare.rank, null)
+        this.game.unselectSrcSquare()
     }
 }
 

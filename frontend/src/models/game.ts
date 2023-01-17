@@ -5,7 +5,7 @@ import { RequestMovesAction } from './actions/send/request_moves_action'
 import { MovePieceAction } from './actions/send/move_piece_action'
 import type { Rooms } from './room'
 
-class GameController {
+class Game {
     private repository: ConnectionRepository
     private _board: Board
     private rooms: Rooms
@@ -82,4 +82,4 @@ class SrcSquare {
     }
 }
 
-export { GameController }
+export { Game }

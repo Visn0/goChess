@@ -9,7 +9,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits(['onSquareClick'])
-function onSquareClickEvent(file: File, rank: Rank) {
+function squareClick(file: File, rank: Rank) {
     emit('onSquareClick', file, rank)
 }
 
@@ -38,7 +38,7 @@ function enumToArray(e: any): Array<any> {
                         v-for="f in ascFiles"
                         :square="board.getSquare(f, r)"
                         :key="board.getSquare(f, r).id"
-                        @onSquareClick="onSquareClickEvent"
+                        @on-square-click="squareClick"
                     />
                 </tr>
             </template>
@@ -48,7 +48,7 @@ function enumToArray(e: any): Array<any> {
                         v-for="f in descFiles"
                         :square="board.getSquare(f, r)"
                         :key="board.getSquare(f, r).id"
-                        @onSquareClick="onSquareClickEvent"
+                        @on-square-click="squareClick"
                     />
                 </tr>
             </template>

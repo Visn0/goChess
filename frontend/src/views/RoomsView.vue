@@ -10,7 +10,7 @@ import { RequestRoomsAction } from '@/models/actions/send/request_rooms'
 import { Board } from '@/models/board'
 import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository'
 import { constants } from '@/models/constants'
-import { GameController } from '@/models/game_controller'
+import { Game } from '@/models/game.js'
 import { Rooms } from '@/models/room'
 import { usePlayerIDStore } from '@/stores/playerID'
 import RoomListing from '@/components/RoomListing.vue'
@@ -29,14 +29,14 @@ board.initFromFenNotation(constants.StartingPosition)
 // const repository: ConnectionRepository = new MockConnectionRepository()
 /* eslint-enable capitalized-comments */
 const repository = new BackendConnectionRepository('localhost', '8081', 'ws')
-const gameController = new GameController(rooms, board, repository)
+const game = new Game(rooms, board, repository)
 
 const routeActions: RouteActions = new RouteActions(
     new Map<string, ReceiveAction>([
         ['create-room', new RoomCreatedAction(rooms)],
         ['join-room', new RoomJoinedAction(rooms)],
-        ['request-moves', new MovesReceivedAction(gameController)],
-        ['move-piece', new PieceMovedAction(gameController)]
+        ['request-moves', new MovesReceivedAction(game)],
+        ['move-piece', new PieceMovedAction(game)]
     ])
 )
 repository.addOnWebSocketMessageEventListener(routeActions.route())

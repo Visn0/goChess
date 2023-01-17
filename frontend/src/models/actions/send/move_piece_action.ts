@@ -1,6 +1,6 @@
 import type { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
 import type { File, Rank } from '../../constants'
-import type { GameController } from '../../game_controller'
+import type { Game } from '../../game'
 import type { Square } from '../../square'
 
 class MovePieceMessage implements Message {
@@ -31,8 +31,8 @@ class MovePieceMessage implements Message {
     }
 }
 
-function MovePieceAction(repository: ConnectionRepository, gameController: GameController, dst: Square) {
-    const srcSquare = gameController.srcSquare
+function MovePieceAction(repository: ConnectionRepository, game: Game, dst: Square) {
+    const srcSquare = game.srcSquare
     if (!srcSquare?.canInnerPieceMoveTo(dst)) {
         return
     }

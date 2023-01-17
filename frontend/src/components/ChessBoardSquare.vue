@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['onSquareClick'])
-function onSquareClickEvent() {
+function squareClick() {
     const file = props.square.file
     const rank = props.square.rank
 
@@ -30,7 +30,7 @@ watch(props.square.getPiece.bind(props.square), () => {
         id="{{ props.square.id }}"
         class="board-square"
         :class="props.square.color"
-        @click="onSquareClickEvent()"
+        @click="squareClick()"
         :key="componentKey"
     >
         <div id="{{ props.square.id }}-piece" class="piece">
