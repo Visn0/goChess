@@ -1,4 +1,4 @@
-import type { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
+import type { ConnectionRepository, Message } from '@/models/connection_repository/connection_repository'
 
 class CreateRoomMessage implements Message {
     action: string

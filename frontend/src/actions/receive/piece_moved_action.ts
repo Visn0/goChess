@@ -1,6 +1,6 @@
-import type { File, Rank } from '../../constants'
-import type { Game } from '../../game'
-import type { Square } from '../../square'
+import type { File, Rank } from '@/models/constants'
+import type { Game } from '@/models/game'
+import type { Square } from '@/models/square'
 
 class PieceMovedParams {
     public src: CoordinateParams

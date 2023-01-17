@@ -1,6 +1,6 @@
-import type { CreateRoomMessage } from '../actions/send/create_room_action'
-import type { JoinRoomMessage } from '../actions/send/join_room_action'
-import type { MovePieceMessage } from '../actions/send/move_piece_action'
+import type { CreateRoomMessage } from '@/actions/send/create_room_action'
+import type { JoinRoomMessage } from '@/actions/send/join_room_action'
+import type { MovePieceMessage } from '@/actions/send/move_piece_action'
 import { File, Rank } from '../constants'
 import type { ConnectionRepository, Message } from './connection_repository'
 

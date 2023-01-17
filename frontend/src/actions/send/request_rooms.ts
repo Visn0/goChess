@@ -1,5 +1,5 @@
-import type { ConnectionRepository } from '../../connection_repository/connection_repository'
-import type { Room, Rooms } from '../../room'
+import type { ConnectionRepository } from '@/models/connection_repository/connection_repository'
+import type { Room, Rooms } from '@/models/room'
 
 class RequestRoomsReponse {
     public rooms: Array<Room>
