@@ -1,11 +1,14 @@
 {
-    // TypeScript configuration file: provides options to the TypeScript
-    // compiler (tsc) and makes VSCode recognize this folder as a TS project,
-    // enabling the VSCode build tasks "tsc: build" and "tsc: watch".
+    "extends": "@vue/tsconfig/tsconfig.web.json",
+    "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
     "compilerOptions": {
-        "target": "es2022", // Compatible with older browsers
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "target": "ES2022", // Compatible with older browsers
         "outDir": "js",
-        "module": "umd", // Compatible with both Node.js and browser
+        "module": "ES2022", // Compatible with both Node.js and browser
         "moduleResolution": "node", // Tell tsc to look in node_modules for modules
         "sourceMap": true, // Creates *.js.map files
         "jsx": "react", // Causes inline XML (JSX code) to be expanded
@@ -16,6 +19,9 @@
         "noUnusedLocals": false, // Report errors on unused local variables
         "noUnusedParameters": false // Report errors on unused parameters in functions
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "exclude": ["node_modules"]
+    "references": [
+        {
+            "path": "./tsconfig.config.json"
+        }
+    ]
 }

@@ -15,6 +15,7 @@ frontend-fmt:
 	npm --prefix frontend/ run fmt
 
 frontend-lint:
+	npm --prefix frontend/ run type-check
 	npm --prefix frontend/ run lint
 
 up:

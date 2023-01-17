@@ -1,7 +1,7 @@
 package game
 
 type Board struct {
-	board [][]*Piece
+	board [][]IPiece
 }
 
 func NewBoard() *Board {
@@ -11,10 +11,10 @@ func NewBoard() *Board {
 // Fill board with pieces using FEN
 func NewBoardFromFEN(fen string) *Board {
 	b := &Board{
-		board: make([][]*Piece, 8),
+		board: make([][]IPiece, 8),
 	}
 	for i := range b.board {
-		b.board[i] = make([]*Piece, 8)
+		b.board[i] = make([]IPiece, 8)
 	}
 	rank, file := _8, A
 	for _, piece := range fen {
@@ -39,11 +39,11 @@ func NewBoardFromFEN(fen string) *Board {
 	return b
 }
 
-func (b *Board) GetPiece(rank Rank, file File) *Piece {
+func (b *Board) GetPiece(rank Rank, file File) IPiece {
 	return b.board[rank][file]
 }
 
-func (b *Board) SetPiece(rank Rank, file File, p *Piece) {
+func (b *Board) SetPiece(rank Rank, file File, p IPiece) {
 	b.board[rank][file] = p
 }
 
@@ -51,7 +51,7 @@ func (b *Board) RemovePiece(rank Rank, file File) {
 	b.board[rank][file] = nil
 }
 
-func fenCharToPiece(fen string) *Piece {
+func fenCharToPiece(fen string) IPiece {
 	switch fen {
 	case "P":
 		return NewPawn(false)
