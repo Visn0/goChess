@@ -55,7 +55,7 @@ func WsCreateRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 		return
 	}
 
-	r := room.NewRoom()
+	r := room.NewRoom(req.RoomID)
 	player := &room.Player{
 		Ws: c,
 		ID: req.PlayerID,
