@@ -17,8 +17,8 @@ type Room struct {
 	game    *game.Game
 }
 
-func NewRoom() *Room {
-	return &Room{game: game.NewGame()}
+func NewRoom(id string) *Room {
+	return &Room{ID: id, game: game.NewGame()}
 }
 
 func (r *Room) AddPlayer(p *Player) error {
