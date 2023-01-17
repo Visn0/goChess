@@ -6,10 +6,12 @@ import { MovePieceAction } from './actions/send/move_piece_action'
 import type { Rooms } from './room'
 
 class Game {
-    private repository: ConnectionRepository
-    private _board: Board
-    private rooms: Rooms
+    private _repository: ConnectionRepository
+    public get repository(): ConnectionRepository {
+        return this._repository
+    }
 
+    private _board: Board
     public get board(): Board {
         return this._board
     }
@@ -20,9 +22,8 @@ class Game {
     }
 
     constructor(rooms: Rooms, board: Board, repository: ConnectionRepository) {
-        this.rooms = rooms
         this._board = board
-        this.repository = repository
+        this._repository = repository
 
         this._srcSquare = null
     }

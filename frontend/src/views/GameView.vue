@@ -1,49 +1,30 @@
 <script setup lang="ts">
 import ChessBoard from '@/components/ChessBoard.vue'
-import { MovesReceivedAction } from '@/models/actions/receive/moves_received_action'
-import { PieceMovedAction } from '@/models/actions/receive/piece_moved_action'
-import type { ReceiveAction } from '@/models/actions/receive/receive_action'
-import { RoomCreatedAction } from '@/models/actions/receive/room_created_action'
-import { RoomJoinedAction } from '@/models/actions/receive/room_joined_action'
-import { RouteActions } from '@/models/actions/receive/route_actions'
-import { CreateRoomAction } from '@/models/actions/send/create_room_action'
-import { RequestRoomsAction } from '@/models/actions/send/request_rooms'
-import { Board } from '@/models/board'
-import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository'
+import type { Board } from '@/models/board'
 import { Color, constants, type File, type Rank } from '@/models/constants'
-import { Game } from '@/models/game.js'
-import { Rooms } from '@/models/room'
+import type { Game } from '@/models/game.js'
+import router from '@/router'
+import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
+import { onBeforeMount } from 'vue'
 
 const playerIDStore = usePlayerIDStore()
+const gameStore = useGameStore()
 
 const playerID = playerIDStore.id
-const rooms = new Rooms()
-const board = new Board()
-board.initFromFenNotation(constants.StartingPosition)
+let board: Board
+let game: Game
 
-/* eslint-disable capitalized-comments */
-// const repository: ConnectionRepository = new MockConnectionRepository()
-/* eslint-enable capitalized-comments */
-const repository = new BackendConnectionRepository('localhost', '8081', 'ws')
-const game = new Game(rooms, board, repository)
-
-const routeActions: RouteActions = new RouteActions(
-    new Map<string, ReceiveAction>([
-        ['create-room', new RoomCreatedAction(rooms)],
-        ['join-room', new RoomJoinedAction(rooms)],
-        ['request-moves', new MovesReceivedAction(game)],
-        ['move-piece', new PieceMovedAction(game)]
-    ])
-)
-repository.addOnWebSocketMessageEventListener(routeActions.route())
-
-RequestRoomsAction(repository, rooms)
-setInterval(() => RequestRoomsAction(repository, rooms), 10000)
-
-function createRoom() {
-    CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
-}
+onBeforeMount(() => {
+    if (gameStore.isEmpty) {
+        console.log('Game is empty. Redirecting to /rooms.')
+        router.push({ name: 'rooms' })
+        return
+    }
+    game = gameStore.game as Game
+    board = game.board
+    board.initFromFenNotation(constants.StartingPosition)
+})
 
 function squareClick(file: File, rank: Rank) {
     const square = board.getSquare(file, rank)
@@ -52,7 +33,7 @@ function squareClick(file: File, rank: Rank) {
 </script>
 
 <template>
-    <main>
+    <main v-if="!gameStore.isEmpty">
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle">
                 <div class="my-2 text-light">{{ playerID }}</div>
@@ -60,15 +41,6 @@ function squareClick(file: File, rank: Rank) {
 
                 <!-- Buttons -->
                 <div class="row mt-3 text-center actions-btns">
-                    <button
-                        type="button"
-                        class="col-sm btn btn-dark border border-light m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal-list-rooms"
-                        @click="createRoom()"
-                    >
-                        Create room
-                    </button>
                     <button type="button" class="col-sm btn btn-dark border border-light m-2">Abandon</button>
                     <button type="button" class="col-sm btn btn-dark border border-light m-2">Draw</button>
                 </div>

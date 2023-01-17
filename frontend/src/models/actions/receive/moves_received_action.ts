@@ -25,7 +25,6 @@ class MovesReceivedAction {
         const board = this.game.board
         const validMoves: Array<Square> = p.validMoves.map((m) => board.getSquare(m.file, m.rank))
 
-        console.log('srcSquare?.setValidMoves: ', this.game.srcSquare)
         this.game.srcSquare?.setValidMoves(validMoves)
     }
 }

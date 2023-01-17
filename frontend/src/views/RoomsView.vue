@@ -17,6 +17,8 @@ import RoomListing from '@/components/RoomListing.vue'
 import RoomItem from '@/components/RoomItem.vue'
 import { watch } from 'vue'
 import { JoinRoomAction } from '@/models/actions/send/join_room_action'
+import router from '@/router'
+import { useGameStore } from '@/stores/game'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -42,14 +44,24 @@ const routeActions: RouteActions = new RouteActions(
 repository.addOnWebSocketMessageEventListener(routeActions.route())
 
 RequestRoomsAction(repository, rooms)
-setInterval(() => RequestRoomsAction(repository, rooms), 10000)
+const requestRoomInterval = setInterval(() => RequestRoomsAction(repository, rooms), 10000)
+
+function goToGame() {
+    clearInterval(requestRoomInterval)
+
+    const gameStore = useGameStore()
+    gameStore.set(game)
+    router.push({ name: 'game' })
+}
 
 function createRoom() {
     CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
+    goToGame()
 }
 
 function joinRoom(roomID: string) {
     JoinRoomAction(repository, playerID, roomID, 'roomPassword')
+    goToGame()
 }
 
 let componentKey = 1

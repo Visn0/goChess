@@ -9,7 +9,7 @@ let playerID = playerIDStore.id
 function confirmNickname() {
     console.log('confirmNickname: ', playerID)
     playerIDStore.set(playerID)
-    router.push('/game')
+    router.push({ name: 'rooms' })
 }
 </script>
 
