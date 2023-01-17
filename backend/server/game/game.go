@@ -25,33 +25,99 @@ func (g *Game) GetValidPositions(rank Rank, file File) []*Position {
 		return nil
 	}
 	fmt.Println("Piece at", rank, file, "is", p.String())
-	// if p.ValidMoves != nil {
-	// 	fmt.Println("Returning cached moves")
-	// 	return p.ValidMoves
-	// }
+	positions := g.GetPieceValidMovesHandler(p.GetName())(rank, file, p)
+	return positions
+}
+
+func (g *Game) GetPieceValidMovesHandler(pieceType string) func(rank Rank, file File, p IPiece) []*Position {
+	switch pieceType {
+	case "pawn":
+		return g.GetPawnValidMoves
+	case "rook":
+		return g.GetRookValidMoves
+	case "knight":
+		return g.GetKnightValidMoves
+	case "bishop":
+		return g.GetBishopValidMoves
+	case "queen":
+		return g.GetQueenValidMoves
+	case "king":
+		return g.GetKingValidMoves
+	default:
+		panic("Invalid piece type")
+	}
+}
+
+func (g *Game) GetShortDistanceMoves(rank Rank, file File, p IPiece) []*Position {
 	positions := []*Position{}
-	fromPos := &Position{Rank: rank, File: file}
-	for _, d := range p.ValidDirections {
-		dCum := Direction{0, 0}
+	for _, d := range p.GetValidDirections() {
+		newPos := &Position{Rank: rank + Rank(d.x), File: file + File(d.y)}
+		if newPos.Valid() {
+			if g.Board.GetPiece(newPos.Rank, newPos.File) == nil {
+				positions = append(positions, newPos)
+			} else if g.Board.GetPiece(newPos.Rank, newPos.File).GetColor() != p.GetColor() &&
+				p.GetName() != "pawn" {
+				positions = append(positions, newPos)
+			}
+		}
+	}
+	return positions
+}
+
+func (g *Game) GetLongDistanceMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := []*Position{}
+	for _, d := range p.GetValidDirections() {
+		dCum := &Direction{0, 0}
 		for {
 			dCum.x += d.x
 			dCum.y += d.y
-			pos := &Position{Rank: fromPos.Rank + Rank(dCum.x), File: fromPos.File + File(dCum.y)}
-			if !pos.Valid() {
-				fmt.Println("Invalid move", pos.Rank, pos.File, d)
-				break
-			}
-			fmt.Println("Checking", pos.Rank, pos.File, d)
-			if g.Board.GetPiece(pos.Rank, pos.File) == nil {
-				positions = append(positions, pos)
+			newPos := &Position{Rank: rank + Rank(dCum.x), File: file + File(dCum.y)}
+			if newPos.Valid() {
+				if g.Board.GetPiece(newPos.Rank, newPos.File) == nil {
+					positions = append(positions, newPos)
+				} else if g.Board.GetPiece(newPos.Rank, newPos.File).GetColor() != p.GetColor() {
+					positions = append(positions, newPos)
+					break
+				} else {
+					break
+				}
 			} else {
-				break
-			}
-			if p.Name == "king" || p.Name == "knight" {
 				break
 			}
 		}
 	}
-	p.ValidPositions = positions
+	return positions
+}
+
+func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetShortDistanceMoves(rank, file, p)
+	if p.(*Pawn).FirstMove {
+		positions = append(positions, &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file})
+	}
+	return positions
+}
+
+func (g *Game) GetRookValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetLongDistanceMoves(rank, file, p)
+	return positions
+}
+
+func (g *Game) GetKnightValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetShortDistanceMoves(rank, file, p)
+	return positions
+}
+
+func (g *Game) GetBishopValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetLongDistanceMoves(rank, file, p)
+	return positions
+}
+
+func (g *Game) GetQueenValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetLongDistanceMoves(rank, file, p)
+	return positions
+}
+
+func (g *Game) GetKingValidMoves(rank Rank, file File, p IPiece) []*Position {
+	positions := g.GetShortDistanceMoves(rank, file, p)
 	return positions
 }

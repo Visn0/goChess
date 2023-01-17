@@ -28,9 +28,6 @@ func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
 		return
 	}
 	validMoves := g.GetValidPositions(req.Rank, req.File)
-	for _, move := range validMoves {
-		fmt.Println(move)
-	}
 	fmt.Printf("Found %d valid moves", len(validMoves))
 	resp := ResponseMoves{
 		Action:     "request-moves",
