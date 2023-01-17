@@ -1,58 +1,36 @@
-import { type Ref, ref } from 'vue'
+import { type Ref, ref, shallowRef } from 'vue'
 import { RoomPlayer } from './room_player'
 
 class Room {
-    public id: string
-    public players: Array<RoomPlayer>
-    public myRoom: boolean
+    public readonly id: string
+
+    private _players: Array<RoomPlayer>
+    public get players(): Array<RoomPlayer> {
+        return this._players
+    }
+    private _myRoom: boolean
+    public get myRoom(): boolean {
+        return this._myRoom
+    }
 
     constructor(id?: string, players?: Array<RoomPlayer>) {
         this.id = id === null || id === undefined ? '' : id
-        this.players = players === null || players === undefined ? new Array(0) : players
-        this.myRoom = false
-    }
-
-    public toDivHTML(): string {
-        let room = `
-            <div id="${this.id}" class="card w-100 bg-dark text-white">
-                <div class="card-header bg-green mx-1">                                        
-        `
-
-        if (!this.myRoom) {
-            room += `
-                    <div class="position-absolute" style="margin-top: -5px;">
-                        <button id="join-btn-${this.id}" class="btn btn-success btn-sm text-left"
-                            onclick="document.dispatchEvent(new CustomEvent('join-room-event', { detail: '${this.id}' }))">
-                            Join
-                        </button>
-                    </div>
-            `
-        }
-
-        room += `
-                <div>
-                    ${this.id}
-                </div>                    
-            </div>
-            <ul class="list-group list-group-flush row mx-1">
-        `
-
-        if (this.players.length > 0) {
-            this.players.forEach((p) => (room += p.toDivHTML()))
-        } else {
-            room += '<li class="list-group-item">No players yet.</li>'
-        }
-        return (room += '</ul>\n</div>')
+        this._players = players === null || players === undefined ? new Array(0) : players
+        this._myRoom = false
     }
 
     public static createFromJSON(src: any): Room {
-        const dst: Room = Object.assign(new Room(), src)
-        dst.players = dst.players.map((p) => RoomPlayer.createFromJSON(p))
+        const dst: Room = new Room(src.id)
+        dst._players = src.players.map((p: any) => RoomPlayer.createFromJSON(p))
         return dst
     }
 
     public setMyRoom() {
-        this.myRoom = true
+        this._myRoom = true
+    }
+
+    public isRoomFull(): boolean {
+        return this.players.length >= 2
     }
 }
 
@@ -70,7 +48,7 @@ class Rooms {
     }
 
     constructor() {
-        this._rooms = ref(Array<Room>())
+        this._rooms = shallowRef(Array<Room>())
         this._myRoom = ref(null)
     }
 

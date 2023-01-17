@@ -15,7 +15,14 @@ function joinRoom() {
     <div class="card bg-dark text-white border border-secondary">
         <div class="card-header bg-dark">
             <div class="position-absolute" style="margin-top: -5px">
-                <button type="button" class="btn bg-green btn-sm text-left" @click="joinRoom">Join</button>
+                <button
+                    type="button"
+                    :disabled="room.isRoomFull()"
+                    class="btn bg-green btn-sm text-left"
+                    @click="joinRoom"
+                >
+                    Join
+                </button>
             </div>
             <div>{{ room.id }}</div>
         </div>
