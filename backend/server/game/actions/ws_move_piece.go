@@ -8,14 +8,14 @@ import (
 )
 
 type RequestMovePiece struct {
-	Src *game.Move `json:"src"`
-	Dst *game.Move `json:"dst"`
+	Src *game.Position `json:"src"`
+	Dst *game.Position `json:"dst"`
 }
 
 type ResponseMovePiece struct {
-	Action string     `json:"action"`
-	Src    *game.Move `json:"src"`
-	Dst    *game.Move `json:"dst"`
+	Action string         `json:"action"`
+	Src    *game.Position `json:"src"`
+	Dst    *game.Position `json:"dst"`
 }
 
 func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
@@ -23,7 +23,11 @@ func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
 	req := RequestMovePiece{}
 	json.Unmarshal(body, &req)
 
-	g.Move(req.Src, req.Dst)
+	move := &game.Move{
+		From: req.Src,
+		To:   req.Dst,
+	}
+	g.Move(move)
 	resp := ResponseMovePiece{
 		Action: "move-piece",
 		Src:    req.Src,

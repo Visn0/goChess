@@ -11,21 +11,24 @@ type Piece struct {
 	Name            string
 	Black           bool
 	ValidDirections []Direction
-	ValidMoves      []*Move
+	ValidPositions  []*Position
+	FirstMove       bool
 }
 
-func NewPawn(black bool) *Piece {
-	if black {
+func NewPawn(isBlack bool) *Piece {
+	if isBlack {
 		return &Piece{
 			Name:            "pawn",
-			Black:           black,
+			Black:           isBlack,
 			ValidDirections: []Direction{{-1, 0}},
+			FirstMove:       true,
 		}
 	}
 	return &Piece{
 		Name:            "pawn",
-		Black:           black,
+		Black:           isBlack,
 		ValidDirections: []Direction{{1, 0}},
+		FirstMove:       true,
 	}
 }
 
@@ -34,6 +37,7 @@ func NewRook(black bool) *Piece {
 		Name:            "rook",
 		Black:           black,
 		ValidDirections: []Direction{{1, 0}, {0, 1}, {-1, 0}, {0, -1}},
+		FirstMove:       true,
 	}
 }
 
@@ -47,6 +51,7 @@ func NewKnight(black bool) *Piece {
 			{2, -1}, {2, 1},
 			{-2, -1}, {-2, 1},
 		},
+		FirstMove: true,
 	}
 }
 
@@ -60,6 +65,7 @@ func NewBishop(black bool) *Piece {
 			{1, 1},
 			{1, -1},
 		},
+		FirstMove: true,
 	}
 }
 
@@ -77,6 +83,7 @@ func NewQueen(black bool) *Piece {
 			{-1, 0},
 			{0, -1},
 		},
+		FirstMove: true,
 	}
 }
 
@@ -94,6 +101,7 @@ func NewKing(black bool) *Piece {
 			{-1, 0},
 			{0, -1},
 		},
+		FirstMove: true,
 	}
 }
 

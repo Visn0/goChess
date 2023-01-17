@@ -1,23 +1,28 @@
 package game
 
-type Move struct {
+type Position struct {
 	Rank `json:"rank"`
 	File `json:"file"`
 }
 
-func (m *Move) Equals(other Move) bool {
-	return m.Rank == other.Rank && m.File == other.File
+func (p *Position) Equals(other Position) bool {
+	return p.Rank == other.Rank && p.File == other.File
 }
 
-func (m *Move) String() string {
-	return string(rune('A'+m.File)) + string(rune('1'+m.Rank))
+func (p *Position) String() string {
+	return string(rune('A'+p.File)) + string(rune('1'+p.Rank))
 }
 
-func (m *Move) Valid() bool {
-	return m.Rank >= 0 && m.Rank < 8 && m.File >= 0 && m.File < 8
+func (p *Position) Valid() bool {
+	return p.Rank >= 0 && p.Rank < 8 && p.File >= 0 && p.File < 8
 }
 
-func (m *Move) Add(d Direction) {
-	m.Rank = Rank(int(m.Rank) + d.x)
-	m.File = File(int(m.File) + d.y)
+func (p *Position) Add(d Direction) {
+	p.Rank = Rank(int(p.Rank) + d.x)
+	p.File = File(int(p.File) + d.y)
+}
+
+type Move struct {
+	From *Position `json:"from"`
+	To   *Position `json:"to"`
 }

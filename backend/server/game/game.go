@@ -3,20 +3,21 @@ package game
 import "fmt"
 
 type Game struct {
-	Board *Board
+	Board     *Board
+	LastMoves []*Move
 }
 
 func NewGame() *Game {
 	return &Game{Board: NewBoard()}
 }
 
-func (g *Game) Move(src, dst *Move) {
-	p := g.Board.GetPiece(src.Rank, src.File)
-	g.Board.SetPiece(dst.Rank, dst.File, p)
-	g.Board.RemovePiece(src.Rank, src.File)
+func (g *Game) Move(m *Move) {
+	p := g.Board.GetPiece(m.From.Rank, m.From.File)
+	g.Board.SetPiece(m.To.Rank, m.To.File, p)
+	g.Board.RemovePiece(m.From.Rank, m.From.File)
 }
 
-func (g *Game) GetValidMoves(rank Rank, file File) []*Move {
+func (g *Game) GetValidPositions(rank Rank, file File) []*Position {
 	fmt.Println("Getting valid moves for", rank, file)
 	p := g.Board.GetPiece(rank, file)
 	if p == nil {
@@ -28,21 +29,21 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Move {
 	// 	fmt.Println("Returning cached moves")
 	// 	return p.ValidMoves
 	// }
-	moves := []*Move{}
-	fromMove := &Move{Rank: rank, File: file}
+	positions := []*Position{}
+	fromPos := &Position{Rank: rank, File: file}
 	for _, d := range p.ValidDirections {
 		dCum := Direction{0, 0}
 		for {
 			dCum.x += d.x
 			dCum.y += d.y
-			move := &Move{Rank: fromMove.Rank + Rank(dCum.x), File: fromMove.File + File(dCum.y)}
-			if !move.Valid() {
-				fmt.Println("Invalid move", move.Rank, move.File, d)
+			pos := &Position{Rank: fromPos.Rank + Rank(dCum.x), File: fromPos.File + File(dCum.y)}
+			if !pos.Valid() {
+				fmt.Println("Invalid move", pos.Rank, pos.File, d)
 				break
 			}
-			fmt.Println("Checking", move.Rank, move.File, d)
-			if g.Board.GetPiece(move.Rank, move.File) == nil {
-				moves = append(moves, move)
+			fmt.Println("Checking", pos.Rank, pos.File, d)
+			if g.Board.GetPiece(pos.Rank, pos.File) == nil {
+				positions = append(positions, pos)
 			} else {
 				break
 			}
@@ -51,6 +52,6 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Move {
 			}
 		}
 	}
-	p.ValidMoves = moves
-	return moves
+	p.ValidPositions = positions
+	return positions
 }
