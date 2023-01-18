@@ -13,8 +13,52 @@ func NewGame() *Game {
 
 func (g *Game) Move(m *Move) {
 	p := g.Board.GetPiece(m.From.Rank, m.From.File)
-	g.Board.SetPiece(m.To.Rank, m.To.File, p)
+
+	if p.GetName() == "pawn" {
+		p.(*Pawn).FirstMove = false
+		if m.To.Rank == _1 || m.To.Rank == _8 {
+			g.Board.SetPiece(m.To.Rank, m.To.File, NewQueen(p.GetColor()))
+		} else {
+			g.Board.SetPiece(m.To.Rank, m.To.File, p)
+		}
+		g.Board.RemovePiece(m.From.Rank, m.From.File)
+	} else if p.GetName() == "king" {
+		g.checkCastleMove(m, p.(*King))
+	} else {
+		g.Board.SetPiece(m.To.Rank, m.To.File, p)
+		g.Board.RemovePiece(m.From.Rank, m.From.File)
+	}
+}
+
+func (g *Game) checkCastleMove(m *Move, king *King) {
+
+	distance := m.To.File - m.From.File
+	// Check if king is moving 2 spaces
+	if king.FirstMove && distance == 2 || distance == -2 {
+		var rook IPiece
+		if distance == 2 {
+			rook = g.Board.GetPiece(m.From.Rank, H)
+		} else {
+			rook = g.Board.GetPiece(m.From.Rank, A)
+		}
+		// Check if rook is in correct position
+		if rook == nil || rook.GetName() != "rook" || !rook.(*Rook).FirstMove {
+			panic("Invalid castle")
+		}
+		// Move the correct rook
+		if distance == 2 {
+			g.Board.SetPiece(m.From.Rank, F, rook)
+			g.Board.RemovePiece(m.From.Rank, H)
+		} else {
+			g.Board.SetPiece(m.From.Rank, D, rook)
+			g.Board.RemovePiece(m.From.Rank, A)
+		}
+		rook.(*Rook).FirstMove = false
+	}
+	g.Board.SetPiece(m.To.Rank, m.To.File, king)
 	g.Board.RemovePiece(m.From.Rank, m.From.File)
+	king.FirstMove = false
+
 }
 
 func (g *Game) GetValidPositions(rank Rank, file File) []*Position {
@@ -91,8 +135,24 @@ func (g *Game) GetLongDistanceMoves(rank Rank, file File, p IPiece) []*Position 
 
 func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 	positions := g.GetShortDistanceMoves(rank, file, p)
+	// Check if pawn can move two spaces forward
 	if p.(*Pawn).FirstMove {
 		positions = append(positions, &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file})
+	}
+	topPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y)}
+	if topPos.Valid() {
+		// Check if there is a piece in front left of the pawn
+		topLeftPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y-1)}
+		topLeftPiece := g.Board.GetPiece(topLeftPos.Rank, topLeftPos.File)
+		if topLeftPiece != nil && topLeftPiece.GetColor() != p.GetColor() {
+			positions = append(positions, &topLeftPos)
+		}
+		// Check if there is a piece in front right of the pawn
+		topRightPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y+1)}
+		topRightPiece := g.Board.GetPiece(topRightPos.Rank, topRightPos.File)
+		if topRightPiece != nil && topRightPiece.GetColor() != p.GetColor() {
+			positions = append(positions, &topRightPos)
+		}
 	}
 	return positions
 }
@@ -119,5 +179,26 @@ func (g *Game) GetQueenValidMoves(rank Rank, file File, p IPiece) []*Position {
 
 func (g *Game) GetKingValidMoves(rank Rank, file File, p IPiece) []*Position {
 	positions := g.GetShortDistanceMoves(rank, file, p)
+	g.getKingCastlePositions(rank, file, p, &positions)
 	return positions
+}
+
+func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions *([]*Position)) {
+	// Check if king can castle
+	if p.(*King).FirstMove {
+		// Check if king can castle kingside
+		if g.Board.GetPiece(rank, file+1) == nil && g.Board.GetPiece(rank, file+2) == nil {
+			rook := g.Board.GetPiece(rank, file+3)
+			if rook != nil && rook.GetName() == "rook" && rook.(*Rook).FirstMove {
+				*positions = append(*positions, &Position{Rank: rank, File: file + 2})
+			}
+		}
+		// Check if king can castle queenside
+		if g.Board.GetPiece(rank, file-1) == nil && g.Board.GetPiece(rank, file-2) == nil && g.Board.GetPiece(rank, file-3) == nil {
+			rook := g.Board.GetPiece(rank, file-4)
+			if rook != nil && rook.GetName() == "rook" && rook.(*Rook).FirstMove {
+				*positions = append(*positions, &Position{Rank: rank, File: file - 2})
+			}
+		}
+	}
 }
