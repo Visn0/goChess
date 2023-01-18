@@ -46,8 +46,8 @@ watch(props.square.getPiece.bind(props.square), () => {
 
 <style scoped>
 .board-square {
-    width: 10vmin;
-    height: 10vmin;
+    width: 9vmin;
+    height: 9vmin;
     position: relative;
     align-items: center;
     justify-content: center;
@@ -82,5 +82,26 @@ watch(props.square.getPiece.bind(props.square), () => {
     width: 100%;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+}
+
+@media (max-width: 576px) {
+    .board-square {
+        width: 12.5vmin;
+        height: 12.5vmin;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+    .board-square {
+        width: 11.5vmin;
+        height: 11.5vmin;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    .board-square {
+        width: 10.5vmin;
+        height: 10.5vmin;
+    }
 }
 </style>
