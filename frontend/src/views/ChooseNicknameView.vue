@@ -31,7 +31,7 @@ function confirmNickname() {
                             v-model="playerID"
                         />
                     </div>
-                    <button type="button" class="btn bg-green w-100" @click="confirmNickname">Confirm</button>
+                    <button type="button" class="btn btn-green w-100" @click="confirmNickname">Confirm</button>
                 </div>
             </div>
         </form>

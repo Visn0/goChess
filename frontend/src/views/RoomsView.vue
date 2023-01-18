@@ -81,7 +81,7 @@ watch(rooms.getMyRoom.bind(rooms), () => {
                         <div class="h-0 p-0 rounded border border-light my-2 mb-4"></div>
                     </template>
                     <RoomListing :rooms="rooms" @join-room="joinRoom" :key="componentKey" />
-                    <button type="button" class="mt-2 w-100 btn bg-green" @click="createRoom">Create room</button>
+                    <button type="button" class="mt-2 w-100 btn btn-green" @click="createRoom">Create room</button>
                 </div>
             </div>
         </div>

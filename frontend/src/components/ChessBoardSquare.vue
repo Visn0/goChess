@@ -69,7 +69,8 @@ watch(props.square.getPiece.bind(props.square), () => {
 }
 
 .board-square.black-square {
-    background-color: #7fa650;
+    /* background-color: #7fa650; */
+    background-color: #65a371;
 }
 
 .piece {
