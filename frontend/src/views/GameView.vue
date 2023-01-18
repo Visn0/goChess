@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import ChessBoard from '@/components/ChessBoard.vue'
+import ChessTimer from '@/components/ChessTimer.vue'
 import PlayerNickname from '@/components/PlayerNickname.vue'
 import type { Board } from '@/models/board'
 import { Color, constants, type File, type Rank } from '@/models/constants'
 import type { Game } from '@/models/game.js'
+import { Timer } from '@/models/timer'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, watch } from 'vue'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -32,6 +34,14 @@ function squareClick(file: File, rank: Rank) {
     const square = board.getSquare(file, rank)
     game.selectSquare(square)
 }
+
+const oponentTimer = new Timer(600)
+const myTimer = new Timer(600)
+myTimer.start()
+
+watch(myTimer.isStoped.bind(myTimer), () => {
+    console.log(`Timer finished: ${myTimer.toString()}`)
+})
 </script>
 
 <template>
@@ -40,12 +50,14 @@ function squareClick(file: File, rank: Rank) {
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
                 <div class="py-1 d-flex justify-content-between">
                     <PlayerNickname :nickname="oponentPlayerID" />
+                    <ChessTimer :timer="oponentTimer" />
                 </div>
                 <div class="d-flex justify-content-center">
                     <ChessBoard :board="board" :color-down="Color.WHITE" @on-square-click="squareClick" />
                 </div>
                 <div class="py-1 d-flex justify-content-between">
                     <PlayerNickname :nickname="myPlayerID" />
+                    <ChessTimer :timer="myTimer" />
                 </div>
 
                 <!-- Buttons -->
