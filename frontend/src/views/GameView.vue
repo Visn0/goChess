@@ -62,8 +62,10 @@ watch(myTimer.isStoped.bind(myTimer), () => {
 
                 <!-- Buttons -->
                 <div class="mt-1">
-                    <button type="button" class="col-sm btn btn-dark btn-sm border border-light m-2">Abandon</button>
-                    <button type="button" class="col-sm btn btn-dark btn-sm border border-light m-2">Draw</button>
+                    <button type="button" class="col-4 action btn btn-dark btn-sm border border-light m-2">
+                        Abandon
+                    </button>
+                    <button type="button" class="col-4 action btn btn-dark btn-sm border border-light m-2">Draw</button>
                 </div>
             </div>
         </div>
@@ -76,10 +78,29 @@ watch(myTimer.isStoped.bind(myTimer), () => {
     max-width: 72vmin !important;
 }
 
-@media (max-width: 576px) {
+.action {
+    font-size: 1em;
+}
+
+@media (max-width: 281px) {
     .game {
         width: 100vmin !important;
         max-width: 100vmin !important;
+    }
+
+    .action {
+        font-size: 0.45em;
+    }
+}
+
+@media (min-width: 281px) and (max-width: 576px) {
+    .game {
+        width: 100vmin !important;
+        max-width: 100vmin !important;
+    }
+
+    .action {
+        font-size: 0.6em;
     }
 }
 
@@ -88,12 +109,20 @@ watch(myTimer.isStoped.bind(myTimer), () => {
         width: 92vmin !important;
         max-width: 92vmin !important;
     }
+
+    .action {
+        font-size: 0.8em;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
     .game {
         width: 84vmin !important;
         max-width: 84vmin !important;
+    }
+
+    .action {
+        font-size: 0.9em;
     }
 }
 </style>

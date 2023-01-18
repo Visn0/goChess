@@ -35,6 +35,10 @@ body {
     background-color: rgba(29, 163, 56, 0.25);
 }
 
+.btn-maroon {
+    background-color: rgba(87, 0, 13, 0.34);
+}
+
 .border-green {
-    border-color: #9cd952;
+    border-color: #43f066;
 }

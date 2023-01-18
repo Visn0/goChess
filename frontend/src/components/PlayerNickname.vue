@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-    <p class="my-0 text-size badge bg-dark text-start text-white">
+    <p class="my-0 text-size badge text-start bg-dark text-white">
         {{ nickname }}
     </p>
 </template>
