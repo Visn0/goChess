@@ -15,7 +15,7 @@ function joinRoom(roomID: string) {
 <template>
     <template v-if="props.rooms.getRooms().length > 0">
         <ul class="list-group overflow-auto room-listing bg-dark rounded border-dark">
-            <li class="list-group-item bg-transparent" v-for="r in props.rooms.getRooms()" :key="r.id">
+            <li class="list-group-item bg-transparent mx-0 px-0 pe-1" v-for="r in props.rooms.getRooms()" :key="r.id">
                 <RoomItem :room="r" @join-room="joinRoom" />
             </li>
         </ul>
@@ -31,8 +31,8 @@ function joinRoom(roomID: string) {
 
 <style scoped>
 .room-listing {
-    margin-top: 20%;
-    max-height: 80vmin !important;
+    margin-top: 15%;
+    max-height: 65vmin !important;
 }
 
 ::-webkit-scrollbar {

@@ -73,23 +73,78 @@ watch(rooms.getMyRoom.bind(rooms), () => {
 
 <template>
     <main>
-        <div class="container h-100 d-flex justify-content-center">
-            <div class="row w-100 d-flex justify-content-center">
-                <div class="col-sm-12 col-lg-6">
+        <div class="container h-auto position-absolute top-40 start-50 translate-middle room-listing">
+            <div class="d-flex justify-content-center w-100">
+                <div>
                     <template v-if="rooms.myRoom">
                         <RoomItem :room="rooms.myRoom" />
                         <div class="h-0 p-0 rounded border border-light my-2 mb-4"></div>
                     </template>
                     <RoomListing :rooms="rooms" @join-room="joinRoom" :key="componentKey" />
-                    <button type="button" class="mt-2 w-100 btn btn-green" @click="createRoom">Create room</button>
+                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="createRoom">
+                        Create room
+                    </button>
                 </div>
             </div>
         </div>
     </main>
 </template>
 
-<style scoped>
-.top-30 {
-    margin-top: 30% !important;
+<style>
+.top-40 {
+    top: 45% !important;
+}
+
+.room-listing {
+    width: 46.8vmin !important;
+    max-width: 46.8vmin !important;
+    font-size: 0.95em;
+}
+
+@media (max-width: 576px) {
+    .room-listing {
+        width: 96vmin !important;
+        max-width: 96vmin !important;
+        font-size: 0.75em;
+    }
+
+    .btn {
+        font-size: 0.75em;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+    .room-listing {
+        width: 76vmin !important;
+        max-width: 76vmin !important;
+        font-size: 0.85em;
+    }
+
+    .btn {
+        font-size: 0.85em;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    .room-listing {
+        width: 61.6vmin !important;
+        max-width: 61.6vmin !important;
+        font-size: 0.87em;
+    }
+
+    .btn {
+        font-size: 0.87em;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+    .room-listing {
+        width: 72.6vmin !important;
+        max-width: 72.6vmin !important;
+    }
+
+    .btn {
+        font-size: 0.95em;
+    }
 }
 </style>
