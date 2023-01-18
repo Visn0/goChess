@@ -27,9 +27,6 @@ const rooms = new Rooms()
 const board = new Board()
 board.initFromFenNotation(constants.StartingPosition)
 
-/* eslint-disable capitalized-comments */
-// const repository: ConnectionRepository = new MockConnectionRepository()
-/* eslint-enable capitalized-comments */
 const repository = new BackendConnectionRepository('localhost', '8081', 'ws')
 const game = new Game(rooms, board, repository)
 
@@ -76,16 +73,15 @@ watch(rooms.getMyRoom.bind(rooms), () => {
 
 <template>
     <main>
-        <div class="container h-auto position-absolute top-30 start-50 translate-middle d-flex justify-content-center">
+        <div class="container h-100 d-flex justify-content-center">
             <div class="row w-100 d-flex justify-content-center">
                 <div class="col-sm-12 col-lg-6">
-                    <div class="d-flex justify-content-center my-2 text-light">{{ playerID }}</div>
                     <template v-if="rooms.myRoom">
                         <RoomItem :room="rooms.myRoom" />
                         <div class="h-0 p-0 rounded border border-light my-2 mb-4"></div>
                     </template>
                     <RoomListing :rooms="rooms" @join-room="joinRoom" :key="componentKey" />
-                    <button type="button" class="w-100 btn bg-green" @click="createRoom">Create room</button>
+                    <button type="button" class="mt-2 w-100 btn bg-green" @click="createRoom">Create room</button>
                 </div>
             </div>
         </div>
@@ -94,6 +90,6 @@ watch(rooms.getMyRoom.bind(rooms), () => {
 
 <style scoped>
 .top-30 {
-    top: 30% !important;
+    margin-top: 30% !important;
 }
 </style>
