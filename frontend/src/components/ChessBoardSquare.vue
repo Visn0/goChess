@@ -28,7 +28,7 @@ watch(props.square.getPiece.bind(props.square), () => {
 <template>
     <td
         id="{{ props.square.id }}"
-        class="board-square"
+        class="board-square p-0"
         :class="props.square.color"
         @click="squareClick()"
         :key="componentKey"
@@ -36,11 +36,9 @@ watch(props.square.getPiece.bind(props.square), () => {
         <div id="{{ props.square.id }}-piece" class="piece">
             <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
         </div>
-        <div
-            v-if="props.square.isValidMove()"
-            id="{{ props.square.id }}-valid-move"
-            class="board-square valid-move"
-        ></div>
+        <div v-if="props.square.isValidMove()" class="position-absolute top-0 h-100 w-100">
+            <div class="valid-move"></div>
+        </div>
     </td>
 </template>
 
@@ -53,11 +51,9 @@ watch(props.square.getPiece.bind(props.square), () => {
     justify-content: center;
 }
 
-.board-square.valid-move {
-    position: absolute;
-    top: 0;
-    left: auto;
-
+.valid-move {
+    width: 100%;
+    height: 100%;
     shape-outside: circle(100%);
     clip-path: circle(40%);
     background-color: rgba(45, 45, 45, 0.15);
