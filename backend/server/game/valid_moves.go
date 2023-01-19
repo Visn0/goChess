@@ -9,24 +9,24 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 		fmt.Println("No piece at", rank, file)
 		return nil
 	}
-	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetName())
-	positions := g.getPieceValidMovesHandler(p.GetName())(rank, file, p)
+	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetPieceType())
+	positions := g.getPieceValidMovesHandler(p.GetPieceType())(rank, file, p)
 	return positions
 }
 
-func (g *Game) getPieceValidMovesHandler(pieceType string) func(rank Rank, file File, p IPiece) []*Position {
+func (g *Game) getPieceValidMovesHandler(pieceType PieceType) func(rank Rank, file File, p IPiece) []*Position {
 	switch pieceType {
-	case "pawn":
+	case PAWN:
 		return g.getPawnValidMoves
-	case "rook":
+	case ROOK:
 		return g.getRookValidMoves
-	case "knight":
+	case KNIGHT:
 		return g.getKnightValidMoves
-	case "bishop":
+	case BISHOP:
 		return g.getBishopValidMoves
-	case "queen":
+	case QUEEN:
 		return g.getQueenValidMoves
-	case "king":
+	case KING:
 		return g.getKingValidMoves
 	default:
 		panic("Invalid piece type")
@@ -41,7 +41,8 @@ func (g *Game) getShortDistanceMoves(rank Rank, file File, p IPiece) []*Position
 			if g.Board.GetPiece(newPos.Rank, newPos.File) == nil {
 				positions = append(positions, newPos)
 			} else if g.Board.GetPiece(newPos.Rank, newPos.File).GetColor() != p.GetColor() &&
-				p.GetName() != "pawn" {
+				p.GetPieceType() != PAWN {
+				// Pawns can not take pieces in front of them
 				positions = append(positions, newPos)
 			}
 		}
@@ -148,14 +149,14 @@ func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions 
 		// Check if king can castle kingside
 		if g.Board.GetPiece(rank, file+1) == nil && g.Board.GetPiece(rank, file+2) == nil {
 			rook := g.Board.GetPiece(rank, file+3)
-			if rook != nil && rook.GetName() == "rook" && rook.(*Rook).FirstMove {
+			if rook != nil && rook.GetPieceType() == ROOK && rook.(*Rook).FirstMove {
 				*positions = append(*positions, &Position{Rank: rank, File: file + 2})
 			}
 		}
 		// Check if king can castle queenside
 		if g.Board.GetPiece(rank, file-1) == nil && g.Board.GetPiece(rank, file-2) == nil && g.Board.GetPiece(rank, file-3) == nil {
 			rook := g.Board.GetPiece(rank, file-4)
-			if rook != nil && rook.GetName() == "rook" && rook.(*Rook).FirstMove {
+			if rook != nil && rook.GetPieceType() == ROOK && rook.(*Rook).FirstMove {
 				*positions = append(*positions, &Position{Rank: rank, File: file - 2})
 			}
 		}

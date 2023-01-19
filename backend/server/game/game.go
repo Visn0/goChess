@@ -14,9 +14,9 @@ func NewGame() *Game {
 func (g *Game) Move(m *Move) {
 	p := g.Board.GetPiece(m.From.Rank, m.From.File)
 
-	if p.GetName() == "pawn" {
+	if p.GetPieceType() == PAWN {
 		g.checkPawnMove(m, p.(*Pawn))
-	} else if p.GetName() == "king" {
+	} else if p.GetPieceType() == KING {
 		g.checkCastleMove(m, p.(*King))
 	} else {
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
@@ -41,7 +41,7 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn) {
 			leftPos := &Position{m.To.Rank, m.To.File - 1}
 			if leftPos.Valid() {
 				leftPiece := g.Board.GetPiece(leftPos.Rank, leftPos.File)
-				if leftPiece != nil && leftPiece.GetName() == "pawn" && leftPiece.GetColor() != pawn.GetColor() {
+				if leftPiece != nil && leftPiece.GetPieceType() == PAWN && leftPiece.GetColor() != pawn.GetColor() {
 					leftPiece.(*Pawn).EnPassantNeighbourPos = &Position{m.To.Rank, m.To.File}
 				}
 			}
@@ -49,7 +49,7 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn) {
 			rightPos := &Position{m.To.Rank, m.To.File + 1}
 			if rightPos.Valid() {
 				rightPiece := g.Board.GetPiece(rightPos.Rank, rightPos.File)
-				if rightPiece != nil && rightPiece.GetName() == "pawn" && rightPiece.GetColor() != pawn.GetColor() {
+				if rightPiece != nil && rightPiece.GetPieceType() == PAWN && rightPiece.GetColor() != pawn.GetColor() {
 					rightPiece.(*Pawn).EnPassantNeighbourPos = &Position{m.To.Rank, m.To.File}
 				}
 			}
@@ -69,7 +69,7 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn) {
 				// Check if en passant
 				if pawn.EnPassantNeighbourPos != nil {
 					neighbourPiece := g.Board.GetPiece(pawn.EnPassantNeighbourPos.Rank, pawn.EnPassantNeighbourPos.File)
-					if neighbourPiece != nil && neighbourPiece.GetName() == "pawn" && neighbourPiece.GetColor() != pawn.GetColor() {
+					if neighbourPiece != nil && neighbourPiece.GetPieceType() == PAWN && neighbourPiece.GetColor() != pawn.GetColor() {
 						g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
 						g.Board.RemovePiece(m.From.Rank, m.From.File)
 						g.Board.RemovePiece(pawn.EnPassantNeighbourPos.Rank, pawn.EnPassantNeighbourPos.File)
@@ -98,7 +98,7 @@ func (g *Game) checkCastleMove(m *Move, king *King) {
 			rook = g.Board.GetPiece(m.From.Rank, A)
 		}
 		// Check if rook is in correct position
-		if rook == nil || rook.GetName() != "rook" || !rook.(*Rook).FirstMove {
+		if rook == nil || rook.GetPieceType() != ROOK || !rook.(*Rook).FirstMove {
 			panic("Invalid castle")
 		}
 		// Move the correct rook

@@ -52,6 +52,37 @@ func (b *Board) RemovePiece(rank Rank, file File) {
 }
 
 func fenCharToPiece(fen string) IPiece {
+	var p IPiece = NewPiece[Pawn](PAWN, false)
+	return p
+	// switch fen {
+	// case "P":
+	// 	p := NewPiece[Pawn](PAWN, false)
+	// 	return &p
+	// case "p":
+	// 	return NewPiece[Pawn](PAWN, true)
+	// case "N":
+	// 	return NewPiece[Knight](KNIGHT, false)
+	// case "n":
+	// 	return NewPiece[Knight](KNIGHT, true)
+	// case "B":
+	// 	return NewPiece[Bishop](BISHOP, false)
+	// case "b":
+	// 	return NewPiece[Bishop](BISHOP, true)
+	// case "R":
+	// 	return NewPiece[Rook](ROOK, false)
+	// case "r":
+	// 	return NewPiece[Rook](ROOK, true)
+	// case "Q":
+	// 	return NewPiece[Queen](QUEEN, false)
+	// case "q":
+	// 	return NewPiece[Queen](QUEEN, true)
+	// case "K":
+	// 	return NewPiece[King](KING, false)
+	// case "k":
+	// 	return NewPiece[King](KING, true)
+	// default:
+	// 	return nil
+	// }
 	switch fen {
 	case "P":
 		return NewPawn(false)

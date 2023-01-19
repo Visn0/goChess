@@ -1,6 +1,9 @@
 package game
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Direction struct {
 	x int
@@ -8,19 +11,62 @@ type Direction struct {
 }
 
 type IPiece interface {
-	GetName() string
-	GetValidPositions() []*Position
+	SetPiece(pieceType PieceType, color Color)
+	GetPieceType() PieceType
+	GetColor() Color
 	GetValidDirections() []Direction
-	GetColor() bool
 	String() string
+	IsEnemy(piece IPiece) bool
 }
 
 type PieceBase struct {
-	Name            string
-	Black           bool
-	ValidDirections []Direction
-	ValidPositions  []*Position
-	FirstMove       bool
+	PieceType
+	Color
+	FirstMove bool
+}
+
+var PIECE_DIRECTION = map[PieceType][]Direction{
+	PAWN: {
+		{1, 0},
+	},
+	ROOK: {
+		{1, 0},
+		{0, 1},
+		{-1, 0},
+		{0, -1},
+	},
+	KNIGHT: {
+		{1, -2}, {1, 2},
+		{-1, -2}, {-1, 2},
+		{2, -1}, {2, 1},
+		{-2, -1}, {-2, 1},
+	},
+	BISHOP: {
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	},
+	QUEEN: {
+		{1, 0},
+		{0, 1},
+		{-1, 0},
+		{0, -1},
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	},
+	KING: {
+		{1, 0},
+		{0, 1},
+		{-1, 0},
+		{0, -1},
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	},
 }
 
 type Pawn struct {
@@ -48,112 +94,96 @@ type King struct {
 	PieceBase
 }
 
-func NewPawn(isBlack bool) *Pawn {
-	if isBlack {
-		return &Pawn{
-			PieceBase: PieceBase{
-				Name:            "pawn",
-				Black:           isBlack,
-				ValidDirections: []Direction{{-1, 0}},
-				FirstMove:       true,
-			},
-		}
-	}
+// type VALID_PIECE_TYPE interface {
+// 	*Pawn | *Rook | *Knight | *Bishop | *Queen | *King
+// }
+
+type VALID_PIECE_TYPE interface {
+	Pawn | Rook | Knight | Bishop | Queen | King
+}
+
+func NewPiece[T VALID_PIECE_TYPE](pieceType PieceType, color Color) *T {
+	fmt.Printf("%+v\n", pieceType)
+	var piece = new(T)
+	// piece.PieceBase = PieceBase{}
+	//.SetPiece(pieceType, color)
+	return piece
+}
+
+func NewPawn(color Color) *Pawn {
 	return &Pawn{
 		PieceBase: PieceBase{
-			Name:            "pawn",
-			Black:           isBlack,
-			ValidDirections: []Direction{{1, 0}},
-			FirstMove:       true,
+			PieceType: PAWN,
+			Color:     color,
+			FirstMove: true,
 		},
+		EnPassantNeighbourPos: nil,
 	}
 }
 
-func NewRook(black bool) *Rook {
+func NewRook(color Color) *Rook {
 	return &Rook{
 		PieceBase: PieceBase{
-			Name:            "rook",
-			Black:           black,
-			ValidDirections: []Direction{{1, 0}, {0, 1}, {-1, 0}, {0, -1}},
-			FirstMove:       true,
+			PieceType: ROOK,
+			Color:     color,
+			FirstMove: true,
 		},
 	}
 }
 
-func NewKnight(black bool) *Knight {
+func NewKnight(color Color) *Knight {
 	return &Knight{
 		PieceBase: PieceBase{
-			Name:  "knight",
-			Black: black,
-			ValidDirections: []Direction{
-				{1, -2}, {1, 2},
-				{-1, -2}, {-1, 2},
-				{2, -1}, {2, 1},
-				{-2, -1}, {-2, 1},
-			},
+			PieceType: KNIGHT,
+			Color:     color,
 			FirstMove: true,
 		},
 	}
 }
 
-func NewBishop(black bool) *Bishop {
+func NewBishop(color Color) *Bishop {
 	return &Bishop{
 		PieceBase: PieceBase{
-			Name:  "bishop",
-			Black: black,
-			ValidDirections: []Direction{
-				{-1, -1},
-				{-1, 1},
-				{1, 1},
-				{1, -1},
-			},
+			PieceType: BISHOP,
+			Color:     color,
 			FirstMove: true,
 		},
 	}
 }
 
-func NewQueen(black bool) *Queen {
+func NewQueen(color Color) *Queen {
 	return &Queen{
 		PieceBase: PieceBase{
-			Name:  "queen",
-			Black: black,
-			ValidDirections: []Direction{
-				{-1, -1},
-				{-1, 1},
-				{1, 1},
-				{1, -1},
-				{1, 0},
-				{0, 1},
-				{-1, 0},
-				{0, -1},
-			},
+			PieceType: QUEEN,
+			Color:     color,
 			FirstMove: true,
 		},
 	}
 }
 
-func NewKing(black bool) *King {
+func NewKing(color Color) *King {
 	return &King{
 		PieceBase: PieceBase{
-			Name:  "king",
-			Black: black,
-			ValidDirections: []Direction{
-				{-1, -1},
-				{-1, 1},
-				{1, 1},
-				{1, -1},
-				{1, 0},
-				{0, 1},
-				{-1, 0},
-				{0, -1},
-			},
+			PieceType: KING,
+			Color:     color,
 			FirstMove: true,
 		},
 	}
 }
 
-func (p *PieceBase) GetName() string {
-	return p.Name
+func (p *PieceBase) SetPiece(pieceType PieceType, color Color) {
+	p.PieceType = pieceType
+	p.Color = color
+	p.FirstMove = true
+}
+
+func (p *Pawn) SetPiece(pieceType PieceType, color Color) {
+	p.PieceBase.SetPiece(pieceType, color)
+	p.EnPassantNeighbourPos = nil
+}
+
+func (p *PieceBase) GetPieceType() PieceType {
+	return p.PieceType
 }
 
 func (p *PieceBase) String() string {
@@ -161,18 +191,18 @@ func (p *PieceBase) String() string {
 	return string(j)
 }
 
-func (p *PieceBase) GetValidPositions() []*Position {
-	return p.ValidPositions
-}
-
 func (p *PieceBase) GetValidDirections() []Direction {
-	return p.ValidDirections
+	dir, _ := PIECE_DIRECTION[p.PieceType]
+	if p.PieceType == PAWN && p.Color == BLACK {
+		return []Direction{{-1, 0}}
+	}
+	return dir
 }
 
-func (p *PieceBase) GetColor() bool {
-	return p.Black
+func (p *PieceBase) GetColor() Color {
+	return p.Color
 }
 
 func (p *PieceBase) IsEnemy(piece IPiece) bool {
-	return p.Black != piece.GetColor()
+	return bool(p.GetColor()) != bool(piece.GetColor())
 }
