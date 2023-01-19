@@ -5,11 +5,12 @@ import { ref, watch } from 'vue'
 
 const MaxPlayerIDLength = 15
 const playerIDStore = usePlayerIDStore()
-let playerID = ref(playerIDStore.id)
+let playerID = ref('')
+playerID.value = !playerIDStore.isEmpty ? playerIDStore.id : ''
 
 function confirmNickname() {
-    console.log('confirmNickname: ', playerID.value)
     playerIDStore.set(playerID.value)
+    console.log('PlayerID: ', playerID.value, '| playerIDStore.id: ', playerIDStore.id)
     router.push({ name: 'rooms' })
 }
 
@@ -35,7 +36,7 @@ watch(playerID, () => {
                             class="form-control"
                             id="input-nickname"
                             placeholder="DarkGreatMaster"
-                            v-model="playerID"
+                            v-model.trim="playerID"
                         />
                     </div>
                     <button type="button" class="btn btn-green w-100" @click="confirmNickname">Confirm</button>
