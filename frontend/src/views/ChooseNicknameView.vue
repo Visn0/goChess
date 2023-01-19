@@ -26,7 +26,7 @@ watch(playerID, () => {
             <h1 class="row header text-light d-flex justify-content-center mb-3 p-0">
                 <span class="p-0">Welcome to GoChess</span>
             </h1>
-            <div class="row d-flex justify-content-center">
+            <div class="row d-flex justify-content-center form-body">
                 <div class="rounded border border-green py-2">
                     <div class="mb-3">
                         <label for="input-nickname" class="form-label text-light">Choose your nickname</label>
@@ -61,11 +61,38 @@ watch(playerID, () => {
     margin-left: -5%;
 }
 
-@media (max-width: 576px) {
+.form-body {
+    width: 75%;
+    margin: auto;
+    justify-content: center;
+}
+
+@media (max-width: 450px) {
+    .choose-nickname-form {
+        width: 100vmin !important;
+        max-width: 100vmin !important;
+        font-size: 0.7em;
+    }
+
+    .form-body {
+        width: 100%;
+    }
+
+    .btn,
+    .form-control {
+        font-size: 0.8em;
+    }
+}
+
+@media (min-width: 450px) and (max-width: 576px) {
     .choose-nickname-form {
         width: 96vmin !important;
         max-width: 96vmin !important;
         font-size: 0.75em;
+    }
+
+    .form-body {
+        width: 80%;
     }
 
     .btn,
@@ -76,9 +103,13 @@ watch(playerID, () => {
 
 @media (min-width: 576px) and (max-width: 680px) {
     .choose-nickname-form {
-        width: 85vmin !important;
-        max-width: 85vmin !important;
+        width: 80vmin !important;
+        max-width: 80vmin !important;
         font-size: 0.85em;
+    }
+
+    .form-body {
+        width: 80%;
     }
 
     .btn,
@@ -157,11 +188,19 @@ watch(playerID, () => {
 }
 
 @media (min-width: 1400px) {
+    .choose-nickname-form {
+        font-size: 0.91em;
+    }
     .header {
         width: 200%;
         justify-content: center;
         margin-left: -50%;
         font-size: 2.7em;
+    }
+
+    .btn,
+    .form-control {
+        font-size: 0.91em;
     }
 }
 </style>
