@@ -10,8 +10,8 @@ import (
 )
 
 type RequestMoves struct {
-	*game.Position
-	Piece string `json:"piece"`
+	Rank game.Rank `json:"rank"`
+	File game.File `json:"file"`
 }
 
 type ResponseMoves struct {
