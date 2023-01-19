@@ -27,7 +27,7 @@ func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
 		log.Println("Error unmarshalling request moves:", err)
 		return
 	}
-	validMoves := g.GetValidPositions(req.Rank, req.File)
+	validMoves := g.GetValidMoves(req.Rank, req.File)
 	fmt.Printf("Found %d valid moves", len(validMoves))
 	resp := ResponseMoves{
 		Action:     "request-moves",
