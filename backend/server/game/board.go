@@ -52,63 +52,47 @@ func (b *Board) RemovePiece(rank Rank, file File) {
 }
 
 func fenCharToPiece(fen string) IPiece {
-	var p IPiece = NewPiece[Pawn](PAWN, false)
-	return p
-	// switch fen {
-	// case "P":
-	// 	p := NewPiece[Pawn](PAWN, false)
-	// 	return &p
-	// case "p":
-	// 	return NewPiece[Pawn](PAWN, true)
-	// case "N":
-	// 	return NewPiece[Knight](KNIGHT, false)
-	// case "n":
-	// 	return NewPiece[Knight](KNIGHT, true)
-	// case "B":
-	// 	return NewPiece[Bishop](BISHOP, false)
-	// case "b":
-	// 	return NewPiece[Bishop](BISHOP, true)
-	// case "R":
-	// 	return NewPiece[Rook](ROOK, false)
-	// case "r":
-	// 	return NewPiece[Rook](ROOK, true)
-	// case "Q":
-	// 	return NewPiece[Queen](QUEEN, false)
-	// case "q":
-	// 	return NewPiece[Queen](QUEEN, true)
-	// case "K":
-	// 	return NewPiece[King](KING, false)
-	// case "k":
-	// 	return NewPiece[King](KING, true)
-	// default:
-	// 	return nil
-	// }
+	var p IPiece
+
 	switch fen {
 	case "P":
-		return NewPawn(false)
+		p = &Pawn{}
+		setNewPiece(p, PAWN, false)
 	case "p":
-		return NewPawn(true)
+		p = &Pawn{}
+		setNewPiece(p, PAWN, true)
 	case "N":
-		return NewKnight(false)
+		p = &Knight{}
+		setNewPiece(p, KNIGHT, false)
 	case "n":
-		return NewKnight(true)
+		p = &Knight{}
+		setNewPiece(p, KNIGHT, true)
 	case "B":
-		return NewBishop(false)
+		p = &Bishop{}
+		setNewPiece(p, BISHOP, false)
 	case "b":
-		return NewBishop(true)
+		p = &Bishop{}
+		setNewPiece(p, BISHOP, true)
 	case "R":
-		return NewRook(false)
+		p = &Rook{}
+		setNewPiece(p, ROOK, false)
 	case "r":
-		return NewRook(true)
+		p = &Rook{}
+		setNewPiece(p, ROOK, true)
 	case "Q":
-		return NewQueen(false)
+		p = &Queen{}
+		setNewPiece(p, QUEEN, false)
 	case "q":
-		return NewQueen(true)
+		p = &Queen{}
+		setNewPiece(p, QUEEN, true)
 	case "K":
-		return NewKing(false)
+		p = &King{}
+		setNewPiece(p, KING, false)
 	case "k":
-		return NewKing(true)
+		p = &King{}
+		setNewPiece(p, KING, true)
 	default:
 		return nil
 	}
+	return p
 }

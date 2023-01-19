@@ -2,7 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Direction struct {
@@ -94,20 +93,11 @@ type King struct {
 	PieceBase
 }
 
-// type VALID_PIECE_TYPE interface {
-// 	*Pawn | *Rook | *Knight | *Bishop | *Queen | *King
-// }
-
-type VALID_PIECE_TYPE interface {
-	Pawn | Rook | Knight | Bishop | Queen | King
-}
-
-func NewPiece[T VALID_PIECE_TYPE](pieceType PieceType, color Color) *T {
-	fmt.Printf("%+v\n", pieceType)
-	var piece = new(T)
-	// piece.PieceBase = PieceBase{}
-	//.SetPiece(pieceType, color)
-	return piece
+func setNewPiece(piece IPiece, pieceType PieceType, color Color) {
+	piece.SetPiece(pieceType, color)
+	if pieceType == PAWN {
+		piece.(*Pawn).EnPassantNeighbourPos = nil
+	}
 }
 
 func NewPawn(color Color) *Pawn {
@@ -192,7 +182,7 @@ func (p *PieceBase) String() string {
 }
 
 func (p *PieceBase) GetValidDirections() []Direction {
-	dir, _ := PIECE_DIRECTION[p.PieceType]
+	dir := PIECE_DIRECTION[p.PieceType]
 	if p.PieceType == PAWN && p.Color == BLACK {
 		return []Direction{{-1, 0}}
 	}
