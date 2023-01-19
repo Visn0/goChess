@@ -39,7 +39,14 @@ watch(playerID, () => {
                             v-model.trim="playerID"
                         />
                     </div>
-                    <button type="button" class="btn btn-green w-100" @click="confirmNickname">Confirm</button>
+                    <button
+                        type="button"
+                        :disabled="playerID.length === 0"
+                        class="btn btn-green w-100"
+                        @click="confirmNickname"
+                    >
+                        Confirm
+                    </button>
                 </div>
             </div>
         </form>
