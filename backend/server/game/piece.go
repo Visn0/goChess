@@ -25,6 +25,7 @@ type PieceBase struct {
 
 type Pawn struct {
 	PieceBase
+	EnPassantNeighbourPos *Position
 }
 
 type Rook struct {
@@ -170,4 +171,8 @@ func (p *PieceBase) GetValidDirections() []Direction {
 
 func (p *PieceBase) GetColor() bool {
 	return p.Black
+}
+
+func (p *PieceBase) IsEnemy(piece IPiece) bool {
+	return p.Black != piece.GetColor()
 }

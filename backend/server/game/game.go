@@ -15,19 +15,75 @@ func (g *Game) Move(m *Move) {
 	p := g.Board.GetPiece(m.From.Rank, m.From.File)
 
 	if p.GetName() == "pawn" {
-		p.(*Pawn).FirstMove = false
-		if m.To.Rank == _1 || m.To.Rank == _8 {
-			g.Board.SetPiece(m.To.Rank, m.To.File, NewQueen(p.GetColor()))
-		} else {
-			g.Board.SetPiece(m.To.Rank, m.To.File, p)
-		}
-		g.Board.RemovePiece(m.From.Rank, m.From.File)
+		g.checkPawnMove(m, p.(*Pawn))
 	} else if p.GetName() == "king" {
 		g.checkCastleMove(m, p.(*King))
 	} else {
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)
 	}
+}
+
+func (g *Game) checkPawnMove(m *Move, pawn *Pawn) {
+
+	dirRank := Rank(pawn.GetValidDirections()[0].x)
+	if m.From.File == m.To.File {
+		// Move forward
+		if m.From.Rank+dirRank == m.To.Rank {
+			// 1 space forward
+			g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
+			g.Board.RemovePiece(m.From.Rank, m.From.File)
+		} else if pawn.FirstMove && m.From.Rank+2*dirRank == m.To.Rank {
+			// 2 spaces forward
+			g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
+			g.Board.RemovePiece(m.From.Rank, m.From.File)
+			// Set en passant left neighbour
+			leftPos := &Position{m.To.Rank, m.To.File - 1}
+			if leftPos.Valid() {
+				leftPiece := g.Board.GetPiece(leftPos.Rank, leftPos.File)
+				if leftPiece != nil && leftPiece.GetName() == "pawn" && leftPiece.GetColor() != pawn.GetColor() {
+					leftPiece.(*Pawn).EnPassantNeighbourPos = &Position{m.To.Rank, m.To.File}
+				}
+			}
+			// Set en passant right neighbour
+			rightPos := &Position{m.To.Rank, m.To.File + 1}
+			if rightPos.Valid() {
+				rightPiece := g.Board.GetPiece(rightPos.Rank, rightPos.File)
+				if rightPiece != nil && rightPiece.GetName() == "pawn" && rightPiece.GetColor() != pawn.GetColor() {
+					rightPiece.(*Pawn).EnPassantNeighbourPos = &Position{m.To.Rank, m.To.File}
+				}
+			}
+		} else {
+			fmt.Println(pawn.FirstMove, m.From.Rank+2*dirRank, m.To.Rank)
+			panic("Invalid forward pawn move")
+		}
+	} else {
+		// Move diagonally
+		if m.To.Rank == m.From.Rank+dirRank {
+			dstPiece := g.Board.GetPiece(m.To.Rank, m.To.File)
+			if dstPiece != nil && dstPiece.GetColor() != pawn.GetColor() {
+				// Capture piece
+				g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
+				g.Board.RemovePiece(m.From.Rank, m.From.File)
+			} else if dstPiece == nil {
+				// Check if en passant
+				if pawn.EnPassantNeighbourPos != nil {
+					neighbourPiece := g.Board.GetPiece(pawn.EnPassantNeighbourPos.Rank, pawn.EnPassantNeighbourPos.File)
+					if neighbourPiece != nil && neighbourPiece.GetName() == "pawn" && neighbourPiece.GetColor() != pawn.GetColor() {
+						g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
+						g.Board.RemovePiece(m.From.Rank, m.From.File)
+						g.Board.RemovePiece(pawn.EnPassantNeighbourPos.Rank, pawn.EnPassantNeighbourPos.File)
+					}
+				}
+			} else {
+				panic("Invalid capture pawn move")
+			}
+		} else {
+			panic("Invalid diagonal pawn move")
+		}
+	}
+	pawn.EnPassantNeighbourPos = nil
+	pawn.FirstMove = false
 }
 
 func (g *Game) checkCastleMove(m *Move, king *King) {
@@ -58,7 +114,6 @@ func (g *Game) checkCastleMove(m *Move, king *King) {
 	g.Board.SetPiece(m.To.Rank, m.To.File, king)
 	g.Board.RemovePiece(m.From.Rank, m.From.File)
 	king.FirstMove = false
-
 }
 
 func (g *Game) GetValidPositions(rank Rank, file File) []*Position {
@@ -135,8 +190,9 @@ func (g *Game) GetLongDistanceMoves(rank Rank, file File, p IPiece) []*Position 
 
 func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 	positions := g.GetShortDistanceMoves(rank, file, p)
+	pawn := p.(*Pawn)
 	// Check if pawn can move two spaces forward
-	if p.(*Pawn).FirstMove {
+	if pawn.FirstMove {
 		positions = append(positions, &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file})
 	}
 	// Check if pawn can move diagonally
@@ -148,7 +204,8 @@ func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 		topLeftPos := Position{Rank: topPos.Rank, File: topPos.File - 1}
 		if topLeftPos.Valid() {
 			topLeftPiece := g.Board.GetPiece(topLeftPos.Rank, topLeftPos.File)
-			if topLeftPiece != nil && topLeftPiece.GetColor() != p.GetColor() {
+			// Check if the piece is an enemy piece
+			if topLeftPiece != nil && pawn.IsEnemy(topLeftPiece) {
 				positions = append(positions, &topLeftPos)
 			}
 		}
@@ -156,8 +213,16 @@ func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 		topRightPos := Position{Rank: topPos.Rank, File: topPos.File + 1}
 		if topRightPos.Valid() {
 			topRightPiece := g.Board.GetPiece(topRightPos.Rank, topRightPos.File)
-			if topRightPiece != nil && topRightPiece.GetColor() != p.GetColor() {
+			// Check if the piece is an enemy piece
+			if topRightPiece != nil && pawn.IsEnemy(topRightPiece) {
 				positions = append(positions, &topRightPos)
+			}
+		}
+		// Check if pawn has En Passant move
+		if pawn.EnPassantNeighbourPos != nil {
+			dstPos := &Position{Rank: rank + pawnRankDir, File: pawn.EnPassantNeighbourPos.File}
+			if dstPos.Valid() {
+				positions = append(positions, dstPos)
 			}
 		}
 	}
