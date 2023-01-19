@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Square } from '@/models/square'
 import ChessPiece from './ChessPiece.vue'
-import { watch } from 'vue'
 
 const props = defineProps<{
     square: Square
@@ -14,29 +13,14 @@ function squareClick() {
 
     emit('onSquareClick', file, rank)
 }
-
-let componentKey = 0
-watch(props.square.isValidMove.bind(props.square), () => {
-    componentKey += 1
-})
-
-watch(props.square.getPiece.bind(props.square), () => {
-    componentKey += 1
-})
 </script>
 
 <template>
-    <td
-        id="{{ props.square.id }}"
-        class="board-square p-0"
-        :class="props.square.color"
-        @click="squareClick()"
-        :key="componentKey"
-    >
-        <div id="{{ props.square.id }}-piece" class="piece">
-            <ChessPiece v-if="props.square.piece" :piece="props.square.piece" />
+    <td id="{{ square.id }}" class="board-square p-0" :class="square.color" @click="squareClick()">
+        <div class="piece">
+            <ChessPiece v-if="square.piece" :piece="square.piece" :selected="square.isSelected()" />
         </div>
-        <div v-if="props.square.isValidMove()" class="position-absolute top-0 h-100 w-100">
+        <div v-if="square.isValidMove()" class="position-absolute top-0 h-100 w-100">
             <div class="valid-move"></div>
         </div>
     </td>

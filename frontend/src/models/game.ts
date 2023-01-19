@@ -44,11 +44,13 @@ class Game {
             return
         }
 
+        square.setAsSelected()
         this._srcSquare = new SrcSquare(square)
         RequestMovesAction(this.repository, square)
     }
 
     public unselectSrcSquare() {
+        this._srcSquare?.square.unsetAsSelected()
         this._srcSquare?.removeValidMoves()
         this._srcSquare = null
     }
