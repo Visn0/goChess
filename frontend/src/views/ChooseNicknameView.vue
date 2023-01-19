@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import router from '@/router'
 import { usePlayerIDStore } from '@/stores/playerID'
+import { ref, watch } from 'vue'
 
+const MaxPlayerIDLength = 15
 const playerIDStore = usePlayerIDStore()
-
-let playerID = playerIDStore.id
+let playerID = ref(playerIDStore.id)
 
 function confirmNickname() {
-    console.log('confirmNickname: ', playerID)
-    playerIDStore.set(playerID)
+    console.log('confirmNickname: ', playerID.value)
+    playerIDStore.set(playerID.value)
     router.push({ name: 'rooms' })
 }
+
+watch(playerID, () => {
+    if (playerID.value.length > MaxPlayerIDLength) {
+        playerID.value = playerID.value.slice(0, MaxPlayerIDLength)
+    }
+})
 </script>
 
 <template>

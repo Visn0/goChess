@@ -16,31 +16,31 @@ watch(props.timer.isPaused.bind(props.timer), () => {
 </script>
 
 <template>
-    <p class="my-0 text-size badge" :class="timerStyle">
+    <p class="badge my-0 p-1 text-size" :class="timerStyle">
         {{ timer.toString() }}
     </p>
 </template>
 
 <style scoped>
 .text-size {
-    font-size: 0.8em;
+    font-size: 0.7em;
 }
 
 @media (max-width: 576px) {
     .text-size {
-        font-size: 0.55em;
+        font-size: 0.45em;
     }
 }
 
 @media (min-width: 576px) and (max-width: 768px) {
     .text-size {
-        font-size: 0.6em;
+        font-size: 0.55em;
     }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
     .text-size {
-        font-size: 0.7em;
+        font-size: 0.65em;
     }
 }
 </style>
