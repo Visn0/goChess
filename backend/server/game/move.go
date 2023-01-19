@@ -5,10 +5,6 @@ type Position struct {
 	File `json:"file"`
 }
 
-func (p *Position) Equals(other Position) bool {
-	return p.Rank == other.Rank && p.File == other.File
-}
-
 func (p *Position) String() string {
 	return string(rune('A'+p.File)) + string(rune('1'+p.Rank))
 }

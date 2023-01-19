@@ -10,8 +10,8 @@ import (
 )
 
 type RequestMoves struct {
-	*game.Position
-	Piece string `json:"piece"`
+	Rank game.Rank `json:"rank"`
+	File game.File `json:"file"`
 }
 
 type ResponseMoves struct {
@@ -20,14 +20,14 @@ type ResponseMoves struct {
 }
 
 func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
-	log.Println("handle request moves")
+	log.Println("Handle request moves")
 	req := RequestMoves{}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("Error unmarshalling request moves:", err)
 		return
 	}
-	validMoves := g.GetValidPositions(req.Rank, req.File)
+	validMoves := g.GetValidMoves(req.Rank, req.File)
 	fmt.Printf("Found %d valid moves", len(validMoves))
 	resp := ResponseMoves{
 		Action:     "request-moves",

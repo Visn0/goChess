@@ -1,5 +1,5 @@
-import { Room, Rooms } from '../../room'
-import { RoomPlayer } from '../../room_player'
+import { Room, Rooms } from '@/models/room'
+import { RoomPlayer } from '@/models/room_player'
 
 class RoomJoinedParams {
     httpCode: number

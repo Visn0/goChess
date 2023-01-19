@@ -24,10 +24,21 @@ body {
     margin-top: 50px;
 }
 
-.bg-green {
-    background-color: #7fa650;
+/* #7fa650 */
+.btn-green {
+    background-color: #1da338;
+}
+
+.btn-green:hover {
+    color: white;
+    border: 1px solid #1da338;
+    background-color: rgba(29, 163, 56, 0.25);
+}
+
+.btn-maroon {
+    background-color: rgba(87, 0, 13, 0.34);
 }
 
 .border-green {
-    border-color: #7fa650;
+    border-color: #43f066;
 }

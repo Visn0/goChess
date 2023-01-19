@@ -1,8 +1,8 @@
 import type { Board } from './board'
 import type { Square } from './square'
 import type { ConnectionRepository } from './connection_repository/connection_repository'
-import { RequestMovesAction } from './actions/send/request_moves_action'
-import { MovePieceAction } from './actions/send/move_piece_action'
+import { RequestMovesAction } from '@/actions/send/request_moves_action'
+import { MovePieceAction } from '@/actions/send/move_piece_action'
 import type { Rooms } from './room'
 
 class Game {
@@ -44,11 +44,13 @@ class Game {
             return
         }
 
+        square.setAsSelected()
         this._srcSquare = new SrcSquare(square)
         RequestMovesAction(this.repository, square)
     }
 
     public unselectSrcSquare() {
+        this._srcSquare?.square.unsetAsSelected()
         this._srcSquare?.removeValidMoves()
         this._srcSquare = null
     }

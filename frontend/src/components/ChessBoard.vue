@@ -30,40 +30,30 @@ function enumToArray(e: any): Array<any> {
 </script>
 
 <template>
-    <div class="chess-board">
-        <table id="board-table">
-            <template v-if="colorDown === Color.WHITE">
-                <tr v-for="r in descRanks" :key="r">
-                    <ChessBoardSquare
-                        v-for="f in ascFiles"
-                        :square="board.getSquare(f, r)"
-                        :key="board.getSquare(f, r).id"
-                        @on-square-click="squareClick"
-                    />
-                </tr>
-            </template>
-            <template v-else>
-                <tr v-for="r in ascRanks" :key="r">
-                    <ChessBoardSquare
-                        v-for="f in descFiles"
-                        :square="board.getSquare(f, r)"
-                        :key="board.getSquare(f, r).id"
-                        @on-square-click="squareClick"
-                    />
-                </tr>
-            </template>
-        </table>
-    </div>
+    <table id="board-table">
+        <template v-if="colorDown === Color.WHITE">
+            <tr v-for="r in descRanks" :key="r">
+                <ChessBoardSquare
+                    v-for="f in ascFiles"
+                    :square="board.getSquare(f, r)"
+                    :display-file="r === Rank._1"
+                    :display-rank="f === File.A"
+                    :key="board.getSquare(f, r).id"
+                    @on-square-click="squareClick"
+                />
+            </tr>
+        </template>
+        <template v-else>
+            <tr v-for="r in ascRanks" :key="r">
+                <ChessBoardSquare
+                    v-for="f in descFiles"
+                    :square="board.getSquare(f, r)"
+                    :display-file="r === Rank._8"
+                    :display-rank="f === File.H"
+                    :key="board.getSquare(f, r).id"
+                    @on-square-click="squareClick"
+                />
+            </tr>
+        </template>
+    </table>
 </template>
-
-<style scoped>
-.board {
-    margin: auto;
-    border: 2px solid #000;
-    border-radius: 5px;
-    width: 80vmin;
-    height: 80vmin;
-    display: flex;
-    flex-wrap: wrap;
-}
-</style>

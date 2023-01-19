@@ -1,6 +1,6 @@
-import type { File, Rank } from '../../constants'
-import type { Game } from '../../game'
-import type { Square } from '../../square'
+import type { File, Rank } from '@/models/constants'
+import type { Game } from '@/models/game'
+import type { Square } from '@/models/square'
 
 class MovesReceivedParams {
     validMoves: Array<CoordinateParams>
@@ -24,6 +24,11 @@ class MovesReceivedAction {
 
         const board = this.game.board
         const validMoves: Array<Square> = p.validMoves.map((m) => board.getSquare(m.file, m.rank))
+
+        if (validMoves.length < 1) {
+            this.game.unselectSrcSquare()
+            return
+        }
 
         this.game.srcSquare?.setValidMoves(validMoves)
     }

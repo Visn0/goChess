@@ -1,6 +1,6 @@
-import type { ConnectionRepository, Message } from '../../connection_repository/connection_repository'
-import type { PieceType, File, Rank } from '../../constants'
-import type { Square } from '../../square'
+import type { ConnectionRepository, Message } from '@/models/connection_repository/connection_repository'
+import type { PieceType, File, Rank } from '@/models/constants'
+import type { Square } from '@/models/square'
 
 class RequestMovesMessage implements Message {
     action: string

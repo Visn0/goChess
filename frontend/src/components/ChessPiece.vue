@@ -1,13 +1,22 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import type { Piece } from '..//models/piece'
 
 const props = defineProps<{
     piece: Piece
+    selected: boolean
 }>()
+
+const styleSelected = 'selected'
+const styleDefault = ''
+let squareColor = styleDefault
+watch(props, () => {
+    squareColor = props.selected ? styleSelected : styleDefault
+})
 </script>
 
 <template>
-    <div v-if="piece" class="piece" :class="`${props.piece.color}-${props.piece.type}`"></div>
+    <div v-if="piece" class="piece" :class="`${squareColor} ${props.piece.color}-${props.piece.type}`"></div>
 </template>
 
 <style scoped>
@@ -21,6 +30,11 @@ const props = defineProps<{
     width: 100%;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+}
+
+.selected {
+    background-color: rgba(67, 240, 102, 0.54) !important;
+    box-shadow: inset 0px 0px 2.5vmin rgba(0, 0, 0, 0.24);
 }
 
 /*white pieces*/
