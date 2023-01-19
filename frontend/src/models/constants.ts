@@ -9,6 +9,10 @@ enum File {
     H = 7
 }
 
+function fileToString(e: File): string {
+    return File[e]
+}
+
 enum Rank {
     _1 = 0,
     _2 = 1,
@@ -18,6 +22,10 @@ enum Rank {
     _6 = 5,
     _7 = 6,
     _8 = 7
+}
+
+function rankToString(e: Rank): string {
+    return Rank[e].charAt(1)
 }
 
 enum Color {
@@ -39,4 +47,4 @@ const constants = {
     StartingPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 }
 
-export { File, Rank, Color, PieceType, constants }
+export { File, fileToString, rankToString, Rank, Color, PieceType, constants }

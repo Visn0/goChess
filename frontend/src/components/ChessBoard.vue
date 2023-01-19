@@ -36,6 +36,8 @@ function enumToArray(e: any): Array<any> {
                 <ChessBoardSquare
                     v-for="f in ascFiles"
                     :square="board.getSquare(f, r)"
+                    :display-file="r === Rank._1"
+                    :display-rank="f === File.A"
                     :key="board.getSquare(f, r).id"
                     @on-square-click="squareClick"
                 />
@@ -46,6 +48,8 @@ function enumToArray(e: any): Array<any> {
                 <ChessBoardSquare
                     v-for="f in descFiles"
                     :square="board.getSquare(f, r)"
+                    :display-file="r === Rank._8"
+                    :display-rank="f === File.H"
                     :key="board.getSquare(f, r).id"
                     @on-square-click="squareClick"
                 />

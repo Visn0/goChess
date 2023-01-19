@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import type { Square } from '@/models/square'
+import { fileToString, rankToString } from '@/models/constants'
 import ChessPiece from './ChessPiece.vue'
 
 const props = defineProps<{
     square: Square
+    displayRank: boolean
+    displayFile: boolean
 }>()
+const file = fileToString(props.square.file)
+const rank = rankToString(props.square.rank)
 
 const emit = defineEmits(['onSquareClick'])
 function squareClick() {
@@ -17,6 +22,8 @@ function squareClick() {
 
 <template>
     <td id="{{ square.id }}" class="board-square p-0" :class="square.color" @click="squareClick()">
+        <span v-show="displayRank" class="position-absolute top-0 start-0 rank">{{ rank }}</span>
+        <span v-show="displayFile" class="position-absolute bottom-0 end-0 file">{{ file }}</span>
         <div class="piece">
             <ChessPiece v-if="square.piece" :piece="square.piece" :selected="square.isSelected()" />
         </div>
@@ -33,6 +40,24 @@ function squareClick() {
     position: relative;
     align-items: center;
     justify-content: center;
+    font-weight: 600;
+}
+
+.rank {
+    margin-left: 3%;
+    margin-top: 3%;
+}
+
+.file {
+    margin-bottom: 3%;
+    margin-right: 3%;
+}
+
+.rank,
+.file {
+    display: inline-block;
+    font-size: 16px;
+    line-height: 16px;
 }
 
 .valid-move {
@@ -45,11 +70,12 @@ function squareClick() {
 }
 
 .board-square.white-square {
+    color: #65a371;
     background-color: #fff;
 }
 
 .board-square.black-square {
-    /* background-color: #7fa650; */
+    color: #fff;
     background-color: #65a371;
 }
 
@@ -70,6 +96,12 @@ function squareClick() {
         width: 12.5vmin;
         height: 12.5vmin;
     }
+
+    .rank,
+    .file {
+        font-size: 12px;
+        line-height: 12px;
+    }
 }
 
 @media (min-width: 576px) and (max-width: 768px) {
@@ -77,12 +109,24 @@ function squareClick() {
         width: 11.5vmin;
         height: 11.5vmin;
     }
+
+    .rank,
+    .file {
+        font-size: 14px;
+        line-height: 14px;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
     .board-square {
         width: 10.5vmin;
         height: 10.5vmin;
+    }
+
+    .rank,
+    .file {
+        font-size: 16px;
+        line-height: 16px;
     }
 }
 </style>
