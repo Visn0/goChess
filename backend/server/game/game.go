@@ -68,7 +68,7 @@ func (g *Game) GetValidPositions(rank Rank, file File) []*Position {
 		fmt.Println("No piece at", rank, file)
 		return nil
 	}
-	fmt.Println("Piece at", rank, file, "is", p.String())
+	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetName())
 	positions := g.GetPieceValidMovesHandler(p.GetName())(rank, file, p)
 	return positions
 }
@@ -139,21 +139,29 @@ func (g *Game) GetPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 	if p.(*Pawn).FirstMove {
 		positions = append(positions, &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file})
 	}
-	topPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y)}
+	// Check if pawn can move diagonally
+	fmt.Println("Checking diagonals")
+	pawnRankDir := Rank(p.GetValidDirections()[0].x)
+	topPos := Position{Rank: rank + pawnRankDir, File: file}
 	if topPos.Valid() {
 		// Check if there is a piece in front left of the pawn
-		topLeftPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y-1)}
-		topLeftPiece := g.Board.GetPiece(topLeftPos.Rank, topLeftPos.File)
-		if topLeftPiece != nil && topLeftPiece.GetColor() != p.GetColor() {
-			positions = append(positions, &topLeftPos)
+		topLeftPos := Position{Rank: topPos.Rank, File: topPos.File - 1}
+		if topLeftPos.Valid() {
+			topLeftPiece := g.Board.GetPiece(topLeftPos.Rank, topLeftPos.File)
+			if topLeftPiece != nil && topLeftPiece.GetColor() != p.GetColor() {
+				positions = append(positions, &topLeftPos)
+			}
 		}
 		// Check if there is a piece in front right of the pawn
-		topRightPos := Position{Rank: rank + Rank(p.GetValidDirections()[0].x), File: file + File(p.GetValidDirections()[0].y+1)}
-		topRightPiece := g.Board.GetPiece(topRightPos.Rank, topRightPos.File)
-		if topRightPiece != nil && topRightPiece.GetColor() != p.GetColor() {
-			positions = append(positions, &topRightPos)
+		topRightPos := Position{Rank: topPos.Rank, File: topPos.File + 1}
+		if topRightPos.Valid() {
+			topRightPiece := g.Board.GetPiece(topRightPos.Rank, topRightPos.File)
+			if topRightPiece != nil && topRightPiece.GetColor() != p.GetColor() {
+				positions = append(positions, &topRightPos)
+			}
 		}
 	}
+	fmt.Println("Done checking diagonals")
 	return positions
 }
 

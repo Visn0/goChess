@@ -20,7 +20,7 @@ type ResponseMoves struct {
 }
 
 func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
-	log.Println("handle request moves")
+	log.Println("Handle request moves")
 	req := RequestMoves{}
 	err := json.Unmarshal(body, &req)
 	if err != nil {
