@@ -103,6 +103,9 @@ func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
 
 			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
 			enemy.StartTimer()
+		case "get-timers":
+			// log.Println("Get timers")
+			gameActions.WsGetTimers(player.Ws, enemy.Ws, player.TimeLeft(), enemy.TimeLeft())
 		default:
 			log.Println("Unknown action")
 		}

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 )
 
 type RequestJoinRoom struct {
@@ -48,10 +49,11 @@ func WsJoinRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 		return
 	}
 	player := &room.Player{
-		Ws:                    c,
-		ID:                    req.PlayerID,
-		TimeConsumedInSeconds: 0,
-		Color:                 game.BLACK,
+		Ws:             c,
+		ID:             req.PlayerID,
+		TimeConsumedMS: 0,
+		LastClockTime:  time.Time{},
+		Color:          game.BLACK,
 	}
 	r.AddPlayer(player)
 	log.Println("Player joined room", player.ID, r.ID)

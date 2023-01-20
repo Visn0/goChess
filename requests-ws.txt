@@ -106,7 +106,20 @@
 		}
 	}
 }
-
+###############################################
+## GetTimers
+{
+	Request
+	{
+		"action": "get-timers",
+	}
+	Response
+	{
+		"action": "get-timers",
+		"player-time": 600000,
+		"enemy-time": 600000,
+	}
+}
 
 
 
