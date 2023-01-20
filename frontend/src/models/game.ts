@@ -101,6 +101,7 @@ class Game {
     public cancelPromotion() {
         this._pendingPromotion.value = false
         this.dstPromotedPawn = null
+        this.unselectSrcSquare()
     }
 
     public unselectSrcSquare() {
