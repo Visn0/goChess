@@ -32,12 +32,12 @@ func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
 		fmt.Println("No valid moves found")
 		return
 	}
-	fmt.Printf("Found %d valid moves", len(validMoves))
+	// fmt.Printf("Found %d valid moves", len(validMoves))
 	resp := ResponseMoves{
 		Action:     "request-moves",
 		ValidMoves: validMoves,
 	}
-	j, _ := json.Marshal(resp)
-	log.Println(string(j))
+	// j, _ := json.Marshal(resp)
+	// log.Println(string(j))
 	c.WriteJSON(resp)
 }

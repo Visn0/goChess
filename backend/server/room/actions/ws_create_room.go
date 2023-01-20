@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"chess/server/game"
 	"chess/server/room"
 	"chess/server/shared"
 	"encoding/json"
@@ -57,13 +58,15 @@ func WsCreateRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 
 	r := room.NewRoom(req.RoomID)
 	player := &room.Player{
-		Ws: c,
-		ID: req.PlayerID,
+		Ws:                    c,
+		ID:                    req.PlayerID,
+		TimeConsumedInSeconds: 0,
+		Color:                 game.WHITE,
 	}
 
 	r.AddPlayer(player)
 	rm.AddRoom(r)
-	log.Println("Room created")
+	log.Println("Room created", r.ID, "by player", player.ID)
 
 	resp.Room = &ResponseRoom{
 		ID: req.RoomID,

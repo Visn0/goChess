@@ -2,8 +2,6 @@ package actions
 
 import (
 	"chess/server/room"
-	"encoding/json"
-	"fmt"
 
 	fiber "github.com/gofiber/fiber/v2"
 )
@@ -26,8 +24,8 @@ func HttpGetRooms(ctx *fiber.Ctx, rm *room.RoomManager) error {
 	addTestRooms(rm) //TODO: remove
 
 	rooms := rm.GetRooms()
-	b, _ := json.Marshal(rooms)
-	fmt.Printf("### Rooms: %v\n", string(b))
+	// b, _ := json.Marshal(rooms)
+	// fmt.Printf("### Rooms: %v\n", string(b))
 	roomsResponse := make([]*RoomResponse, 0, len(rooms))
 	for _, room := range rooms {
 		info := room.GetPublicInfo()
