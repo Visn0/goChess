@@ -1,4 +1,4 @@
-package game
+package domain
 
 type Board struct {
 	board [][]IPiece

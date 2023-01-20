@@ -1,6 +1,8 @@
-package game
+package domain
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Position struct {
 	Rank `json:"rank"`

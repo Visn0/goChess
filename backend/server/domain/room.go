@@ -1,8 +1,7 @@
-package room
+package domain
 
 import (
-	"chess/server/game"
-	gameActions "chess/server/game/actions"
+	// "chess/server/application"
 	"fmt"
 	"log"
 	"sync"
@@ -14,11 +13,11 @@ type Room struct {
 	ID      string
 	Player1 *Player
 	Player2 *Player
-	game    *game.Game
+	game    *Game
 }
 
 func NewRoom(id string) *Room {
-	return &Room{ID: id, game: game.NewGame()}
+	return &Room{ID: id, game: NewGame()}
 }
 
 func (r *Room) AddPlayer(p *Player) error {
@@ -89,15 +88,15 @@ func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
 		// log.Println("Get message.")
 
 		reqAction, _ := jsonparser.GetString(message, "action")
-		reqBody, _, _, _ := jsonparser.Get(message, "body")
+		_, _, _, _ = jsonparser.Get(message, "body")
 
 		switch reqAction {
 		case "request-moves":
 			// log.Println("Request moves")
-			gameActions.WsGetValidMoves(r.game, reqBody, player.Ws)
+			// application.WsGetValidMoves(r.game, reqBody, player.Ws)
 		case "move-piece":
 			// log.Println("Move piece")
-			gameActions.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
+			// application.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
 			player.StopTimer()
 			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
 

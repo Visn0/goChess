@@ -1,8 +1,8 @@
 package server
 
 import (
-	"chess/server/room"
-	roomActions "chess/server/room/actions"
+	"chess/server/domain"
+	"chess/server/infrastructure"
 	"chess/server/shared"
 	"flag"
 	"log"
@@ -30,7 +30,7 @@ type Server struct {
 	register   chan subEvent
 	unregister chan subEvent
 
-	roomManager *room.RoomManager
+	roomManager *domain.RoomManager
 }
 
 func NewServer(addr, port string) *Server {
@@ -42,14 +42,13 @@ func NewServer(addr, port string) *Server {
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
 		unregister:         make(chan subEvent),
-		roomManager:        room.NewRoomManager(),
+		roomManager:        domain.NewRoomManager(),
 	}
 }
 
 // The server instantiates the middleware (proxy)
 func (s *Server) initMiddleware() {
 	s.app.Use(cors.New())
-
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
 		if !c.IsFromLocal() {
@@ -108,13 +107,20 @@ func (s *Server) initWebsocket() {
 			return
 		}
 
+		repository := infrastructure.NewBackendConnectionRepository(c)
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
-			roomActions.WsCreateRoom(s.roomManager, reqBody, c)
+			controller := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
+			err = controller.Invoke(reqBody)
+			if err != nil {
+				// TODO: return message in the websocket
+				log.Println(err)
+			}
+			// roomActions.WsCreateRoom(s.roomManager, reqBody, c)
 		case "join-room":
 			log.Println("Request join room")
-			roomActions.WsJoinRoom(s.roomManager, reqBody, c)
+			// roomActions.WsJoinRoom(s.roomManager, reqBody, c)
 		}
 	}))
 }
@@ -122,6 +128,7 @@ func (s *Server) initWebsocket() {
 func (s *Server) initHttp() {
 	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
 		log.Println("############# ROOMS endpoint")
-		return roomActions.HttpGetRooms(ctx, s.roomManager)
+		// return roomActions.HttpGetRooms(ctx, s.roomManager)
+		return nil
 	})
 }

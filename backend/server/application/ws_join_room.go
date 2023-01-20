@@ -1,8 +1,7 @@
-package actions
+package application
 
 import (
-	"chess/server/game"
-	"chess/server/room"
+	"chess/server/domain"
 	"chess/server/shared"
 	"encoding/json"
 	"log"
@@ -21,7 +20,7 @@ type ResponseJoinRoom struct {
 	Room     *ResponseRoom `json:"room"`
 }
 
-func WsJoinRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
+func WsJoinRoom(rm *domain.RoomManager, body []byte, c *shared.WsConn) {
 	req := RequestJoinRoom{}
 	resp := ResponseJoinRoom{
 		Action:   "join-room",
@@ -47,11 +46,11 @@ func WsJoinRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 		}
 		return
 	}
-	player := &room.Player{
+	player := &domain.Player{
 		Ws:                    c,
 		ID:                    req.PlayerID,
 		TimeConsumedInSeconds: 0,
-		Color:                 game.BLACK,
+		Color:                 domain.BLACK,
 	}
 	r.AddPlayer(player)
 	log.Println("Player joined room", player.ID, r.ID)

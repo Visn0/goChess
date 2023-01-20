@@ -1,7 +1,7 @@
-package actions
+package application
 
 import (
-	"chess/server/game"
+	"chess/server/domain"
 	"chess/server/shared"
 
 	"encoding/json"
@@ -10,16 +10,16 @@ import (
 )
 
 type RequestMoves struct {
-	Rank game.Rank `json:"rank"`
-	File game.File `json:"file"`
+	Rank domain.Rank `json:"rank"`
+	File domain.File `json:"file"`
 }
 
 type ResponseMoves struct {
-	Action     string           `json:"action"`
-	ValidMoves []*game.Position `json:"validMoves"`
+	Action     string             `json:"action"`
+	ValidMoves []*domain.Position `json:"validMoves"`
 }
 
-func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
+func WsGetValidMoves(g *domain.Game, body []byte, c *shared.WsConn) {
 	log.Println("Handle request moves")
 	req := RequestMoves{}
 	err := json.Unmarshal(body, &req)

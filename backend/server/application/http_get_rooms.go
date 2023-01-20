@@ -1,7 +1,7 @@
-package actions
+package application
 
 import (
-	"chess/server/room"
+	"chess/server/domain"
 
 	fiber "github.com/gofiber/fiber/v2"
 )
@@ -19,7 +19,7 @@ type HttpRoomsResponse struct {
 	Rooms []*RoomResponse `json:"rooms"`
 }
 
-func HttpGetRooms(ctx *fiber.Ctx, rm *room.RoomManager) error {
+func HttpGetRooms(ctx *fiber.Ctx, rm *domain.RoomManager) error {
 	// TEST ROOMS
 	addTestRooms(rm) //TODO: remove
 
@@ -46,25 +46,25 @@ func HttpGetRooms(ctx *fiber.Ctx, rm *room.RoomManager) error {
 	return ctx.JSON(resp)
 }
 
-func addTestRooms(rm *room.RoomManager) {
-	roomTest1 := &room.Room{
+func addTestRooms(rm *domain.RoomManager) {
+	roomTest1 := &domain.Room{
 		ID: "roomTest1",
-		Player1: &room.Player{
+		Player1: &domain.Player{
 			Ws: nil,
 			ID: "player1",
 		},
-		Player2: &room.Player{
+		Player2: &domain.Player{
 			Ws: nil,
 			ID: "player2",
 		},
 	}
-	roomTest2 := &room.Room{
+	roomTest2 := &domain.Room{
 		ID: "roomTest2",
-		Player1: &room.Player{
+		Player1: &domain.Player{
 			Ws: nil,
 			ID: "player3",
 		},
-		Player2: &room.Player{
+		Player2: &domain.Player{
 			Ws: nil,
 			ID: "player4",
 		},
