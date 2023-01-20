@@ -25,7 +25,7 @@ type Move struct {
 	To   *Position `json:"to"`
 }
 
-func (g *Game) Move(m *Move, promoteTo string) {
+func (g *Game) Move(m *Move, promoteTo *PieceType) {
 	p := g.Board.GetPiece(m.From.Rank, m.From.File)
 	if p == nil {
 		fmt.Println("No piece at", m.From)
@@ -65,7 +65,7 @@ func (g *Game) removeEnPassantStatesIfNotThisPiece(p IPiece) {
 	}
 }
 
-func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo string) {
+func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo *PieceType) {
 	dirRank := Rank(pawn.GetValidDirections()[0].x)
 	if g.checkPawnPromotion(m, pawn, promoteTo) {
 		return
@@ -131,25 +131,25 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo string) {
 	pawn.FirstMove = false
 }
 
-func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo string) bool {
+func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo *PieceType) bool {
 
 	var piece IPiece
-	if promoteTo != "" {
+	if promoteTo != nil {
 		fmt.Println("Promoting pawn", m.To, promoteTo)
 		if m.To.Rank != 0 && m.To.Rank != 7 {
 			panic("Invalid promotion rank")
 		}
-		switch promoteTo {
-		case "queen":
+		switch *promoteTo {
+		case QUEEN:
 			piece = &Queen{}
 			setNewPiece(piece, QUEEN, pawn.GetColor())
-		case "rook":
+		case ROOK:
 			piece = &Rook{}
 			setNewPiece(piece, ROOK, pawn.GetColor())
-		case "bishop":
+		case BISHOP:
 			piece = &Bishop{}
 			setNewPiece(piece, BISHOP, pawn.GetColor())
-		case "knight":
+		case KNIGHT:
 			piece = &Knight{}
 			setNewPiece(piece, KNIGHT, pawn.GetColor())
 		default:
