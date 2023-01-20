@@ -10,7 +10,6 @@ playerID.value = !playerIDStore.isEmpty ? playerIDStore.id : ''
 
 function confirmNickname() {
     playerIDStore.set(playerID.value)
-    console.log('PlayerID: ', playerID.value, '| playerIDStore.id: ', playerIDStore.id)
     router.push({ name: 'rooms' })
 }
 
