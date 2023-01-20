@@ -108,7 +108,8 @@ class MockConnectionRepository implements ConnectionRepository {
             dst: {
                 file: m.body.dst.file,
                 rank: m.body.dst.rank
-            }
+            },
+            promotedTo: m.body.promoteTo
         })
 
         return new MessageEvent(this.onMessageEventTopic, { data: data })

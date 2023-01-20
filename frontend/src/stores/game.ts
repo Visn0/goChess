@@ -10,5 +10,6 @@ export const useGameStore = defineStore('game', () => {
     function set(newGame: Game) {
         _game.value = newGame
     }
+
     return { game, isEmpty, set }
 })
