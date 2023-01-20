@@ -9,6 +9,10 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 		fmt.Println("No piece at", rank, file)
 		return nil
 	}
+	if p.GetColor() != g.ColotToMove {
+		fmt.Println("Wrong color to move")
+		return nil
+	}
 	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetPieceType())
 	positions := g.getPieceValidMovesHandler(p.GetPieceType())(rank, file, p)
 	return positions

@@ -31,6 +31,10 @@ func (g *Game) Move(m *Move, promoteTo string) {
 		fmt.Println("No piece at", m.From)
 		panic("No piece at " + m.From.String())
 	}
+	if p.GetColor() != g.ColotToMove {
+		fmt.Println("Wrong color to move")
+		panic("Wrong color to move")
+	}
 	g.removeEnPassantStatesIfNotThisPiece(p)
 
 	if p.GetPieceType() == PAWN {
@@ -41,6 +45,7 @@ func (g *Game) Move(m *Move, promoteTo string) {
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)
 	}
+	g.ColotToMove = Color(!bool(g.ColotToMove))
 }
 
 func (g *Game) removeEnPassantStatesIfNotThisPiece(p IPiece) {
