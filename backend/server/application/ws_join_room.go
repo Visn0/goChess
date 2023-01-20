@@ -2,81 +2,80 @@ package application
 
 import (
 	"chess/server/domain"
-	"chess/server/shared"
-	"encoding/json"
+	"fmt"
 	"log"
-	"sync"
 )
 
-type RequestJoinRoom struct {
+type JoinRoomParams struct {
 	RoomID   string `json:"roomID"`
 	PlayerID string `json:"playerID"`
 	Password string `json:"password"`
 }
 
-type ResponseJoinRoom struct {
-	HttpCode int           `json:"httpCode"`
-	Action   string        `json:"action"`
-	Room     *ResponseRoom `json:"room"`
+type JoinRoomOutput struct {
+	HttpCode int                 `json:"httpCode"`
+	Action   string              `json:"action"`
+	Room     *JoinRoomInfoOutput `json:"room"`
+}
+type JoinRoomInfoOutput struct {
+	ID      string                  `json:"id"`
+	Players []*JoinRoomPlayerOutput `json:"players"`
 }
 
-func WsJoinRoom(rm *domain.RoomManager, body []byte, c *shared.WsConn) {
-	req := RequestJoinRoom{}
-	resp := ResponseJoinRoom{
+type JoinRoomPlayerOutput struct {
+	ID string `json:"id"`
+}
+
+func newJoinRoomOutput(httpCode int, roomID string, player1 *domain.Player, player2 *domain.Player) *JoinRoomOutput {
+	players := make([]*JoinRoomPlayerOutput, 0, 2)
+	if player1 != nil {
+		players = append(players, &JoinRoomPlayerOutput{
+			ID: player1.ID,
+		})
+	}
+
+	if player2 != nil {
+		players = append(players, &JoinRoomPlayerOutput{
+			ID: player2.ID,
+		})
+	}
+
+	return &JoinRoomOutput{
+		HttpCode: httpCode,
 		Action:   "join-room",
-		HttpCode: 200,
-		Room:     nil,
+		Room: &JoinRoomInfoOutput{
+			ID:      roomID,
+			Players: players,
+		},
 	}
-	err := json.Unmarshal(body, &req)
-	if err != nil {
-		log.Println("Error unmarshalling request join room:", err)
-		resp.HttpCode = 400
-		err = c.WriteJSON(resp)
-		if err != nil {
-			log.Println("Error sending error response unmarshalling:", err)
-		}
-		return
-	}
-	r, ok := rm.GetRoom(req.RoomID)
+
+}
+
+type JoinRoomAction struct {
+	rm *domain.RoomManager
+	r  domain.ConnectionRepository
+}
+
+func NewJoinRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) *JoinRoomAction {
+	return &JoinRoomAction{rm: rm, r: r}
+}
+
+func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
+	room, ok := uc.rm.GetRoom(p.RoomID)
 	if !ok {
-		resp.HttpCode = 400
-		err = c.WriteJSON(resp)
-		if err != nil {
-			log.Println("Error sending error response room exists:", err)
-		}
-		return
+		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
+		log.Println(err)
+		return nil, err
 	}
-	player := &domain.Player{
-		Ws:                    c,
-		ID:                    req.PlayerID,
-		TimeConsumedInSeconds: 0,
-		Color:                 domain.BLACK,
-	}
-	r.AddPlayer(player)
-	log.Println("Player joined room", player.ID, r.ID)
+	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.BLACK)
+	room.AddPlayer(player)
+	log.Println("Player joined room", player.ID, room.ID)
 
-	playersInfo := []*ResponsePlayer{}
-	if r.Player1 != nil {
-		playersInfo = append(playersInfo, &ResponsePlayer{
-			ID: r.Player1.ID,
-		})
+	output := newJoinRoomOutput(200, p.RoomID, room.Player1, room.Player2)
+	err := uc.r.SendWebSocketMessage(output)
+	if err != nil {
+		return nil, err
 	}
-	if r.Player2 != nil {
-		playersInfo = append(playersInfo, &ResponsePlayer{
-			ID: r.Player2.ID,
-		})
-	}
-	resp.Room = &ResponseRoom{
-		ID:      req.RoomID,
-		Players: playersInfo,
-	}
-	// j, _ := json.Marshal(resp)
-	// log.Println(string(j))
-	c.WriteJSON(resp)
 
-	var roomWG sync.WaitGroup
-	roomWG.Add(1)
-	go r.HandleGame(false, &roomWG)
-
-	roomWG.Wait()
+	return room, nil
 }

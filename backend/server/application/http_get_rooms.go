@@ -2,51 +2,59 @@ package application
 
 import (
 	"chess/server/domain"
-
-	fiber "github.com/gofiber/fiber/v2"
 )
 
-type PlayerResponse struct {
+type GetRoomsOutput struct {
+	Rooms []*GetRoomInfoOutput `json:"rooms"`
+}
+
+type GetRoomInfoOutput struct {
+	ID      string                  `json:"id"`
+	Players []*GetRoomsPlayerOutput `json:"players"`
+}
+
+type GetRoomsPlayerOutput struct {
 	ID string `json:"id"`
 }
 
-type RoomResponse struct {
-	ID      string            `json:"id"`
-	Players []*PlayerResponse `json:"players"`
-}
+func newGetRoomsOutput(rooms []*domain.Room) *GetRoomsOutput {
+	outputRooms := make([]*GetRoomInfoOutput, 0, len(rooms))
+	for i := range rooms {
+		r := rooms[i].GetPublicInfo()
+		players := make([]*GetRoomsPlayerOutput, 0, 2)
 
-type HttpRoomsResponse struct {
-	Rooms []*RoomResponse `json:"rooms"`
-}
-
-func HttpGetRooms(ctx *fiber.Ctx, rm *domain.RoomManager) error {
-	// TEST ROOMS
-	addTestRooms(rm) //TODO: remove
-
-	rooms := rm.GetRooms()
-	// b, _ := json.Marshal(rooms)
-	// fmt.Printf("### Rooms: %v\n", string(b))
-	roomsResponse := make([]*RoomResponse, 0, len(rooms))
-	for _, room := range rooms {
-		info := room.GetPublicInfo()
-		roomResponse := &RoomResponse{
-			ID:      info.ID,
-			Players: make([]*PlayerResponse, 0, 2),
-		}
-		for _, player := range info.Players {
-			roomResponse.Players = append(roomResponse.Players, &PlayerResponse{
-				ID: player.ID,
+		for p := range r.Players {
+			players = append(players, &GetRoomsPlayerOutput{
+				ID: r.Players[p].ID,
 			})
 		}
-		roomsResponse = append(roomsResponse, roomResponse)
+
+		outputRooms = append(outputRooms, &GetRoomInfoOutput{
+			ID:      r.ID,
+			Players: players,
+		})
 	}
-	resp := HttpRoomsResponse{
-		Rooms: roomsResponse,
+
+	return &GetRoomsOutput{
+		Rooms: outputRooms,
 	}
-	return ctx.JSON(resp)
 }
 
-func addTestRooms(rm *domain.RoomManager) {
+type GetRoomsAction struct {
+	rm *domain.RoomManager
+}
+
+func NewGetRoomsAction(rm *domain.RoomManager) *GetRoomsAction {
+	return &GetRoomsAction{rm: rm}
+}
+
+func (uc *GetRoomsAction) Invoke() *GetRoomsOutput {
+	uc.addTestRooms(uc.rm)
+	rooms := uc.rm.GetRooms()
+	return newGetRoomsOutput(rooms)
+}
+
+func (uc *GetRoomsAction) addTestRooms(rm *domain.RoomManager) {
 	roomTest1 := &domain.Room{
 		ID: "roomTest1",
 		Player1: &domain.Player{
