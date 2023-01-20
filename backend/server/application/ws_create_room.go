@@ -4,7 +4,6 @@ import (
 	"chess/server/domain"
 	"fmt"
 	"log"
-	"sync"
 )
 
 type CreateRoomParams struct {
@@ -40,12 +39,12 @@ func NewCreateRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) 
 	return &CreateRoomAction{rm: rm, r: r}
 }
 
-func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) error {
+func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 	_, ok := uc.rm.GetRoom(p.RoomID)
 	if ok {
 		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
 		log.Println(err)
-		return err
+		return nil, err
 	}
 
 	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.WHITE)
@@ -59,15 +58,15 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) error {
 	output := newCreateRoomOutput(p.PlayerID)
 	err := uc.r.SendWebSocketMessage(output)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	var roomWG sync.WaitGroup
-	roomWG.Add(1)
-	go r.HandleGame(true, &roomWG)
+	// var roomWG sync.WaitGroup
+	// roomWG.Add(1)
+	// go r.HandleGame(true, &roomWG)
 
-	roomWG.Wait()
-	return nil
+	// roomWG.Wait()
+	return r, nil
 }
 
 //

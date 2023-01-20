@@ -13,11 +13,11 @@ type Room struct {
 	ID      string
 	Player1 *Player
 	Player2 *Player
-	game    *Game
+	Game    *Game
 }
 
 func NewRoom(id string) *Room {
-	return &Room{ID: id, game: NewGame()}
+	return &Room{ID: id, Game: NewGame()}
 }
 
 func (r *Room) AddPlayer(p *Player) error {
@@ -76,7 +76,7 @@ func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
 		if enemy == nil {
 			continue
 		}
-		if r.game.ColotToMove != player.Color {
+		if r.Game.ColotToMove != player.Color {
 			continue
 		}
 		_, message, err := player.Ws.ReadMessage()

@@ -5,6 +5,7 @@ import (
 	"chess/server/infrastructure"
 	"chess/server/shared"
 	"flag"
+	"fmt"
 	"log"
 	"sync"
 
@@ -108,21 +109,82 @@ func (s *Server) initWebsocket() {
 		}
 
 		repository := infrastructure.NewBackendConnectionRepository(c)
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
-			controller := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
-			err = controller.Invoke(reqBody)
+			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
+			room, err := createRoomController.Invoke(reqBody)
 			if err != nil {
 				// TODO: return message in the websocket
 				log.Println(err)
 			}
+
+			s.wsRouter(room, repository, true, wg)
 			// roomActions.WsCreateRoom(s.roomManager, reqBody, c)
 		case "join-room":
 			log.Println("Request join room")
 			// roomActions.WsJoinRoom(s.roomManager, reqBody, c)
 		}
+
+		wg.Wait()
 	}))
+}
+
+func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	log.Println("Room activated")
+	var player *domain.Player
+	var enemy *domain.Player
+
+	for {
+		if isHost {
+			player = room.Player1
+			enemy = room.Player2
+		} else {
+			player = room.Player2
+			enemy = room.Player1
+		}
+		if player == nil {
+			return
+		}
+		if enemy == nil {
+			continue
+		}
+		if room.Game.ColotToMove != player.Color {
+			continue
+		}
+		_, message, err := player.Ws.ReadMessage()
+		if err != nil {
+			log.Println("Some error:", err)
+			player = nil
+			return
+		}
+		// log.Println("Get message.")
+
+		reqAction, _ := jsonparser.GetString(message, "action")
+		reqBody, _, _, _ := jsonparser.Get(message, "body")
+
+		switch reqAction {
+		case "request-moves":
+			// log.Println("Request moves")
+			// application.WsGetValidMoves(r.game, reqBody, player.Ws)
+			getValidMovesController := infrastructure.NewGetValidMovesWsController(repository, room.Game)
+			getValidMovesController.Invoke(reqBody)
+		case "move-piece":
+			// log.Println("Move piece")
+			// application.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
+			player.StopTimer()
+			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
+
+			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
+			enemy.StartTimer()
+		default:
+			log.Println("Unknown action")
+		}
+	}
 }
 
 func (s *Server) initHttp() {

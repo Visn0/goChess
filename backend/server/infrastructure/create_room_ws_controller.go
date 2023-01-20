@@ -17,12 +17,12 @@ func NewCreateRoomWsController(rm *domain.RoomManager, r domain.ConnectionReposi
 	}
 }
 
-func (c *CreateRoomWsController) Invoke(body []byte) error {
+func (c *CreateRoomWsController) Invoke(body []byte) (*domain.Room, error) {
 	var p application.CreateRoomParams
 	err := json.Unmarshal(body, &p)
 	if err != nil {
 		log.Println("Error unmarshalling request create room:", err)
-		return nil
+		return nil, err
 	}
 
 	return c.uc.Invoke(&p)
