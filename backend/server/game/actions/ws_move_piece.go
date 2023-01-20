@@ -9,16 +9,16 @@ import (
 )
 
 type RequestMovePiece struct {
-	Src       *game.Position `json:"src"`
-	Dst       *game.Position `json:"dst"`
-	PromoteTo string         `json:"promoteTo"`
+	Src       *game.Position  `json:"src"`
+	Dst       *game.Position  `json:"dst"`
+	PromoteTo *game.PieceType `json:"promoteTo"`
 }
 
 type ResponseMovePiece struct {
-	Action    string         `json:"action"`
-	Src       *game.Position `json:"src"`
-	Dst       *game.Position `json:"dst"`
-	PromoteTo string         `json:"promoteTo"`
+	Action    string          `json:"action"`
+	Src       *game.Position  `json:"src"`
+	Dst       *game.Position  `json:"dst"`
+	PromoteTo *game.PieceType `json:"promoteTo"`
 }
 
 func WsMovePiece(g *game.Game, body []byte, player, enemy *shared.WsConn) {

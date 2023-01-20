@@ -6,7 +6,7 @@ import type { Square } from '@/models/square'
 class PieceMovedParams {
     public src: CoordinateParams
     public dst: CoordinateParams
-    public promoteTo: number
+    public promoteTo: number | null
 }
 
 class CoordinateParams {
