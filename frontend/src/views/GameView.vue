@@ -12,6 +12,7 @@ import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, watch } from 'vue'
 import { Piece } from '@/models/piece'
+import { AbandonAction } from '@/actions/send/abandon_action'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -52,6 +53,10 @@ function cancelPromotion() {
 
     const modal = document.getElementById('promotion-modal') as HTMLElement
     modal.hidden = true
+}
+
+function abandon() {
+    AbandonAction(game.repository)
 }
 </script>
 
@@ -123,7 +128,9 @@ function cancelPromotion() {
 
                 <!-- Buttons -->
                 <div class="mt-1">
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2">Abandon</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">
+                        Abandon
+                    </button>
                     <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2">Draw</button>
                 </div>
             </div>
