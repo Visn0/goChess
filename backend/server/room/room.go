@@ -26,6 +26,8 @@ func (r *Room) AddPlayer(p *Player) error {
 		r.Player1 = p
 	} else if r.Player2 == nil {
 		r.Player2 = p
+		fmt.Println("Set player 2")
+		r.Player1.StartTimer()
 	} else {
 		return fmt.Errorf("Room is full")
 	}
@@ -59,36 +61,48 @@ func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
 
 	log.Println("Room activated")
 	var player *Player
-	if isHost {
-		player = r.Player1
-	} else {
-		player = r.Player2
-	}
+	var enemy *Player
 
 	for {
+		if isHost {
+			player = r.Player1
+			enemy = r.Player2
+		} else {
+			player = r.Player2
+			enemy = r.Player1
+		}
 		if player == nil {
 			return
 		}
-
-		messageType, message, err := player.Ws.ReadMessage()
-		log.Println(messageType)
+		if enemy == nil {
+			continue
+		}
+		if r.game.ColotToMove != player.Color {
+			continue
+		}
+		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
 			player = nil
 			return
 		}
-		log.Println("Get message.")
+		// log.Println("Get message.")
 
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")
 
 		switch reqAction {
 		case "request-moves":
-			log.Println("Request moves")
+			// log.Println("Request moves")
 			gameActions.WsGetValidMoves(r.game, reqBody, player.Ws)
 		case "move-piece":
-			log.Println("Move piece")
-			gameActions.WsMovePiece(r.game, reqBody, player.Ws)
+			// log.Println("Move piece")
+			gameActions.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
+			player.StopTimer()
+			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
+
+			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
+			enemy.StartTimer()
 		default:
 			log.Println("Unknown action")
 		}

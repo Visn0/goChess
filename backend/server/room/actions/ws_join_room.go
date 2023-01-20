@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"chess/server/game"
 	"chess/server/room"
 	"chess/server/shared"
 	"encoding/json"
@@ -47,11 +48,13 @@ func WsJoinRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 		return
 	}
 	player := &room.Player{
-		Ws: c,
-		ID: req.PlayerID,
+		Ws:                    c,
+		ID:                    req.PlayerID,
+		TimeConsumedInSeconds: 0,
+		Color:                 game.BLACK,
 	}
 	r.AddPlayer(player)
-	log.Println("Player joined room")
+	log.Println("Player joined room", player.ID, r.ID)
 
 	playersInfo := []*ResponsePlayer{}
 	if r.Player1 != nil {
@@ -68,8 +71,8 @@ func WsJoinRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 		ID:      req.RoomID,
 		Players: playersInfo,
 	}
-	j, _ := json.Marshal(resp)
-	log.Println(string(j))
+	// j, _ := json.Marshal(resp)
+	// log.Println(string(j))
 	c.WriteJSON(resp)
 
 	var roomWG sync.WaitGroup

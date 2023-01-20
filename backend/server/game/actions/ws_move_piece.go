@@ -5,6 +5,7 @@ import (
 	"chess/server/shared"
 	"encoding/json"
 	"log"
+	"time"
 )
 
 type RequestMovePiece struct {
@@ -20,7 +21,7 @@ type ResponseMovePiece struct {
 	PromoteTo string         `json:"promoteTo"`
 }
 
-func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
+func WsMovePiece(g *game.Game, body []byte, player, enemy *shared.WsConn) {
 	log.Println("handle move piece")
 	req := RequestMovePiece{}
 	json.Unmarshal(body, &req)
@@ -37,5 +38,7 @@ func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
 		PromoteTo: req.PromoteTo,
 	}
 
-	c.WriteJSON(resp)
+	player.WriteJSON(resp)
+	time.Sleep(100 * time.Millisecond)
+	enemy.WriteJSON(resp)
 }
