@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 )
 
 type RequestCreateRoom struct {
@@ -58,10 +59,11 @@ func WsCreateRoom(rm *room.RoomManager, body []byte, c *shared.WsConn) {
 
 	r := room.NewRoom(req.RoomID)
 	player := &room.Player{
-		Ws:                    c,
-		ID:                    req.PlayerID,
-		TimeConsumedInSeconds: 0,
-		Color:                 game.WHITE,
+		Ws:             c,
+		ID:             req.PlayerID,
+		TimeConsumedMS: 0,
+		LastClockTime:  time.Time{},
+		Color:          game.WHITE,
 	}
 
 	r.AddPlayer(player)

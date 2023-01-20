@@ -10,11 +10,11 @@ import (
 type wsConn = websocket.Conn
 
 type Player struct {
-	Ws                    *wsConn
-	ID                    string
-	Color                 game.Color
-	TimeConsumedInSeconds int
-	LastClockTime         time.Time
+	Ws             *wsConn
+	ID             string
+	Color          game.Color
+	TimeConsumedMS int
+	LastClockTime  time.Time
 }
 
 type PlayerPublicInfo struct {
@@ -32,10 +32,13 @@ func (p *Player) StartTimer() {
 }
 
 func (p *Player) StopTimer() {
-	p.TimeConsumedInSeconds += int(time.Since(p.LastClockTime).Seconds())
+	p.TimeConsumedMS += int(time.Since(p.LastClockTime).Milliseconds())
 	p.LastClockTime = time.Now()
 }
 
 func (p *Player) TimeLeft() int {
-	return 10*60 - p.TimeConsumedInSeconds
+	if p.LastClockTime.IsZero() {
+		return 10 * 60 * 1000
+	}
+	return 10*60*1000 - (p.TimeConsumedMS + int(time.Since(p.LastClockTime).Milliseconds()))
 }
