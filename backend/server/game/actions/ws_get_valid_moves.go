@@ -28,6 +28,10 @@ func WsGetValidMoves(g *game.Game, body []byte, c *shared.WsConn) {
 		return
 	}
 	validMoves := g.GetValidMoves(req.Rank, req.File)
+	if validMoves == nil {
+		fmt.Println("No valid moves found")
+		return
+	}
 	fmt.Printf("Found %d valid moves", len(validMoves))
 	resp := ResponseMoves{
 		Action:     "request-moves",
