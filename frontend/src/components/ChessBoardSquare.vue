@@ -69,16 +69,6 @@ function squareClick() {
     border: 2px solid #000;
 }
 
-.board-square.white-square {
-    color: #65a371;
-    background-color: #fff;
-}
-
-.board-square.black-square {
-    color: #fff;
-    background-color: #65a371;
-}
-
 .piece {
     margin: 0;
     padding: 0;

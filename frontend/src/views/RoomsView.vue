@@ -28,7 +28,7 @@ const board = new Board()
 board.initFromFenNotation(constants.StartingPosition)
 
 const repository = new BackendConnectionRepository('localhost', '8081', 'ws')
-const game = new Game(rooms, board, repository)
+const game = new Game(board, repository)
 
 const routeActions: RouteActions = new RouteActions(
     new Map<string, ReceiveAction>([
