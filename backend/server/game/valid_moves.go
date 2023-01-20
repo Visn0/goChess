@@ -80,7 +80,10 @@ func (g *Game) getPawnValidMoves(rank Rank, file File, p IPiece) []*Position {
 	pawn := p.(*Pawn)
 	// Check if pawn can move two spaces forward
 	if pawn.FirstMove {
-		positions = append(positions, &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file})
+		dstPos := &Position{Rank: rank + Rank(p.GetValidDirections()[0].x*2), File: file}
+		if dstPos.Valid() && g.Board.GetPiece(dstPos.Rank, dstPos.File) == nil {
+			positions = append(positions, dstPos)
+		}
 	}
 	// Check if pawn can move diagonally
 	fmt.Println("Checking diagonals")

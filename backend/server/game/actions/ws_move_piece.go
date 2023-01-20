@@ -10,14 +10,14 @@ import (
 type RequestMovePiece struct {
 	Src       *game.Position `json:"src"`
 	Dst       *game.Position `json:"dst"`
-	Promotion string         `json:"promotion"`
+	PromoteTo string         `json:"promoteTo"`
 }
 
 type ResponseMovePiece struct {
 	Action    string         `json:"action"`
 	Src       *game.Position `json:"src"`
 	Dst       *game.Position `json:"dst"`
-	Promotion string         `json:"promotion"`
+	PromoteTo string         `json:"promoteTo"`
 }
 
 func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
@@ -34,7 +34,7 @@ func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
 		Action:    "move-piece",
 		Src:       req.Src,
 		Dst:       req.Dst,
-		Promotion: "",
+		PromoteTo: req.PromoteTo,
 	}
 
 	c.WriteJSON(resp)
