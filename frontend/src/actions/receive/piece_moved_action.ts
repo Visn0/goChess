@@ -1,4 +1,4 @@
-import { PieceType, File, Rank } from '@/models/constants'
+import { PieceType, File, Rank, numberToPieceType } from '@/models/constants'
 import type { Game } from '@/models/game'
 import { Piece } from '@/models/piece'
 import type { Square } from '@/models/square'
@@ -6,7 +6,7 @@ import type { Square } from '@/models/square'
 class PieceMovedParams {
     public src: CoordinateParams
     public dst: CoordinateParams
-    public promoteTo: PieceType
+    public promoteTo: number
 }
 
 class CoordinateParams {
@@ -23,6 +23,7 @@ class PieceMovedAction {
 
     public Invoke(body: string) {
         const p: PieceMovedParams = JSON.parse(body)
+        console.log(p)
 
         const src: Square = this.game.board.getSquare(p.src.file, p.src.rank)
         const srcPiece = src.piece as Piece
@@ -38,7 +39,7 @@ class PieceMovedAction {
             return
         }
 
-        const dstPieceType = p.promoteTo ? new Piece(srcPiece.color, p.promoteTo) : srcPiece
+        const dstPieceType = p.promoteTo ? new Piece(srcPiece.color, numberToPieceType(p.promoteTo)) : srcPiece
 
         this.game.board.setSquarePiece(p.dst.file, p.dst.rank, dstPieceType)
         this.game.board.setSquarePiece(src.file, src.rank, null)

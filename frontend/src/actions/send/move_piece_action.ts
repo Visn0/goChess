@@ -1,5 +1,5 @@
 import type { ConnectionRepository, Message } from '@/models/connection_repository/connection_repository'
-import type { File, PieceType, Rank } from '@/models/constants'
+import { pieceTypeToNumber, type File, type PieceType, type Rank } from '@/models/constants'
 import type { Game } from '@/models/game'
 import type { Square } from '@/models/square'
 
@@ -14,7 +14,7 @@ class MovePieceMessage implements Message {
             file: File
             rank: Rank
         }
-        promoteTo: PieceType | null
+        promoteTo: number | null
     }
 
     constructor(src: Square, dst: Square, promoteTo: PieceType | null) {
@@ -28,7 +28,7 @@ class MovePieceMessage implements Message {
                 file: dst.file,
                 rank: dst.rank
             },
-            promoteTo: promoteTo
+            promoteTo: promoteTo ? pieceTypeToNumber(promoteTo) : null
         }
     }
 }
