@@ -87,7 +87,7 @@
 				file: 1
 				rank: 5
 			}
-			promotion: "queen", // "" if not promotion
+			promoteTo: "queen", // "" if not promotion
 		}
 	}
 	Response
@@ -102,7 +102,7 @@
 				file: 1
 				rank: 5
 			}
-			promotion: "queen", // "" if not promotion
+			promoteTo: "queen", // "" if not promotion
 		}
 	}
 }
