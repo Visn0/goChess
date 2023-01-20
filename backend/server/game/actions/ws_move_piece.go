@@ -29,7 +29,7 @@ func WsMovePiece(g *game.Game, body []byte, c *shared.WsConn) {
 		From: req.Src,
 		To:   req.Dst,
 	}
-	g.Move(move)
+	g.Move(move, req.PromoteTo)
 	resp := ResponseMovePiece{
 		Action:    "move-piece",
 		Src:       req.Src,

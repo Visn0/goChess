@@ -25,7 +25,7 @@ type Move struct {
 	To   *Position `json:"to"`
 }
 
-func (g *Game) Move(m *Move) {
+func (g *Game) Move(m *Move, promoteTo string) {
 	p := g.Board.GetPiece(m.From.Rank, m.From.File)
 	if p == nil {
 		fmt.Println("No piece at", m.From)
@@ -34,7 +34,7 @@ func (g *Game) Move(m *Move) {
 	g.removeEnPassantStatesIfNotThisPiece(p)
 
 	if p.GetPieceType() == PAWN {
-		g.checkPawnMove(m, p.(*Pawn), -1)
+		g.checkPawnMove(m, p.(*Pawn), promoteTo)
 	} else if p.GetPieceType() == KING {
 		g.checkCastleMove(m, p.(*King))
 	} else {
@@ -60,7 +60,7 @@ func (g *Game) removeEnPassantStatesIfNotThisPiece(p IPiece) {
 	}
 }
 
-func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo PieceType) {
+func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo string) {
 	dirRank := Rank(pawn.GetValidDirections()[0].x)
 	if g.checkPawnPromotion(m, pawn, promoteTo) {
 		return
@@ -126,26 +126,30 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo PieceType) {
 	pawn.FirstMove = false
 }
 
-func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo PieceType) bool {
+func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo string) bool {
 
 	var piece IPiece
-	if promoteTo != -1 {
+	if promoteTo != "" {
+		fmt.Println("Promoting pawn", m.To, promoteTo)
 		if m.To.Rank != 0 && m.To.Rank != 7 {
 			panic("Invalid promotion rank")
 		}
 		switch promoteTo {
-		case QUEEN:
+		case "queen":
 			piece = &Queen{}
-		case ROOK:
+			setNewPiece(piece, QUEEN, pawn.GetColor())
+		case "rook":
 			piece = &Rook{}
-		case BISHOP:
+			setNewPiece(piece, ROOK, pawn.GetColor())
+		case "bishop":
 			piece = &Bishop{}
-		case KNIGHT:
+			setNewPiece(piece, BISHOP, pawn.GetColor())
+		case "knight":
 			piece = &Knight{}
+			setNewPiece(piece, KNIGHT, pawn.GetColor())
 		default:
 			panic(fmt.Sprintf("Invalid promotion piece type: %v", promoteTo))
 		}
-		setNewPiece(piece, promoteTo, pawn.GetColor())
 		g.Board.SetPiece(m.To.Rank, m.To.File, piece)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)
 		return true
