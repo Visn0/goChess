@@ -34,17 +34,27 @@ enum Color {
 }
 
 enum PieceType {
-    EMPTY = 'empty',
     PAWN = 'pawn',
     ROOK = 'rook',
     KNIGHT = 'knight',
     BISHOP = 'bishop',
     QUEEN = 'queen',
-    KING = 'king'
+    KING = 'king',
+    EMPTY = 'empty'
+}
+
+function pieceTypeToNumber(pieceType: PieceType): number {
+    return Object.keys(PieceType)
+        .map((key) => PieceType[key as keyof typeof PieceType])
+        .indexOf(pieceType)
+}
+
+function numberToPieceType(n: number): PieceType {
+    return PieceType[Object.keys(PieceType)[n] as keyof typeof PieceType]
 }
 
 const constants = {
     StartingPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 }
 
-export { File, fileToString, rankToString, Rank, Color, PieceType, constants }
+export { File, fileToString, rankToString, Rank, Color, PieceType, pieceTypeToNumber, numberToPieceType, constants }
