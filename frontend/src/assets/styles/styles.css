@@ -42,3 +42,13 @@ body {
 .border-green {
     border-color: #43f066;
 }
+
+.white-square {
+    color: #65a371;
+    background-color: #fff;
+}
+
+.black-square {
+    color: #fff;
+    background-color: #65a371 !important;
+}

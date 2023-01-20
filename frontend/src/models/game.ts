@@ -1,9 +1,11 @@
 import type { Board } from './board'
-import type { Square } from './square'
 import type { ConnectionRepository } from './connection_repository/connection_repository'
 import { RequestMovesAction } from '@/actions/send/request_moves_action'
 import { MovePieceAction } from '@/actions/send/move_piece_action'
-import type { Rooms } from './room'
+import { Color, PieceType, Rank } from './constants'
+import type { Piece } from './piece'
+import { ref, type Ref } from 'vue'
+import type { Square } from './square'
 
 class Game {
     private _repository: ConnectionRepository
@@ -21,9 +23,17 @@ class Game {
         return this._srcSquare
     }
 
-    constructor(rooms: Rooms, board: Board, repository: ConnectionRepository) {
+    private dstPromotedPawn: Square | null
+    private _pendingPromotion: Ref<boolean>
+    public isPromotionPending(): boolean {
+        return this._pendingPromotion.value
+    }
+
+    constructor(board: Board, repository: ConnectionRepository) {
         this._board = board
         this._repository = repository
+        this.dstPromotedPawn = null
+        this._pendingPromotion = ref(false)
 
         this._srcSquare = null
     }
@@ -35,7 +45,19 @@ class Game {
                 return
             }
 
-            MovePieceAction(this.repository, this, square)
+            if (!this._srcSquare.canInnerPieceMoveTo(square)) {
+                this.unselectSrcSquare()
+                return
+            }
+
+            if (this.canPromote(this._srcSquare, square)) {
+                this.dstPromotedPawn = square
+                this._pendingPromotion.value = true
+                // show piece options to player
+                return
+            }
+
+            MovePieceAction(this.repository, this, square, null)
             this.unselectSrcSquare()
             return
         }
@@ -46,7 +68,40 @@ class Game {
 
         square.setAsSelected()
         this._srcSquare = new SrcSquare(square)
+
         RequestMovesAction(this.repository, square)
+    }
+
+    private canPromote(src: SrcSquare, dst: Square): boolean {
+        const piece = src.square.piece as Piece
+        if (piece.type !== PieceType.PAWN) {
+            return false
+        }
+
+        if (dst.rank === Rank._8) {
+            return piece.color === Color.WHITE
+        }
+
+        if (dst.rank === Rank._1) {
+            return piece.color === Color.BLACK
+        }
+
+        return false
+    }
+
+    public promotePiece(pieceType: PieceType) {
+        if (this.isPromotionPending() && this.dstPromotedPawn) {
+            MovePieceAction(this.repository, this, this.dstPromotedPawn, pieceType)
+        }
+
+        this._pendingPromotion.value = false
+        this.dstPromotedPawn = null
+    }
+
+    public cancelPromotion() {
+        this._pendingPromotion.value = false
+        this.dstPromotedPawn = null
+        this.unselectSrcSquare()
     }
 
     public unselectSrcSquare() {

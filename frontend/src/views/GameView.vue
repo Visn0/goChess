@@ -2,23 +2,23 @@
 import ChessBoard from '@/components/ChessBoard.vue'
 import ChessTimer from '@/components/ChessTimer.vue'
 import PlayerNickname from '@/components/PlayerNickname.vue'
+import ChessPiece from '@/components/ChessPiece.vue'
 import type { Board } from '@/models/board'
-import { Color, constants, type File, type Rank } from '@/models/constants'
+import { Color, constants, PieceType, type File, type Rank } from '@/models/constants'
 import type { Game } from '@/models/game.js'
 import { Timer } from '@/models/timer'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, watch } from 'vue'
+import { Piece } from '@/models/piece'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
-
 const myPlayerID = myPlayerIDStore.id
 const oponentPlayerID = 'OponentPlayerID'
 let board: Board
 let game: Game
-
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         console.log('Game is empty. Redirecting to /rooms.')
@@ -35,6 +35,7 @@ function squareClick(file: File, rank: Rank) {
     game.selectSquare(square)
 }
 
+let colorDown = Color.WHITE
 const oponentTimer = new Timer(600)
 const myTimer = new Timer(600)
 myTimer.start()
@@ -42,10 +43,71 @@ myTimer.start()
 watch(myTimer.isStoped.bind(myTimer), () => {
     console.log(`Timer finished: ${myTimer.toString()}`)
 })
+
+function promotePiece(pieceType: PieceType) {
+    game.promotePiece(pieceType)
+}
+
+function cancelPromotion() {
+    game.cancelPromotion()
+
+    const modal = document.getElementById('promotion-modal') as HTMLElement
+    modal.hidden = true
+}
 </script>
 
 <template>
     <main v-if="!gameStore.isEmpty">
+        <div
+            id="promotion-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+            :hidden="!game.isPromotionPending()"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Promote pawn to:</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-between">
+                        <button
+                            type="button"
+                            @click="promotePiece(PieceType.ROOK)"
+                            class="rounded promote-piece white-piece"
+                        >
+                            <ChessPiece :piece="new Piece(colorDown, PieceType.ROOK)" :selected="false" />
+                        </button>
+                        <button
+                            type="button"
+                            @click="promotePiece(PieceType.KNIGHT)"
+                            class="rounded promote-piece black-piece"
+                        >
+                            <ChessPiece :piece="new Piece(colorDown, PieceType.KNIGHT)" :selected="false" />
+                        </button>
+                        <button
+                            type="button"
+                            @click="promotePiece(PieceType.BISHOP)"
+                            class="rounded promote-piece white-piece"
+                        >
+                            <ChessPiece :piece="new Piece(colorDown, PieceType.BISHOP)" :selected="false" />
+                        </button>
+                        <button
+                            type="button"
+                            @click="promotePiece(PieceType.QUEEN)"
+                            class="rounded promote-piece black-piece"
+                        >
+                            <ChessPiece :piece="new Piece(colorDown, PieceType.QUEEN)" :selected="false" />
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cancelPromotion()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
                 <div class="py-1 d-flex justify-content-between">
@@ -53,7 +115,7 @@ watch(myTimer.isStoped.bind(myTimer), () => {
                     <ChessTimer :timer="oponentTimer" />
                 </div>
                 <div class="d-flex justify-content-center">
-                    <ChessBoard :board="board" :color-down="Color.WHITE" @on-square-click="squareClick" />
+                    <ChessBoard :board="board" :color-down="colorDown" @on-square-click="squareClick" />
                 </div>
                 <div class="py-1 d-flex justify-content-between">
                     <PlayerNickname :nickname="myPlayerID" />
@@ -71,6 +133,15 @@ watch(myTimer.isStoped.bind(myTimer), () => {
 </template>
 
 <style scoped>
+.modal {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.promote-piece {
+    width: 75px;
+    height: 75px;
+}
+
 .game {
     width: 72vmin !important;
     max-width: 72vmin !important;
