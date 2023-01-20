@@ -122,7 +122,6 @@ class SrcSquare {
 
     public setValidMoves(moves: Array<Square>) {
         this.validMoves = moves
-        console.log('Set valid moves:', moves)
         moves.forEach((m) => m.setAsValidMove())
     }
 

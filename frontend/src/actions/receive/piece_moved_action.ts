@@ -1,4 +1,4 @@
-import { PieceType, type File, type Rank } from '@/models/constants'
+import { PieceType, File, Rank } from '@/models/constants'
 import type { Game } from '@/models/game'
 import { Piece } from '@/models/piece'
 import type { Square } from '@/models/square'
@@ -23,11 +23,15 @@ class PieceMovedAction {
 
     public Invoke(body: string) {
         const p: PieceMovedParams = JSON.parse(body)
-        console.log('==> Piece moved: ', p)
 
         const src: Square = this.game.board.getSquare(p.src.file, p.src.rank)
         const srcPiece = src.piece as Piece
         const dst = this.game.board.getSquare(p.dst.file, p.dst.rank)
+
+        if (this.isCastle(src, dst)) {
+            this.moveCastle(src, dst)
+            return
+        }
 
         if (this.isPawnPassant(src, dst)) {
             this.movePassant(src, dst)
@@ -38,6 +42,49 @@ class PieceMovedAction {
 
         this.game.board.setSquarePiece(p.dst.file, p.dst.rank, dstPieceType)
         this.game.board.setSquarePiece(src.file, src.rank, null)
+        this.game.unselectSrcSquare()
+    }
+
+    private isCastle(src: Square, dst: Square): boolean {
+        if (src.piece?.type !== PieceType.KING) {
+            return false
+        }
+
+        // Castle must be in the same rank
+        if (src.rank !== dst.rank) {
+            return false
+        }
+
+        // Castle is only allowed in Rank 1 (white) and 8 (black)
+        if (src.rank > Rank._1 && src.rank < Rank._8) {
+            return false
+        }
+
+        if (dst.rank > Rank._1 && dst.rank < Rank._8) {
+            return false
+        }
+
+        const distance = src.file - dst.file
+        return Math.abs(distance) >= 2
+    }
+
+    private moveCastle(src: Square, dst: Square) {
+        // Move King to destination
+        this.game.board.setSquarePiece(dst.file, dst.rank, src.piece)
+        this.game.board.setSquarePiece(src.file, src.rank, null)
+
+        // Move Rook next to the King
+        if (dst.file === File.G) {
+            const rookFileH = this.game.board.getSquare(File.H, dst.rank)
+            this.game.board.setSquarePiece(File.F, dst.rank, rookFileH.piece)
+            this.game.board.setSquarePiece(File.H, dst.rank, null)
+        } else {
+            // dst.File === File.C
+            const rookFileA = this.game.board.getSquare(File.A, dst.rank)
+            this.game.board.setSquarePiece(File.D, dst.rank, rookFileA.piece)
+            this.game.board.setSquarePiece(File.A, dst.rank, null)
+        }
+
         this.game.unselectSrcSquare()
     }
 

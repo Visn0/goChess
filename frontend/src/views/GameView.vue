@@ -21,7 +21,6 @@ let board: Board
 let game: Game
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
-        console.log('Game is empty. Redirecting to /rooms.')
         router.push({ name: 'rooms' })
         return
     }

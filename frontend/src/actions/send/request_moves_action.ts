@@ -22,7 +22,6 @@ class RequestMovesMessage implements Message {
 
 function RequestMovesAction(repository: ConnectionRepository, square: Square) {
     const m = new RequestMovesMessage(square.file, square.rank, square.piece?.type as PieceType)
-    console.log('Request moves: ', m)
     repository.sendWebSocketMessage(m)
 }
 
