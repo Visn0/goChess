@@ -180,7 +180,10 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 			// log.Println("Request moves")
 			// application.WsGetValidMoves(r.game, reqBody, player.Ws)
 			getValidMovesController := infrastructure.NewGetValidMovesWsController(repository, room.Game)
-			getValidMovesController.Invoke(reqBody)
+			err := getValidMovesController.Invoke(reqBody)
+			if err != nil {
+				log.Println("Error getting valid moves: ", err)
+			}
 		case "move-piece":
 			// log.Println("Move piece")
 			// application.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
@@ -196,9 +199,5 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 }
 
 func (s *Server) initHttp() {
-	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
-		log.Println("############# ROOMS endpoint")
-		// return roomActions.HttpGetRooms(ctx, s.roomManager)
-		return nil
-	})
+	s.app.Get("/rooms", infrastructure.NewGetRoomsHttpController(s.roomManager).Invoke)
 }

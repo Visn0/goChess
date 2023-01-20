@@ -13,11 +13,11 @@ type JoinRoomParams struct {
 }
 
 type JoinRoomOutput struct {
-	HttpCode int         `json:"httpCode"`
-	Action   string      `json:"action"`
-	Room     *RoomOutput `json:"room"`
+	HttpCode int                 `json:"httpCode"`
+	Action   string              `json:"action"`
+	Room     *JoinRoomInfoOutput `json:"room"`
 }
-type RoomOutput struct {
+type JoinRoomInfoOutput struct {
 	ID      string                  `json:"id"`
 	Players []*JoinRoomPlayerOutput `json:"players"`
 }
@@ -43,7 +43,7 @@ func newJoinRoomOutput(httpCode int, roomID string, player1 *domain.Player, play
 	return &JoinRoomOutput{
 		HttpCode: httpCode,
 		Action:   "join-room",
-		Room: &RoomOutput{
+		Room: &JoinRoomInfoOutput{
 			ID:      roomID,
 			Players: players,
 		},
