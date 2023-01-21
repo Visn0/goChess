@@ -1,7 +1,8 @@
 import { Room, Rooms } from '@/models/room'
 import { RoomPlayer } from '@/models/room_player'
+import { ReceiveParams } from './receive_params'
 
-class RoomCreatedParams {
+class RoomCreatedParams extends ReceiveParams {
     httpCode: number
     room: RoomParams
 }
@@ -23,9 +24,10 @@ class RoomCreatedAction {
     }
 
     public Invoke(body: string) {
+        console.log(body)
         const p: RoomCreatedParams = JSON.parse(body)
-        if (p.httpCode === 400) {
-            alert('Room already exists.')
+        if (p.error) {
+            alert(`Room already exists: ${p.error.key}`)
             return
         }
 

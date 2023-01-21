@@ -1,10 +1,12 @@
 package server
 
 import (
-	"chess/server/room"
-	roomActions "chess/server/room/actions"
+	"chess/server/domain"
+	"chess/server/game/actions"
+	"chess/server/infrastructure"
 	"chess/server/shared"
 	"flag"
+	"fmt"
 	"log"
 	"sync"
 
@@ -30,7 +32,7 @@ type Server struct {
 	register   chan subEvent
 	unregister chan subEvent
 
-	roomManager *room.RoomManager
+	roomManager *domain.RoomManager
 }
 
 func NewServer(addr, port string) *Server {
@@ -42,14 +44,13 @@ func NewServer(addr, port string) *Server {
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
 		unregister:         make(chan subEvent),
-		roomManager:        room.NewRoomManager(),
+		roomManager:        domain.NewRoomManager(),
 	}
 }
 
 // The server instantiates the middleware (proxy)
 func (s *Server) initMiddleware() {
 	s.app.Use(cors.New())
-
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
 		if !c.IsFromLocal() {
@@ -108,20 +109,103 @@ func (s *Server) initWebsocket() {
 			return
 		}
 
+		repository := infrastructure.NewBackendConnectionRepository(c)
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
-			roomActions.WsCreateRoom(s.roomManager, reqBody, c)
+			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
+			room, err := createRoomController.Invoke(reqBody)
+			if err != nil {
+				log.Println(err)
+				err = repository.SendWebSocketMessage(err)
+				log.Println(err)
+				return
+			}
+
+			s.wsRouter(room, repository, true, wg)
+
 		case "join-room":
 			log.Println("Request join room")
-			roomActions.WsJoinRoom(s.roomManager, reqBody, c)
+			joinRoomController := infrastructure.NewJoinRoomWsController(s.roomManager, repository)
+			room, err := joinRoomController.Invoke(reqBody)
+			if err != nil {
+				log.Println(err)
+				_ = repository.SendWebSocketMessage(err)
+				return
+			}
+
+			s.wsRouter(room, repository, false, wg)
 		}
+
+		wg.Wait()
 	}))
 }
 
+func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	log.Println("Room activated")
+	var player *domain.Player
+	var enemy *domain.Player
+
+	for player == nil || enemy == nil {
+		if isHost {
+			player = room.Player1
+			enemy = room.Player2
+		} else {
+			player = room.Player2
+			enemy = room.Player1
+		}
+	}
+
+	enemyRepository := infrastructure.NewBackendConnectionRepository(enemy.Ws)
+	for {
+		if room.Game.ColotToMove != player.Color {
+			continue
+		}
+		_, message, err := player.Ws.ReadMessage()
+		if err != nil {
+			log.Println("Some error:", err)
+			player = nil
+			return
+		}
+		// log.Println("Get message.")
+
+		reqAction, _ := jsonparser.GetString(message, "action")
+		reqBody, _, _, _ := jsonparser.Get(message, "body")
+
+		switch reqAction {
+		case "request-moves":
+			getValidMovesController := infrastructure.NewGetValidMovesWsController(repository, room.Game)
+			err := getValidMovesController.Invoke(reqBody)
+			if err != nil {
+				log.Println("Error getting valid moves: ", err)
+			}
+
+		case "move-piece":
+			movePieceController := infrastructure.NewMovePieceWsController(repository, enemyRepository, room.Game)
+			err := movePieceController.Invoke(reqBody)
+			if err != nil {
+				log.Println("Error getting valid moves: ", err)
+			}
+
+			player.StopTimer()
+			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
+
+			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
+			enemy.StartTimer()
+
+		case "get-timers":
+			actions.WsGetTimers(player.Ws, enemy.Ws, player.TimeLeft(), enemy.TimeLeft())
+
+		default:
+			log.Println("Unknown action")
+		}
+	}
+}
+
 func (s *Server) initHttp() {
-	s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
-		log.Println("############# ROOMS endpoint")
-		return roomActions.HttpGetRooms(ctx, s.roomManager)
-	})
+	s.app.Get("/rooms", infrastructure.NewGetRoomsHttpController(s.roomManager).Invoke)
 }

@@ -1,6 +1,8 @@
-package game
+package domain
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	fmt.Println("Getting valid moves for", rank, file)

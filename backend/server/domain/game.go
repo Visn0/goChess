@@ -1,4 +1,4 @@
-package game
+package domain
 
 type Game struct {
 	Board           *Board
