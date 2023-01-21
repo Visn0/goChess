@@ -2,6 +2,7 @@ package domain
 
 import (
 	// "chess/server/application"
+	"chess/server/shared/chesserror"
 	"fmt"
 )
 
@@ -24,7 +25,7 @@ func (r *Room) AddPlayer(p *Player) error {
 		fmt.Println("Set player 2")
 		r.Player1.StartTimer()
 	} else {
-		return fmt.Errorf("Room is full")
+		return chesserror.NewError(chesserror.WrongInputParameter, "Room is full")
 	}
 	return nil
 }
@@ -37,7 +38,8 @@ func (r *Room) RemovePlayer(p *Player) error {
 		r.Player2 = nil
 		return nil
 	}
-	return fmt.Errorf("Player not found")
+
+	return chesserror.NewError(chesserror.ResourceNotFound, fmt.Sprintf("Player with id %q not found", p.ID))
 }
 
 func (r *Room) GetRoomSize() int {

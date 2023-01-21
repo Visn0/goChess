@@ -5,6 +5,8 @@ go 1.18
 require github.com/gofiber/fiber/v2 v2.40.1
 
 require (
+	github.com/ansel1/merry v1.7.0 // indirect
+	github.com/ansel1/merry/v2 v2.0.1 // indirect
 	github.com/fasthttp/websocket v1.5.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20211223103454-d0aaa54c5899 // indirect
 )

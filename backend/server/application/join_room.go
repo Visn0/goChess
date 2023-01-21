@@ -3,6 +3,7 @@ package application
 import (
 	"chess/server/domain"
 	"chess/server/shared"
+	"chess/server/shared/chesserror"
 	"fmt"
 	"log"
 )
@@ -65,7 +66,8 @@ func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
 	log.Println("==> Join room params: ", shared.ToJSONString(p))
 	room, ok := uc.rm.GetRoom(p.RoomID)
 	if !ok {
-		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
+		err := chesserror.NewError(chesserror.ResourceNotFound,
+			fmt.Sprintf("Room with id '%s' not found", p.RoomID))
 		log.Println(err)
 		return nil, err
 	}

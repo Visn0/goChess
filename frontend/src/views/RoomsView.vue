@@ -52,7 +52,7 @@ function goToGame() {
 }
 
 function createRoom() {
-    CreateRoomAction(repository, playerID, `room-${Date.now().toString()}`, 'roomPassword')
+    CreateRoomAction(repository, playerID, `room`, 'roomPassword')
     goToGame()
 }
 

@@ -3,6 +3,7 @@ package application
 import (
 	"chess/server/domain"
 	"chess/server/shared"
+	"chess/server/shared/chesserror"
 	"fmt"
 	"log"
 )
@@ -44,7 +45,8 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 	log.Println("==> Create room params: ", shared.ToJSONString(p))
 	_, ok := uc.rm.GetRoom(p.RoomID)
 	if ok {
-		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
+		err := chesserror.NewError(chesserror.ResourceAlreadyExists,
+			fmt.Sprintf("There is already a room with id '%s'", p.RoomID))
 		log.Println(err)
 		return nil, err
 	}

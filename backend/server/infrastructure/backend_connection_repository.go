@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"chess/server/shared"
+	"chess/server/shared/chesserror"
 )
 
 type BackendConnectionRepository struct {
@@ -15,12 +16,12 @@ func NewBackendConnectionRepository(ws *shared.WsConn) *BackendConnectionReposit
 }
 
 func (r *BackendConnectionRepository) SendWebSocketMessage(msg interface{}) error {
-	// b, err := json.Marshal(msg)
-	// log.Println("===>", string(b))
-	// if err != nil {
-	// 	return err
-	// }
-	return r.ws.WriteJSON(msg)
+	err := r.ws.WriteJSON(msg)
+	if err != nil {
+
+		return chesserror.NewError(chesserror.GenericError, "Error writing message into Websocket").WithCause(err)
+	}
+	return nil
 }
 
 func (r *BackendConnectionRepository) GetWebSocketConnection() *shared.WsConn {

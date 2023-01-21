@@ -115,25 +115,26 @@ func (s *Server) initWebsocket() {
 		case "create-room":
 			log.Println("Request create room")
 			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
-			room, err := createRoomController.Invoke(reqBody)
+			room, err := createRoomController.Invoke(reqBody)			
 			if err != nil {
-				// TODO: return message in the websocket
 				log.Println(err)
+				err = repository.SendWebSocketMessage(err)
+				log.Println(err)
+				return
 			}
 
 			s.wsRouter(room, repository, true, wg)
-			// roomActions.WsCreateRoom(s.roomManager, reqBody, c)
 		case "join-room":
 			log.Println("Request join room")
 			joinRoomController := infrastructure.NewJoinRoomWsController(s.roomManager, repository)
 			room, err := joinRoomController.Invoke(reqBody)
 			if err != nil {
-				// TODO: return message in the websocket
 				log.Println(err)
+				_ = repository.SendWebSocketMessage(err)
+				return
 			}
 
 			s.wsRouter(room, repository, false, wg)
-			// roomActions.WsJoinRoom(s.roomManager, reqBody, c)
 		}
 
 		wg.Wait()

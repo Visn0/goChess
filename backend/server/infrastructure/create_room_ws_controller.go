@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"chess/server/application"
 	"chess/server/domain"
+	"chess/server/shared/chesserror"
 	"encoding/json"
 	"log"
 )
@@ -25,5 +26,10 @@ func (c *CreateRoomWsController) Invoke(body []byte) (*domain.Room, error) {
 		return nil, err
 	}
 
-	return c.uc.Invoke(&p)
+	room, err := c.uc.Invoke(&p)
+	if err != nil {
+		return nil, chesserror.WithAction(err, "create-room")
+	}
+
+	return room, nil
 }
