@@ -51,7 +51,7 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 		return nil, err
 	}
 
-	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.WHITE)
+	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID)
 
 	r := domain.NewRoom(p.RoomID)
 	err := r.AddPlayer(player)

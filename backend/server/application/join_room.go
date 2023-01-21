@@ -71,7 +71,8 @@ func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
 		log.Println(err)
 		return nil, err
 	}
-	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.BLACK)
+	
+	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID)
 	err := room.AddPlayer(player)
 	if err != nil {
 		return nil, err

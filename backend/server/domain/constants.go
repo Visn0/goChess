@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"math/rand"
+	"time"
+)
+
 type File int
 
 const (
@@ -45,6 +50,17 @@ const (
 	WHITE Color = false
 	BLACK Color = true
 )
+
+func GetRandomColor() Color {
+	s := rand.NewSource(time.Now().Unix())
+	r := rand.New(s)
+	n := r.Int()
+
+	if n%2 == 0 {
+		return WHITE
+	}
+	return BLACK
+}
 
 func ColorToString(color Color) string {
 	if color == WHITE {
