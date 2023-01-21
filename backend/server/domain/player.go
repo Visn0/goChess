@@ -14,11 +14,11 @@ type Player struct {
 	paused         bool
 }
 
-func NewPlayer(ws *shared.WsConn, id string, color Color) *Player {
+func NewPlayer(ws *shared.WsConn, id string) *Player {
 	return &Player{
 		Ws:             ws,
 		ID:             id,
-		Color:          color,
+		Color:          false,
 		TimeConsumedMS: 0,
 		LastClockTime:  time.Time{},
 		paused:         true,

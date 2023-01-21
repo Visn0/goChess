@@ -164,12 +164,14 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 	}
 
 	enemyRepository := infrastructure.NewBackendConnectionRepository(enemy.Ws)
-	err := application.StartGameAction(player.Color, enemy.Color, repository, enemyRepository, 10*60*1000)
-	if err != nil {
-		log.Println("Error starting game: ", err)
-		_ = repository.SendWebSocketMessage(err)
-		_ = enemyRepository.SendWebSocketMessage(err)
-		return
+	if isHost {
+		err := application.StartGameAction(player, enemy, repository, enemyRepository, 10*60*1000)
+		if err != nil {
+			log.Println("Error starting game: ", err)
+			_ = repository.SendWebSocketMessage(err)
+			_ = enemyRepository.SendWebSocketMessage(err)
+			return
+		}
 	}
 
 	for {

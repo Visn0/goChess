@@ -22,8 +22,6 @@ func (r *Room) AddPlayer(p *Player) error {
 		r.Player1 = p
 	} else if r.Player2 == nil {
 		r.Player2 = p
-		fmt.Println("Set player 2")
-		r.Player1.StartTimer()
 	} else {
 		return chesserror.NewError(chesserror.WrongInputParameter, "Room is full")
 	}

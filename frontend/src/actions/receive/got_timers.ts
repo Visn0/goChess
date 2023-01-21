@@ -19,9 +19,9 @@ class GotTimersAction {
         this.game.setOwnTimer(p.playerTime)
         this.game.setOpponentTimer(p.enemyTime)
 
-        console.log(p)
-        console.log(this.game.getOwnTimer().toString())
-        console.log(this.game.getOpponentTimer().toString())
+        // console.log(p)
+        // console.log(this.game.getOwnTimer().toString())
+        // console.log(this.game.getOpponentTimer().toString())
     }
 }
 
