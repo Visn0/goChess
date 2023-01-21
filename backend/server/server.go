@@ -87,10 +87,11 @@ func (s *Server) Run() {
 
 // Configures the route for ws requests and handles them
 func (s *Server) initWebsocket() {
-	s.app.All("/ws", websocket.New(func(c *shared.WsConn) {
+	s.app.All("/ws", websocket.New(func(conn *websocket.Conn) {
+		wsConn := &shared.WsConn{Conn: conn}
 		log.Println("New ws connection")
 
-		_, message, err := c.ReadMessage()
+		_, message, err := wsConn.ReadMessage()
 		if err != nil {
 			// Error reading because of an unexpected disconnect (probably)
 			log.Println("Some error:", err)
@@ -109,7 +110,7 @@ func (s *Server) initWebsocket() {
 			return
 		}
 
-		repository := infrastructure.NewBackendConnectionRepository(c)
+		repository := infrastructure.NewBackendConnectionRepository(wsConn)
 		wg := &sync.WaitGroup{}
 		wg.Add(1)
 		switch reqAction {
