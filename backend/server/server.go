@@ -146,9 +146,8 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 	log.Println("Room activated")
 	var player *domain.Player
 	var enemy *domain.Player
-	var enemyRepository domain.ConnectionRepository
 
-	for {
+	for player == nil || enemy == nil {
 		if isHost {
 			player = room.Player1
 			enemy = room.Player2
@@ -156,17 +155,10 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 			player = room.Player2
 			enemy = room.Player1
 		}
-		if player == nil {
-			return
-		}
-		if enemy == nil {
-			continue
-		}
+	}
 
-		if enemyRepository == nil {
-			enemyRepository = infrastructure.NewBackendConnectionRepository(enemy.Ws)
-		}
-
+	enemyRepository := infrastructure.NewBackendConnectionRepository(enemy.Ws)
+	for {
 		if room.Game.ColotToMove != player.Color {
 			continue
 		}
@@ -183,26 +175,18 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 
 		switch reqAction {
 		case "request-moves":
-			// log.Println("Request moves")
-			// application.WsGetValidMoves(r.game, reqBody, player.Ws)
 			getValidMovesController := infrastructure.NewGetValidMovesWsController(repository, room.Game)
 			err := getValidMovesController.Invoke(reqBody)
 			if err != nil {
 				log.Println("Error getting valid moves: ", err)
 			}
 		case "move-piece":
-			if enemyRepository == nil {
-				log.Println("Enemy repo is null. Enemy ID: ", enemy.ID)
-			}
-
 			movePieceController := infrastructure.NewMovePieceWsController(repository, enemyRepository, room.Game)
 			err := movePieceController.Invoke(reqBody)
 			if err != nil {
 				log.Println("Error getting valid moves: ", err)
 			}
 
-			// log.Println("Move piece")
-			// application.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
 			player.StopTimer()
 			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
 

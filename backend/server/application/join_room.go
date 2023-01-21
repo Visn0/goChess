@@ -2,6 +2,7 @@ package application
 
 import (
 	"chess/server/domain"
+	"chess/server/shared"
 	"fmt"
 	"log"
 )
@@ -61,6 +62,7 @@ func NewJoinRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) *J
 }
 
 func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
+	log.Println("==> Join room params: ", shared.ToJSONString(p))
 	room, ok := uc.rm.GetRoom(p.RoomID)
 	if !ok {
 		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
@@ -68,11 +70,15 @@ func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
 		return nil, err
 	}
 	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.BLACK)
-	room.AddPlayer(player)
-	log.Println("Player joined room", player.ID, room.ID)
+	err := room.AddPlayer(player)
+	if err != nil {
+		return nil, err
+	}
 
 	output := newJoinRoomOutput(200, p.RoomID, room.Player1, room.Player2)
-	err := uc.r.SendWebSocketMessage(output)
+	log.Println("##> Join room output: ", shared.ToJSONString(output))
+
+	err = uc.r.SendWebSocketMessage(output)
 	if err != nil {
 		return nil, err
 	}

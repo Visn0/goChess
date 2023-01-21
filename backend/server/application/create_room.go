@@ -2,6 +2,7 @@ package application
 
 import (
 	"chess/server/domain"
+	"chess/server/shared"
 	"fmt"
 	"log"
 )
@@ -40,6 +41,7 @@ func NewCreateRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) 
 }
 
 func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
+	log.Println("==> Create room params: ", shared.ToJSONString(p))
 	_, ok := uc.rm.GetRoom(p.RoomID)
 	if ok {
 		err := fmt.Errorf("There is already a room with id %q", p.RoomID)
@@ -50,13 +52,16 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID, domain.WHITE)
 
 	r := domain.NewRoom(p.RoomID)
-	r.AddPlayer(player)
+	err := r.AddPlayer(player)
+	if err != nil {
+		return nil, err
+	}
 
 	uc.rm.AddRoom(r)
-	log.Println("Room created", r.ID, "by player", player.ID)
-
 	output := newCreateRoomOutput(p.PlayerID)
-	err := uc.r.SendWebSocketMessage(output)
+	log.Println("##> Create room output: ", shared.ToJSONString(output))
+
+	err = uc.r.SendWebSocketMessage(output)
 	if err != nil {
 		return nil, err
 	}

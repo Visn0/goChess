@@ -2,7 +2,8 @@ package application
 
 import (
 	"chess/server/domain"
-	"time"
+	"chess/server/shared"
+	"log"
 )
 
 type MovePieceParams struct {
@@ -43,6 +44,7 @@ func NewMovePieceAction(ownRepository domain.ConnectionRepository, enemyReposito
 }
 
 func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
+	log.Println("==> Move piece params: ", shared.ToJSONString(p))
 	move := &domain.Move{
 		From: p.Src,
 		To:   p.Dst,
@@ -50,59 +52,12 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 
 	uc.game.Move(move, p.PromoteTo)
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
+	log.Println("##> Move piece output: ", shared.ToJSONString(output))
 
 	err := uc.ownRepository.SendWebSocketMessage(output)
 	if err != nil {
 		return nil
 	}
 
-	time.Sleep(100 * time.Millisecond)
 	return uc.enemyRepository.SendWebSocketMessage(output)
 }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// type RequestMovePiece struct {
-// 	Src       *domain.Position  `json:"src"`
-// 	Dst       *domain.Position  `json:"dst"`
-// 	PromoteTo *domain.PieceType `json:"promoteTo"`
-// }
-
-// type ResponseMovePiece struct {
-// 	Action    string            `json:"action"`
-// 	Src       *domain.Position  `json:"src"`
-// 	Dst       *domain.Position  `json:"dst"`
-// 	PromoteTo *domain.PieceType `json:"promoteTo"`
-// }
-
-// func WsMovePiece(g *domain.Game, body []byte, player, enemy *shared.WsConn) {
-// 	log.Println("handle move piece")
-// 	req := RequestMovePiece{}
-// 	json.Unmarshal(body, &req)
-
-// 	move := &domain.Move{
-// 		From: req.Src,
-// 		To:   req.Dst,
-// 	}
-// 	g.Move(move, req.PromoteTo)
-// 	resp := ResponseMovePiece{
-// 		Action:    "move-piece",
-// 		Src:       req.Src,
-// 		Dst:       req.Dst,
-// 		PromoteTo: req.PromoteTo,
-// 	}
-
-// 	player.WriteJSON(resp)
-// 	time.Sleep(100 * time.Millisecond)
-// 	enemy.WriteJSON(resp)
-// }

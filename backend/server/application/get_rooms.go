@@ -2,6 +2,8 @@ package application
 
 import (
 	"chess/server/domain"
+	"chess/server/shared"
+	"log"
 )
 
 type GetRoomsOutput struct {
@@ -57,7 +59,10 @@ func NewGetRoomsAction(rm *domain.RoomManager) *GetRoomsAction {
 func (uc *GetRoomsAction) Invoke() *GetRoomsOutput {
 	uc.addTestRooms(uc.rm)
 	rooms := uc.rm.GetRooms()
-	return newGetRoomsOutput(rooms)
+	output := newGetRoomsOutput(rooms)
+	log.Println("==> Get rooms output: ", shared.ToJSONString(output))
+
+	return output
 }
 
 func (uc *GetRoomsAction) addTestRooms(rm *domain.RoomManager) {
