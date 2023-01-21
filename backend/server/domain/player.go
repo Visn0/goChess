@@ -1,15 +1,12 @@
 package domain
 
 import (
+	"chess/server/shared"
 	"time"
-
-	websocket "github.com/gofiber/websocket/v2"
 )
 
-type wsConn = websocket.Conn
-
 type Player struct {
-	Ws             *wsConn
+	Ws             *shared.WsConn
 	ID             string
 	Color          Color
 	TimeConsumedMS int
@@ -17,7 +14,7 @@ type Player struct {
 	paused         bool
 }
 
-func NewPlayer(ws *wsConn, id string, color Color) *Player {
+func NewPlayer(ws *shared.WsConn, id string, color Color) *Player {
 	return &Player{
 		Ws:             ws,
 		ID:             id,
