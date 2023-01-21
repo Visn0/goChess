@@ -26,16 +26,6 @@ func NewPlayer(ws *wsConn, id string, color Color) *Player {
 	}
 }
 
-type PlayerPublicInfo struct {
-	ID string `json:"id"`
-}
-
-func (p *Player) GetPublicInfo() *PlayerPublicInfo {
-	return &PlayerPublicInfo{
-		ID: p.ID,
-	}
-}
-
 func (p *Player) StartTimer() {
 	p.LastClockTime = time.Now()
 }

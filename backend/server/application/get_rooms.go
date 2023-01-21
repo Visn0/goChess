@@ -20,12 +20,18 @@ type GetRoomsPlayerOutput struct {
 func newGetRoomsOutput(rooms []*domain.Room) *GetRoomsOutput {
 	outputRooms := make([]*GetRoomInfoOutput, 0, len(rooms))
 	for i := range rooms {
-		r := rooms[i].GetPublicInfo()
+		r := rooms[i]
 		players := make([]*GetRoomsPlayerOutput, 0, 2)
 
-		for p := range r.Players {
+		if r.Player1 != nil {
 			players = append(players, &GetRoomsPlayerOutput{
-				ID: r.Players[p].ID,
+				ID: r.Player1.ID,
+			})
+		}
+
+		if r.Player2 != nil {
+			players = append(players, &GetRoomsPlayerOutput{
+				ID: r.Player2.ID,
 			})
 		}
 

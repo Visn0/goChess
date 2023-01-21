@@ -3,10 +3,6 @@ package domain
 import (
 	// "chess/server/application"
 	"fmt"
-	"log"
-	"sync"
-
-	"github.com/buger/jsonparser"
 )
 
 type Room struct {
@@ -53,82 +49,4 @@ func (r *Room) GetRoomSize() int {
 		size++
 	}
 	return size
-}
-
-func (r *Room) HandleGame(isHost bool, roomsWG *sync.WaitGroup) {
-	defer roomsWG.Done()
-
-	log.Println("Room activated")
-	var player *Player
-	var enemy *Player
-
-	for {
-		if isHost {
-			player = r.Player1
-			enemy = r.Player2
-		} else {
-			player = r.Player2
-			enemy = r.Player1
-		}
-		if player == nil {
-			return
-		}
-		if enemy == nil {
-			continue
-		}
-		if r.Game.ColotToMove != player.Color {
-			continue
-		}
-		_, message, err := player.Ws.ReadMessage()
-		if err != nil {
-			log.Println("Some error:", err)
-			player = nil
-			return
-		}
-		// log.Println("Get message.")
-
-		reqAction, _ := jsonparser.GetString(message, "action")
-		_, _, _, _ = jsonparser.Get(message, "body")
-
-		switch reqAction {
-		case "request-moves":
-			// log.Println("Request moves")
-			// application.WsGetValidMoves(r.game, reqBody, player.Ws)
-		case "move-piece":
-			// log.Println("Move piece")
-			// application.WsMovePiece(r.game, reqBody, player.Ws, enemy.Ws)
-			player.StopTimer()
-			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
-
-			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
-			enemy.StartTimer()
-		default:
-			log.Println("Unknown action")
-		}
-	}
-}
-
-type RoomPublicInfo struct {
-	ID      string              `json:"id"`
-	Players []*PlayerPublicInfo `json:"players"`
-}
-
-func (r *Room) GetPublicInfo() *RoomPublicInfo {
-	players := make([]*PlayerPublicInfo, 0, 2)
-	if r.Player1 != nil {
-		info := r.Player1.GetPublicInfo()
-		players = append(players, &PlayerPublicInfo{
-			ID: info.ID,
-		})
-	}
-	if r.Player2 != nil {
-		info := r.Player2.GetPublicInfo()
-		players = append(players, &PlayerPublicInfo{
-			ID: info.ID,
-		})
-	}
-	return &RoomPublicInfo{
-		ID:      r.ID,
-		Players: players,
-	}
 }
