@@ -6,13 +6,16 @@ import ChessPiece from '@/components/ChessPiece.vue'
 import type { Board } from '@/models/board'
 import { Color, constants, PieceType, type File, type Rank } from '@/models/constants'
 import type { Game } from '@/models/game.js'
-import { Timer } from '@/models/timer'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
-import { onBeforeMount, watch } from 'vue'
+import { onBeforeMount } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
+import { useRoute } from 'vue-router'
+
+let route = useRoute()
+let colorDown: Color = route.params.color as Color
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -28,21 +31,13 @@ onBeforeMount(() => {
     game = gameStore.game as Game
     board = game.board
     board.initFromFenNotation(constants.StartingPosition)
+    game.start(colorDown, 600 * 1000)
 })
 
 function squareClick(file: File, rank: Rank) {
     const square = board.getSquare(file, rank)
     game.selectSquare(square)
 }
-
-let colorDown = Color.WHITE
-const oponentTimer = new Timer(600)
-const myTimer = new Timer(600)
-myTimer.start()
-
-watch(myTimer.isStoped.bind(myTimer), () => {
-    console.log(`Timer finished: ${myTimer.toString()}`)
-})
 
 function promotePiece(pieceType: PieceType) {
     game.promotePiece(pieceType)
@@ -116,14 +111,14 @@ function abandon() {
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
                 <div class="py-1 d-flex justify-content-between">
                     <PlayerNickname :nickname="oponentPlayerID" />
-                    <ChessTimer :timer="oponentTimer" />
+                    <ChessTimer :timer="game.getOpponentTimer()" />
                 </div>
                 <div class="d-flex justify-content-center">
                     <ChessBoard :board="board" :color-down="colorDown" @on-square-click="squareClick" />
                 </div>
                 <div class="py-1 d-flex justify-content-between">
                     <PlayerNickname :nickname="myPlayerID" />
-                    <ChessTimer :timer="myTimer" />
+                    <ChessTimer :timer="game.getOwnTimer()" />
                 </div>
 
                 <!-- Buttons -->
