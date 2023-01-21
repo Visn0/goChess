@@ -23,10 +23,13 @@ class PieceMovedAction {
 
     public Invoke(body: string) {
         const p: PieceMovedParams = JSON.parse(body)
-        console.log(p)
 
+        this.movePiece(p)
+        this.game.changeTurn()
+    }
+
+    private movePiece(p: PieceMovedParams) {
         const src: Square = this.game.board.getSquare(p.src.file, p.src.rank)
-        const srcPiece = src.piece as Piece
         const dst = this.game.board.getSquare(p.dst.file, p.dst.rank)
 
         if (this.isCastle(src, dst)) {
@@ -39,6 +42,7 @@ class PieceMovedAction {
             return
         }
 
+        const srcPiece = src.piece as Piece
         const dstPieceType = p.promoteTo ? new Piece(srcPiece.color, numberToPieceType(p.promoteTo)) : srcPiece
 
         this.game.board.setSquarePiece(p.dst.file, p.dst.rank, dstPieceType)

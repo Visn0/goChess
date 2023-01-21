@@ -9,7 +9,7 @@ import { CreateRoomAction } from '@/actions/send/create_room_action'
 import { RequestRoomsAction } from '@/actions/send/request_rooms'
 import { Board } from '@/models/board'
 import { BackendConnectionRepository } from '@/models/connection_repository/backend_connection_repository'
-import { constants } from '@/models/constants'
+import { Color, constants } from '@/models/constants'
 import { Game } from '@/models/game.js'
 import { Rooms } from '@/models/room'
 import { usePlayerIDStore } from '@/stores/playerID'
@@ -43,22 +43,22 @@ repository.addOnWebSocketMessageEventListener(routeActions.route())
 RequestRoomsAction(repository, rooms)
 const requestRoomInterval = setInterval(() => RequestRoomsAction(repository, rooms), 10000)
 
-function goToGame() {
+function goToGame(color: Color) {
     clearInterval(requestRoomInterval)
 
     const gameStore = useGameStore()
     gameStore.set(game)
-    router.push({ name: 'game' })
+    router.push({ name: 'game', params: { color: color } })
 }
 
 function createRoom() {
-    CreateRoomAction(repository, playerID, `room`, 'roomPassword')
-    goToGame()
+    CreateRoomAction(repository, playerID, `${Date.now()}`, 'roomPassword')
+    goToGame(Color.WHITE)
 }
 
 function joinRoom(roomID: string) {
     JoinRoomAction(repository, playerID, roomID, 'roomPassword')
-    goToGame()
+    goToGame(Color.BLACK)
 }
 
 let componentKey = 1
