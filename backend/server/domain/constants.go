@@ -46,6 +46,14 @@ const (
 	BLACK Color = true
 )
 
+func ColorToString(color Color) string {
+	if color == WHITE {
+		return "white"
+	} else {
+		return "black"
+	}
+}
+
 const (
 	INIT_BOARD  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 	EMPTY_BOARD = "8/8/8/8/8/8/8/8"

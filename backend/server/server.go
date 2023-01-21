@@ -1,6 +1,7 @@
 package server
 
 import (
+	"chess/server/application"
 	"chess/server/domain"
 	"chess/server/game/actions"
 	"chess/server/infrastructure"
@@ -113,11 +114,12 @@ func (s *Server) initWebsocket() {
 		repository := infrastructure.NewBackendConnectionRepository(wsConn)
 		wg := &sync.WaitGroup{}
 		wg.Add(1)
+		var room *domain.Room
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
 			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
-			room, err := createRoomController.Invoke(reqBody)
+			room, err = createRoomController.Invoke(reqBody)
 			if err != nil {
 				log.Println(err)
 				err = repository.SendWebSocketMessage(err)
@@ -130,7 +132,7 @@ func (s *Server) initWebsocket() {
 		case "join-room":
 			log.Println("Request join room")
 			joinRoomController := infrastructure.NewJoinRoomWsController(s.roomManager, repository)
-			room, err := joinRoomController.Invoke(reqBody)
+			room, err = joinRoomController.Invoke(reqBody)
 			if err != nil {
 				log.Println(err)
 				_ = repository.SendWebSocketMessage(err)
@@ -162,6 +164,14 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 	}
 
 	enemyRepository := infrastructure.NewBackendConnectionRepository(enemy.Ws)
+	err := application.StartGameAction(player.Color, enemy.Color, repository, enemyRepository, 10*60*1000)
+	if err != nil {
+		log.Println("Error starting game: ", err)
+		_ = repository.SendWebSocketMessage(err)
+		_ = enemyRepository.SendWebSocketMessage(err)
+		return
+	}
+
 	for {
 		if room.Game.ColotToMove != player.Color {
 			continue
@@ -172,7 +182,6 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 			player = nil
 			return
 		}
-		// log.Println("Get message.")
 
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")

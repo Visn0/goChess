@@ -15,6 +15,11 @@ class Game {
         return this._repository
     }
 
+    private myColor: Ref<Color>
+    public getMyColor(): Color {
+        return this.myColor.value
+    }
+
     private myTurn: Ref<boolean>
     public isMyTurn(): boolean {
         return this.myTurn.value
@@ -67,6 +72,7 @@ class Game {
     constructor(board: Board, repository: ConnectionRepository) {
         this._board = board
         this._repository = repository
+        this.myColor = ref(Color.WHITE)
         this.myTurn = ref(false)
         this.ownTimer = shallowRef(new Timer(0))
         this.opponentTimer = shallowRef(new Timer(0))
@@ -77,6 +83,7 @@ class Game {
     }
 
     public start(myColor: Color, durationMs: number) {
+        this.myColor.value = myColor
         this.ownTimer.value.setRemainingTime(durationMs)
         this.opponentTimer.value.setRemainingTime(durationMs)
 
