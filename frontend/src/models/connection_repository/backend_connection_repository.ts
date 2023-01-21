@@ -47,8 +47,20 @@ class BackendConnectionRepository implements ConnectionRepository {
         this.connection.onmessage = fn
     }
 
-    public sendWebSocketMessage(message: Message) {
-        this.connection?.send(JSON.stringify(message))
+    public async sendWebSocketMessage(message: Message) {
+        if (!this.connection) {
+            return
+        }
+
+        const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+        for (let i = 0; i < 10; i++) {
+            if (this.connection.readyState === WebSocket.OPEN) {
+                this.connection.send(JSON.stringify(message))
+                return
+            }
+
+            await sleep(200)
+        }
     }
 
     public sendHTTPRequest(method: string, path: string, body: any): Promise<Response> {

@@ -31,7 +31,7 @@ onBeforeMount(() => {
     game = gameStore.game as Game
     board = game.board
     board.initFromFenNotation(constants.StartingPosition)
-    game.start(colorDown, 600 * 1000)
+    setTimeout(() => game.start(colorDown, 600 * 1000), 3000)
 })
 
 function squareClick(file: File, rank: Rank) {

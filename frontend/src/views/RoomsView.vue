@@ -19,6 +19,7 @@ import { watch } from 'vue'
 import { JoinRoomAction } from '@/actions/send/join_room_action'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
+import { GotTimersAction } from '@/actions/receive/got_timers'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -35,7 +36,8 @@ const routeActions: RouteActions = new RouteActions(
         ['create-room', new RoomCreatedAction(rooms)],
         ['join-room', new RoomJoinedAction(rooms)],
         ['request-moves', new MovesReceivedAction(game)],
-        ['move-piece', new PieceMovedAction(game)]
+        ['move-piece', new PieceMovedAction(game)],
+        ['get-timers', new GotTimersAction(game)]
     ])
 )
 repository.addOnWebSocketMessageEventListener(routeActions.route())

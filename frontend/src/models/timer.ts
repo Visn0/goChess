@@ -52,6 +52,8 @@ class Timer {
     }
 
     public setRemainingTime(ms: number) {
+        this.lastUpdate = new Date()
+
         const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
         const seconds = Math.floor((ms % (1000 * 60)) / 1000)
         const milliseconds = Math.floor((ms % 1000) / 1000)
@@ -67,6 +69,7 @@ class Timer {
 
     public pause() {
         this.paused.value = true
+        this.lastUpdate = new Date()
         clearInterval(this.intervalID)
     }
 
@@ -77,7 +80,7 @@ class Timer {
         this.initialDate.setTime(this.initialDate.getTime() + distance)
 
         this.paused.value = false
-        this.intervalID = setInterval(this.update.bind(this), 500)
+        // this.intervalID = setInterval(this.update.bind(this), 1000)
     }
 
     public toString(): string {

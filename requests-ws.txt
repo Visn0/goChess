@@ -116,8 +116,8 @@
 	Response
 	{
 		"action": "get-timers",
-		"player-time": 600000,
-		"enemy-time": 600000,
+		"playerTime": 600000,
+		"enemyTime": 600000,
 	}
 }
 

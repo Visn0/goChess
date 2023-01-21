@@ -7,6 +7,7 @@ import type { Piece } from './piece'
 import { ref, shallowRef, type Ref } from 'vue'
 import type { Square } from './square'
 import { Timer } from './timer'
+import { GetTimersAction } from '@/actions/send/get_timers'
 
 class Game {
     private _repository: ConnectionRepository
@@ -89,7 +90,7 @@ class Game {
             this.opponentTimer.value.resume()
         }
 
-        // this.timerInterval = setInterval(GetTimersAction(this.repository), 500)
+        this.timerInterval = setInterval(() => GetTimersAction(this.repository), 1000)
     }
 
     public selectSquare(square: Square) {
