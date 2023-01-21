@@ -20,6 +20,7 @@ import { JoinRoomAction } from '@/actions/send/join_room_action'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { GotTimersAction } from '@/actions/receive/got_timers'
+import { StartGameAction } from '@/actions/receive/start_game'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -35,6 +36,7 @@ const routeActions: RouteActions = new RouteActions(
     new Map<string, ReceiveAction>([
         ['create-room', new RoomCreatedAction(rooms)],
         ['join-room', new RoomJoinedAction(rooms)],
+        ['start-game', new StartGameAction(game)],
         ['request-moves', new MovesReceivedAction(game)],
         ['move-piece', new PieceMovedAction(game)],
         ['get-timers', new GotTimersAction(game)]

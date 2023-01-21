@@ -9,13 +9,9 @@ import type { Game } from '@/models/game.js'
 import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { usePlayerIDStore } from '@/stores/playerID'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
-import { useRoute } from 'vue-router'
-
-let route = useRoute()
-let colorDown: Color = route.params.color as Color
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -23,6 +19,7 @@ const myPlayerID = myPlayerIDStore.id
 const oponentPlayerID = 'OponentPlayerID'
 let board: Board
 let game: Game
+let colorDown = ref(Color.WHITE)
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         router.push({ name: 'rooms' })
@@ -31,7 +28,10 @@ onBeforeMount(() => {
     game = gameStore.game as Game
     board = game.board
     board.initFromFenNotation(constants.StartingPosition)
-    setTimeout(() => game.start(colorDown, 600 * 1000), 3000)
+
+    watch(game.getMyColor.bind(game), () => {
+        colorDown.value = game.getMyColor()
+    })
 })
 
 function squareClick(file: File, rank: Rank) {
