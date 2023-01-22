@@ -49,13 +49,13 @@ class Timer {
         clearInterval(this.intervalID)
     }
 
-    public setRemainingTime(ms: number) {
-        this.timeConsumedMs = this.durationMs - ms
+    public setRemainingTime(remainingMs: number) {
+        this.timeConsumedMs = this._durationMs - remainingMs
 
-        this.remainingMinutes.value = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
-        this.remainingSeconds.value = Math.floor((ms % (1000 * 60)) / 1000)
+        this.remainingMinutes.value = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60))
+        this.remainingSeconds.value = Math.floor((remainingMs % (1000 * 60)) / 1000)
 
-        if (ms === 0) {
+        if (remainingMs === 0) {
             this.paused.value = true
             this.stoped.value = true
             clearInterval(this.intervalID)
@@ -67,7 +67,7 @@ class Timer {
         this.timeConsumedMs += Date.now() - this.lastClockTime.getTime()
         this.lastClockTime = new Date()
 
-        const remainingMs = this.durationMs - this.timeConsumedMs
+        const remainingMs = this._durationMs - this.timeConsumedMs
         this.setRemainingTime(remainingMs)
     }
 
