@@ -15,7 +15,7 @@ class StartGameAction {
     }
 
     public Invoke(body: string) {
-        const p: StartGameParams = JSON.parse(body)        
+        const p: StartGameParams = JSON.parse(body)
         this.game.start(p.playerColor, p.duration)
     }
 }
