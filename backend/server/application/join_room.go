@@ -55,11 +55,11 @@ func newJoinRoomOutput(httpCode int, roomID string, player1 *domain.Player, play
 
 type JoinRoomAction struct {
 	rm *domain.RoomManager
-	r  domain.ConnectionRepository
+	c  domain.ConnectionRepository
 }
 
-func NewJoinRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) *JoinRoomAction {
-	return &JoinRoomAction{rm: rm, r: r}
+func NewJoinRoomAction(rm *domain.RoomManager, c domain.ConnectionRepository) *JoinRoomAction {
+	return &JoinRoomAction{rm: rm, c: c}
 }
 
 func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
@@ -71,8 +71,8 @@ func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
 		log.Println(err)
 		return nil, err
 	}
-	
-	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID)
+
+	player := domain.NewPlayer(uc.c.GetWebSocketConnection(), p.PlayerID)
 	err := room.AddPlayer(player)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (uc *JoinRoomAction) Invoke(p *JoinRoomParams) (*domain.Room, error) {
 	output := newJoinRoomOutput(200, p.RoomID, room.Player1, room.Player2)
 	log.Println("##> Join room output: ", shared.ToJSONString(output))
 
-	err = uc.r.SendWebSocketMessage(output)
+	err = uc.c.SendWebSocketMessage(output)
 	if err != nil {
 		return nil, err
 	}

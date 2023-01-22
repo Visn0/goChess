@@ -34,11 +34,11 @@ func newCreateRoomOutput(playerID string) *CreateRoomOutput {
 
 type CreateRoomAction struct {
 	rm *domain.RoomManager
-	r  domain.ConnectionRepository
+	c  domain.ConnectionRepository
 }
 
-func NewCreateRoomAction(rm *domain.RoomManager, r domain.ConnectionRepository) *CreateRoomAction {
-	return &CreateRoomAction{rm: rm, r: r}
+func NewCreateRoomAction(rm *domain.RoomManager, c domain.ConnectionRepository) *CreateRoomAction {
+	return &CreateRoomAction{rm: rm, c: c}
 }
 
 func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
@@ -51,7 +51,7 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 		return nil, err
 	}
 
-	player := domain.NewPlayer(uc.r.GetWebSocketConnection(), p.PlayerID)
+	player := domain.NewPlayer(uc.c.GetWebSocketConnection(), p.PlayerID)
 
 	r := domain.NewRoom(p.RoomID)
 	err := r.AddPlayer(player)
@@ -63,7 +63,7 @@ func (uc *CreateRoomAction) Invoke(p *CreateRoomParams) (*domain.Room, error) {
 	output := newCreateRoomOutput(p.PlayerID)
 	log.Println("##> Create room output: ", shared.ToJSONString(output))
 
-	err = uc.r.SendWebSocketMessage(output)
+	err = uc.c.SendWebSocketMessage(output)
 	if err != nil {
 		return nil, err
 	}

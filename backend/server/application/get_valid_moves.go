@@ -19,19 +19,19 @@ type GetValidMovesOutput struct {
 }
 
 type GetValidMovesAction struct {
-	r    domain.ConnectionRepository
+	c    domain.ConnectionRepository
 	game *domain.Game
 }
 
-func NewGetValidMovesAction(r domain.ConnectionRepository, game *domain.Game) *GetValidMovesAction {
+func NewGetValidMovesAction(c domain.ConnectionRepository, game *domain.Game) *GetValidMovesAction {
 	return &GetValidMovesAction{
-		r:    r,
+		c:    c,
 		game: game,
 	}
 }
 
 func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
-	log.Println("==> Request moves params: ", shared.ToJSONString(p))
+	// log.Println("==> Request moves params: ", shared.ToJSONString(p))
 	validMoves := uc.game.GetValidMoves(p.Rank, p.File)
 	if validMoves == nil {
 		fmt.Println("No valid moves found")
@@ -44,5 +44,5 @@ func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
 	}
 
 	log.Println("##> Request moves output: ", shared.ToJSONString(output))
-	return uc.r.SendWebSocketMessage(output)
+	return uc.c.SendWebSocketMessage(output)
 }
