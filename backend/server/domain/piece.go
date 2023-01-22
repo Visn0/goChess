@@ -182,11 +182,7 @@ func (p *PieceBase) String() string {
 }
 
 func (p *PieceBase) GetValidDirections() []Direction {
-	dir := PIECE_DIRECTION[p.PieceType]
-	if p.PieceType == PAWN && p.Color == BLACK {
-		return []Direction{{-1, 0}}
-	}
-	return dir
+	return getPieceDirection(p.PieceType, p.Color)
 }
 
 func (p *PieceBase) GetColor() Color {
@@ -195,4 +191,12 @@ func (p *PieceBase) GetColor() Color {
 
 func (p *PieceBase) IsEnemy(piece IPiece) bool {
 	return bool(p.GetColor()) != bool(piece.GetColor())
+}
+
+func getPieceDirection(t PieceType, color Color) []Direction {
+	dir := PIECE_DIRECTION[t]
+	if t == PAWN && color == BLACK {
+		return []Direction{{-1, 0}}
+	}
+	return dir
 }

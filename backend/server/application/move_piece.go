@@ -17,6 +17,7 @@ type MovePieceOutput struct {
 	Src       *domain.Position  `json:"src"`
 	Dst       *domain.Position  `json:"dst"`
 	PromoteTo *domain.PieceType `json:"promoteTo"`
+	KingCheck *domain.Position  `json:"kingCheck"`
 }
 
 func newMovePieceOutput(src *domain.Position, dst *domain.Position, promoteTo *domain.PieceType) *MovePieceOutput {
@@ -25,6 +26,7 @@ func newMovePieceOutput(src *domain.Position, dst *domain.Position, promoteTo *d
 		Src:       src,
 		Dst:       dst,
 		PromoteTo: promoteTo,
+		KingCheck: nil,
 	}
 }
 
@@ -52,8 +54,19 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 
 	uc.game.Move(move, p.PromoteTo)
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
-	log.Println("##> Move piece output: ", shared.ToJSONString(output))
 
+	nextColorToMove := uc.game.ColotToMove
+	enemyKingPos := uc.game.Board.GetKingPos(nextColorToMove)
+	if enemyKingPos == nil {
+		log.Println("##> King not found: ", nextColorToMove)
+		panic("King not found")
+	}
+	if uc.game.PositionIsUnderAttack(enemyKingPos, !nextColorToMove) {
+		output.KingCheck = enemyKingPos
+		log.Println("##> King is under attack: ", nextColorToMove, enemyKingPos)
+	}
+	log.Println("##> Move piece output: ", shared.ToJSONString(output))
+	log.Println("##> Player to move: ", nextColorToMove)
 	err := uc.c.SendWebSocketMessage(output)
 	if err != nil {
 		return nil
