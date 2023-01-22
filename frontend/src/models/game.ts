@@ -27,9 +27,9 @@ class Game {
     public changeTurn() {
         if (this.myTurn.value) {
             this.ownTimer.value.pause()
-            this.opponentTimer.value.resume()
+            this.opponentTimer.value.start()
         } else {
-            this.ownTimer.value.resume()
+            this.ownTimer.value.start()
             this.opponentTimer.value.pause()
         }
         this.myTurn.value = !this.myTurn.value
@@ -84,20 +84,17 @@ class Game {
 
     public start(myColor: Color, durationMs: number) {
         this.myColor.value = myColor
-        this.ownTimer.value.setRemainingTime(durationMs)
-        this.opponentTimer.value.setRemainingTime(durationMs)
-
-        this.ownTimer.value.init()
-        this.opponentTimer.value.init()
+        this.ownTimer.value.durationMs = durationMs
+        this.opponentTimer.value.durationMs = durationMs
 
         if (myColor === Color.WHITE) {
             this.myTurn.value = true
-            this.ownTimer.value.resume()
+            this.ownTimer.value.start()
         } else {
-            this.opponentTimer.value.resume()
+            this.opponentTimer.value.start()
         }
 
-        this.timerInterval = setInterval(() => GetTimersAction(this.repository), 1000)
+        this.timerInterval = setInterval(() => GetTimersAction(this.repository), 10000)
     }
 
     public selectSquare(square: Square) {
