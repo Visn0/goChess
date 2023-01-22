@@ -13,7 +13,11 @@ class Timer {
         return this.stoped.value
     }
 
-    private durationMs: number
+    private _durationMs: number
+    public set durationMs(ms: number) {
+        this._durationMs = ms
+        this.setRemainingTime(ms)
+    }
     private timeConsumedMs: number
     private lastClockTime: Date
     private remainingMinutes: Ref<number>
@@ -23,7 +27,7 @@ class Timer {
         this.intervalID = 0
         this.paused = ref(true)
         this.stoped = ref(false)
-        this.durationMs = milliseconds
+        this._durationMs = milliseconds + 500
         this.timeConsumedMs = 0
         this.lastClockTime = new Date()
         this.remainingMinutes = ref(0)
@@ -45,13 +49,13 @@ class Timer {
         clearInterval(this.intervalID)
     }
 
-    public setRemainingTime(ms: number) {
-        this.timeConsumedMs = this.durationMs - ms
+    public setRemainingTime(remainingMs: number) {
+        this.timeConsumedMs = this._durationMs - remainingMs
 
-        this.remainingMinutes.value = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
-        this.remainingSeconds.value = Math.floor((ms % (1000 * 60)) / 1000)
+        this.remainingMinutes.value = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60))
+        this.remainingSeconds.value = Math.floor((remainingMs % (1000 * 60)) / 1000)
 
-        if (ms === 0) {
+        if (remainingMs === 0) {
             this.paused.value = true
             this.stoped.value = true
             clearInterval(this.intervalID)
@@ -63,7 +67,7 @@ class Timer {
         this.timeConsumedMs += Date.now() - this.lastClockTime.getTime()
         this.lastClockTime = new Date()
 
-        const remainingMs = this.durationMs - this.timeConsumedMs
+        const remainingMs = this._durationMs - this.timeConsumedMs
         this.setRemainingTime(remainingMs)
     }
 
