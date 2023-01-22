@@ -84,8 +84,8 @@ class Game {
 
     public start(myColor: Color, durationMs: number) {
         this.myColor.value = myColor
-        this.ownTimer.value.setRemainingTime(durationMs)
-        this.opponentTimer.value.setRemainingTime(durationMs)
+        this.ownTimer.value.durationMs = durationMs
+        this.opponentTimer.value.durationMs = durationMs
 
         if (myColor === Color.WHITE) {
             this.myTurn.value = true
