@@ -4,6 +4,7 @@ import type { Game } from '@/models/game'
 
 class StartGameParams extends ReceiveParams {
     playerColor: Color
+    opponentName: string
     duration: number
 }
 
@@ -15,8 +16,8 @@ class StartGameAction {
     }
 
     public Invoke(body: string) {
-        const p: StartGameParams = JSON.parse(body)        
-        this.game.start(p.playerColor, p.duration)
+        const p: StartGameParams = JSON.parse(body)
+        this.game.start(p.opponentName, p.playerColor, p.duration)
     }
 }
 

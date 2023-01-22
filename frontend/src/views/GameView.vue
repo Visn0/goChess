@@ -16,10 +16,10 @@ import { AbandonAction } from '@/actions/send/abandon_action'
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
 const myPlayerID = myPlayerIDStore.id
-const oponentPlayerID = 'OponentPlayerID'
 let board: Board
 let game: Game
 let colorDown = ref(Color.WHITE)
+let oponentPlayerID = ref('')
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         router.push({ name: 'rooms' })
@@ -29,8 +29,9 @@ onBeforeMount(() => {
     board = game.board
     board.initFromFenNotation(constants.StartingPosition)
 
-    watch(game.getMyColor.bind(game), () => {
+    watch(game.started.bind(game), () => {
         colorDown.value = game.getMyColor()
+        oponentPlayerID.value = game.getOpponentID()
     })
 })
 
