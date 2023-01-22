@@ -215,11 +215,6 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error getting player timers: ", err)
 			}
-			getTimersController = infrastructure.NewGetTimersWsController(cEnemy, enemy, player)
-			err = getTimersController.Invoke()
-			if err != nil {
-				log.Println("Error getting enemy timers: ", err)
-			}
 		default:
 			log.Println("Unknown action")
 		}
