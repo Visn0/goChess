@@ -20,7 +20,7 @@ func newStartGameOutput(playerColor domain.Color, opponentName string, durationM
 	}
 }
 
-func StartGameAction(p1, p2 *domain.Player, p1Repo, p2Repo domain.ConnectionRepository, durationMs int) error {
+func StartGameAction(p1, p2 *domain.Player, c1, c2 domain.ConnectionRepository, durationMs int) error {
 	p1.Color = domain.GetRandomColor()
 	if p1.Color == domain.WHITE {
 		p2.Color = domain.BLACK
@@ -31,11 +31,11 @@ func StartGameAction(p1, p2 *domain.Player, p1Repo, p2Repo domain.ConnectionRepo
 	}
 
 	output := newStartGameOutput(p1.Color, p2.ID, durationMs)
-	err := p1Repo.SendWebSocketMessage(output)
+	err := c1.SendWebSocketMessage(output)
 	if err != nil {
 		return err
 	}
 
 	output = newStartGameOutput(p2.Color, p1.ID, durationMs)
-	return p2Repo.SendWebSocketMessage(output)
+	return c2.SendWebSocketMessage(output)
 }

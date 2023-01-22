@@ -29,17 +29,17 @@ func newMovePieceOutput(src *domain.Position, dst *domain.Position, promoteTo *d
 }
 
 type MovePieceAction struct {
-	ownRepository   domain.ConnectionRepository
-	enemyRepository domain.ConnectionRepository
-	game            *domain.Game
+	c      domain.ConnectionRepository
+	cEnemy domain.ConnectionRepository
+	game   *domain.Game
 }
 
-func NewMovePieceAction(ownRepository domain.ConnectionRepository, enemyRepository domain.ConnectionRepository,
+func NewMovePieceAction(c domain.ConnectionRepository, cEnemy domain.ConnectionRepository,
 	game *domain.Game) *MovePieceAction {
 	return &MovePieceAction{
-		ownRepository:   ownRepository,
-		enemyRepository: enemyRepository,
-		game:            game,
+		c:      c,
+		cEnemy: cEnemy,
+		game:   game,
 	}
 }
 
@@ -54,10 +54,10 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
 	log.Println("##> Move piece output: ", shared.ToJSONString(output))
 
-	err := uc.ownRepository.SendWebSocketMessage(output)
+	err := uc.c.SendWebSocketMessage(output)
 	if err != nil {
 		return nil
 	}
 
-	return uc.enemyRepository.SendWebSocketMessage(output)
+	return uc.cEnemy.SendWebSocketMessage(output)
 }

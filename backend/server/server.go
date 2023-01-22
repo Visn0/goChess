@@ -97,7 +97,6 @@ func (s *Server) initWebsocket() {
 			log.Println("Some error:", err)
 			return
 		}
-		log.Println("Get message.")
 
 		reqAction, err := jsonparser.GetString(message, "action")
 		if err != nil {
@@ -110,35 +109,35 @@ func (s *Server) initWebsocket() {
 			return
 		}
 
-		repository := infrastructure.NewBackendConnectionRepository(wsConn)
+		c := infrastructure.NewBackendConnectionRepository(wsConn)
 		wg := &sync.WaitGroup{}
 		wg.Add(1)
 		var room *domain.Room
 		switch reqAction {
 		case "create-room":
 			log.Println("Request create room")
-			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, repository)
+			createRoomController := infrastructure.NewCreateRoomWsController(s.roomManager, c)
 			room, err = createRoomController.Invoke(reqBody)
 			if err != nil {
 				log.Println(err)
-				err = repository.SendWebSocketMessage(err)
+				err = c.SendWebSocketMessage(err)
 				log.Println(err)
 				return
 			}
 
-			s.wsRouter(room, repository, true, wg)
+			s.wsRouter(room, c, true, wg)
 
 		case "join-room":
 			log.Println("Request join room")
-			joinRoomController := infrastructure.NewJoinRoomWsController(s.roomManager, repository)
+			joinRoomController := infrastructure.NewJoinRoomWsController(s.roomManager, c)
 			room, err = joinRoomController.Invoke(reqBody)
 			if err != nil {
 				log.Println(err)
-				_ = repository.SendWebSocketMessage(err)
+				_ = c.SendWebSocketMessage(err)
 				return
 			}
 
-			s.wsRouter(room, repository, false, wg)
+			s.wsRouter(room, c, false, wg)
 		}
 
 		wg.Wait()
@@ -203,13 +202,12 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			}
 
 			player.StopTimer()
-			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
-
-			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
 			enemy.StartTimer()
 
+			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
+			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
+
 		case "get-timers":
-			// actions.WsGetTimers(player.Ws, enemy.Ws, player.TimeLeft(), enemy.TimeLeft())
 			getTimersController := infrastructure.NewGetTimersWsController(c, player, enemy)
 			err := getTimersController.Invoke()
 			if err != nil {
