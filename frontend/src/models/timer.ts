@@ -13,74 +13,58 @@ class Timer {
         return this.stoped.value
     }
 
-    private initialSeconds: number
-    private initialDate: Date
-    private lastUpdate: Date
-
+    private durationMs: number
+    private timeConsumedMs: number
+    private lastClockTime: Date
     private remainingMinutes: Ref<number>
     private remainingSeconds: Ref<number>
 
-    constructor(seconds: number) {
+    constructor(milliseconds: number) {
         this.intervalID = 0
         this.paused = ref(true)
         this.stoped = ref(false)
-        this.initialSeconds = seconds
-        this.initialDate = new Date()
-        this.lastUpdate = new Date()
+        this.durationMs = milliseconds
+        this.timeConsumedMs = 0
+        this.lastClockTime = new Date()
         this.remainingMinutes = ref(0)
         this.remainingSeconds = ref(0)
-
-        this.remainingMinutes.value = Math.floor(this.initialSeconds / 60)
-        this.remainingSeconds.value = Math.floor(this.initialSeconds % 60)
     }
 
-    public init() {
-        this.initialDate = new Date()
-        this.initialDate.setMinutes(
-            this.initialDate.getMinutes() + this.remainingMinutes.value,
-            this.initialDate.getSeconds() + this.remainingSeconds.value,
-            500
-        )
-    }
+    public start() {
+        this.lastClockTime = new Date()
+        this.paused.value = false
 
-    private update() {
-        this.lastUpdate = new Date()
-        const now = this.lastUpdate.getTime()
-        const distance = this.initialDate.getTime() - now
-
-        this.setRemainingTime(distance)
-    }
-
-    public setRemainingTime(ms: number) {
-        this.lastUpdate = new Date()
-
-        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((ms % (1000 * 60)) / 1000)
-        const milliseconds = Math.floor((ms % 1000) / 1000)
-
-        this.remainingMinutes.value = minutes
-        this.remainingSeconds.value = seconds
-
-        if (minutes === 0 && seconds === 0 && milliseconds == 0) {
-            this.stoped.value = true
-            clearInterval(this.intervalID)
-        }
+        this.intervalID = setInterval(() => this.update(), 1000)
     }
 
     public pause() {
+        this.timeConsumedMs += Date.now() - this.lastClockTime.getTime()
+        this.lastClockTime = new Date()
         this.paused.value = true
-        this.lastUpdate = new Date()
+
         clearInterval(this.intervalID)
     }
 
-    public resume() {
-        // This update is to keep track of the countdown even when changing turns.
-        const now = new Date().getTime()
-        const distance = this.lastUpdate.getTime() - now
-        this.initialDate.setTime(this.initialDate.getTime() + distance)
+    public setRemainingTime(ms: number) {
+        this.timeConsumedMs = this.durationMs - ms
 
-        this.paused.value = false
-        // this.intervalID = setInterval(this.update.bind(this), 1000)
+        this.remainingMinutes.value = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
+        this.remainingSeconds.value = Math.floor((ms % (1000 * 60)) / 1000)
+
+        if (ms === 0) {
+            this.paused.value = true
+            this.stoped.value = true
+            clearInterval(this.intervalID)
+            return
+        }
+    }
+
+    private update() {
+        this.timeConsumedMs += Date.now() - this.lastClockTime.getTime()
+        this.lastClockTime = new Date()
+
+        const remainingMs = this.durationMs - this.timeConsumedMs
+        this.setRemainingTime(remainingMs)
     }
 
     public toString(): string {
