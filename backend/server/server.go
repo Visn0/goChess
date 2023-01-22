@@ -3,7 +3,6 @@ package server
 import (
 	"chess/server/application"
 	"chess/server/domain"
-	"chess/server/game/actions"
 	"chess/server/infrastructure"
 	"chess/server/shared"
 	"flag"
@@ -146,7 +145,7 @@ func (s *Server) initWebsocket() {
 	}))
 }
 
-func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	log.Println("Room activated")
@@ -163,13 +162,13 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 		}
 	}
 
-	enemyRepository := infrastructure.NewBackendConnectionRepository(enemy.Ws)
+	cEnemy := infrastructure.NewBackendConnectionRepository(enemy.Ws)
 	if isHost {
-		err := application.StartGameAction(player, enemy, repository, enemyRepository, 10*60*1000)
+		err := application.StartGameAction(player, enemy, c, cEnemy, 10*60*1000)
 		if err != nil {
 			log.Println("Error starting game: ", err)
-			_ = repository.SendWebSocketMessage(err)
-			_ = enemyRepository.SendWebSocketMessage(err)
+			_ = c.SendWebSocketMessage(err)
+			_ = cEnemy.SendWebSocketMessage(err)
 			return
 		}
 	}
@@ -190,17 +189,17 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 
 		switch reqAction {
 		case "request-moves":
-			getValidMovesController := infrastructure.NewGetValidMovesWsController(repository, room.Game)
+			getValidMovesController := infrastructure.NewGetValidMovesWsController(c, room.Game)
 			err := getValidMovesController.Invoke(reqBody)
 			if err != nil {
 				log.Println("Error getting valid moves: ", err)
 			}
 
 		case "move-piece":
-			movePieceController := infrastructure.NewMovePieceWsController(repository, enemyRepository, room.Game)
+			movePieceController := infrastructure.NewMovePieceWsController(c, cEnemy, room.Game)
 			err := movePieceController.Invoke(reqBody)
 			if err != nil {
-				log.Println("Error getting valid moves: ", err)
+				log.Println("Error getting move piece: ", err)
 			}
 
 			player.StopTimer()
@@ -210,8 +209,17 @@ func (s *Server) wsRouter(room *domain.Room, repository domain.ConnectionReposit
 			enemy.StartTimer()
 
 		case "get-timers":
-			actions.WsGetTimers(player.Ws, enemy.Ws, player.TimeLeft(), enemy.TimeLeft())
-
+			// actions.WsGetTimers(player.Ws, enemy.Ws, player.TimeLeft(), enemy.TimeLeft())
+			getTimersController := infrastructure.NewGetTimersWsController(c, player, enemy)
+			err := getTimersController.Invoke()
+			if err != nil {
+				log.Println("Error getting player timers: ", err)
+			}
+			getTimersController = infrastructure.NewGetTimersWsController(cEnemy, enemy, player)
+			err = getTimersController.Invoke()
+			if err != nil {
+				log.Println("Error getting enemy timers: ", err)
+			}
 		default:
 			log.Println("Unknown action")
 		}
