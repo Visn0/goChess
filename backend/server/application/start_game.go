@@ -16,7 +16,7 @@ func newStartGameOutput(playerColor domain.Color, opponentName string, durationM
 		Action:       "start-game",
 		PlayerColor:  domain.ColorToString(playerColor),
 		OpponentName: opponentName,
-		Duration:     durationMs + 500,
+		Duration:     durationMs,
 	}
 }
 

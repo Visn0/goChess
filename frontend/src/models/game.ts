@@ -97,8 +97,8 @@ class Game {
     public start(opponentID: string, myColor: Color, durationMs: number) {
         this.opponentID = opponentID
         this.myColor = myColor
-        this.ownTimer.value.durationMs = durationMs
-        this.opponentTimer.value.durationMs = durationMs
+        this.ownTimer.value.durationMs = durationMs + 400
+        this.opponentTimer.value.durationMs = durationMs + 400
 
         if (myColor === Color.WHITE) {
             this.myTurn.value = true
