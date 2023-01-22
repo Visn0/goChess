@@ -1,7 +1,9 @@
 package domain
 
 type Board struct {
-	board [][]IPiece
+	board        [][]IPiece
+	whiteKingPos *Position
+	blackKingPos *Position
 }
 
 func NewBoard() *Board {
@@ -32,6 +34,13 @@ func NewBoardFromFEN(fen string) *Board {
 		}
 		p := fenCharToPiece(string(piece))
 		if p != nil {
+			if p.GetPieceType() == KING {
+				if p.GetColor() == WHITE {
+					b.whiteKingPos = &Position{rank, file}
+				} else {
+					b.blackKingPos = &Position{rank, file}
+				}
+			}
 			b.SetPiece(rank, file, p)
 			file++
 		}
@@ -95,4 +104,11 @@ func fenCharToPiece(fen string) IPiece {
 		return nil
 	}
 	return p
+}
+
+func (b *Board) GetKingPos(color Color) *Position {
+	if color == WHITE {
+		return b.whiteKingPos
+	}
+	return b.blackKingPos
 }
