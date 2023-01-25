@@ -7,6 +7,7 @@ class PieceMovedParams {
     public src: CoordinateParams
     public dst: CoordinateParams
     public promoteTo: number | null
+    public kingCheck: CoordinateParams | null
 }
 
 class CoordinateParams {
@@ -25,6 +26,14 @@ class PieceMovedAction {
         const p: PieceMovedParams = JSON.parse(body)
 
         this.movePiece(p)
+
+        if (p.kingCheck) {
+            const kingCheckSquare = this.game.board.getSquare(p.kingCheck.file, p.kingCheck.rank)
+            this.game.setKingCheck(kingCheckSquare)
+        } else {
+            this.game.setKingCheck(null)
+        }
+
         this.game.changeTurn()
     }
 

@@ -16,10 +16,10 @@ import { AbandonAction } from '@/actions/send/abandon_action'
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
 const myPlayerID = myPlayerIDStore.id
-const oponentPlayerID = 'OponentPlayerID'
 let board: Board
 let game: Game
 let colorDown = ref(Color.WHITE)
+let oponentPlayerID = ref('')
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         router.push({ name: 'rooms' })
@@ -29,8 +29,9 @@ onBeforeMount(() => {
     board = game.board
     board.initFromFenNotation(constants.StartingPosition)
 
-    watch(game.getMyColor.bind(game), () => {
+    watch(game.started.bind(game), () => {
         colorDown.value = game.getMyColor()
+        oponentPlayerID.value = game.getOpponentID()
     })
 })
 
@@ -76,28 +77,44 @@ function abandon() {
                             @click="promotePiece(PieceType.ROOK)"
                             class="rounded promote-piece white-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.ROOK)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.ROOK)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.KNIGHT)"
                             class="rounded promote-piece black-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.KNIGHT)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.KNIGHT)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.BISHOP)"
                             class="rounded promote-piece white-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.BISHOP)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.BISHOP)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.QUEEN)"
                             class="rounded promote-piece black-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.QUEEN)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.QUEEN)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                     </div>
                     <div class="modal-footer">

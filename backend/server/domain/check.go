@@ -10,6 +10,7 @@ func (g *Game) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
 			return true
 		}
 	}
+	return false
 }
 
 func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {

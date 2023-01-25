@@ -123,4 +123,16 @@
 
 
 
+###############################################
+## StartGame
+{
+	Response
+	{
+		"action": "start-game",
+		"playerColor": "white", // or "black"
+		"opponentName": "bob",
+		"duration": 600000, // milliseconds
+	}
+}
+
 

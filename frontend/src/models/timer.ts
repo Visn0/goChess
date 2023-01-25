@@ -27,7 +27,7 @@ class Timer {
         this.intervalID = 0
         this.paused = ref(true)
         this.stoped = ref(false)
-        this._durationMs = milliseconds + 500
+        this._durationMs = milliseconds
         this.timeConsumedMs = 0
         this.lastClockTime = new Date()
         this.remainingMinutes = ref(0)
@@ -53,7 +53,7 @@ class Timer {
         this.timeConsumedMs = this._durationMs - remainingMs
 
         this.remainingMinutes.value = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60))
-        this.remainingSeconds.value = Math.floor((remainingMs % (1000 * 60)) / 1000)
+        this.remainingSeconds.value = Math.round((remainingMs % (1000 * 60)) / 1000)
 
         if (remainingMs === 0) {
             this.paused.value = true

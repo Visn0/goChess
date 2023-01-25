@@ -15,9 +15,19 @@ class Game {
         return this._repository
     }
 
-    private myColor: Ref<Color>
+    private _started: Ref<boolean>
+    public started(): boolean {
+        return this._started.value
+    }
+
+    private opponentID: string
+    public getOpponentID(): string {
+        return this.opponentID
+    }
+
+    private myColor: Color
     public getMyColor(): Color {
-        return this.myColor.value
+        return this.myColor
     }
 
     private myTurn: Ref<boolean>
@@ -69,10 +79,25 @@ class Game {
         return this._pendingPromotion.value
     }
 
+    private kingCheckSquare: Square | null
+    public setKingCheck(square: Square | null) {
+        if (this.kingCheckSquare) {
+            this.kingCheckSquare.unsetAsKingCheck()
+        }
+
+        if (square) {
+            square.setAsKingCheck()
+        }
+
+        this.kingCheckSquare = square
+    }
+
     constructor(board: Board, repository: ConnectionRepository) {
         this._board = board
         this._repository = repository
-        this.myColor = ref(Color.WHITE)
+        this._started = ref(false)
+        this.opponentID = ''
+        this.myColor = Color.WHITE
         this.myTurn = ref(false)
         this.ownTimer = shallowRef(new Timer(0))
         this.opponentTimer = shallowRef(new Timer(0))
@@ -82,10 +107,11 @@ class Game {
         this._srcSquare = null
     }
 
-    public start(myColor: Color, durationMs: number) {
-        this.myColor.value = myColor
-        this.ownTimer.value.durationMs = durationMs
-        this.opponentTimer.value.durationMs = durationMs
+    public start(opponentID: string, myColor: Color, durationMs: number) {
+        this.opponentID = opponentID
+        this.myColor = myColor
+        this.ownTimer.value.durationMs = durationMs + 400
+        this.opponentTimer.value.durationMs = durationMs + 400
 
         if (myColor === Color.WHITE) {
             this.myTurn.value = true
@@ -94,6 +120,7 @@ class Game {
             this.opponentTimer.value.start()
         }
 
+        this._started.value = true
         this.timerInterval = setInterval(() => GetTimersAction(this.repository), 10000)
     }
 
