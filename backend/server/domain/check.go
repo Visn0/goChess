@@ -3,16 +3,16 @@ package domain
 import "fmt"
 
 func (g *Game) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
-	//TODO: check dir for each piece because far away pawn cant attack
-	queenDir := getPieceDirection(QUEEN, enemyColor)
-	if g.positionIsUnderAttackUsingDirections(pos, enemyColor, queenDir) {
-		return true
+	for i := 0; i < N_PIECE_TYPES; i++ {
+		pieceType := PieceType(i)
+		directions := getPieceDirection(pieceType, enemyColor)
+		if g.positionIsUnderAttackUsingDirections(pos, pieceType, enemyColor, directions) {
+			return true
+		}
 	}
-	knightDir := getPieceDirection(ROOK, enemyColor)
-	return g.positionIsUnderAttackUsingDirections(pos, enemyColor, knightDir)
 }
 
-func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, enemyColor Color, directions []Direction) bool {
+func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {
 	for _, d := range directions {
 		fmt.Println("check dir: ", d, " pos: ", pos)
 		dCum := &Direction{0, 0}
@@ -25,10 +25,14 @@ func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, enemyColor Co
 			}
 			piece := g.Board.GetPiece(newPos.Rank, newPos.File)
 			if piece != nil {
-				if piece.GetColor() == enemyColor {
+				if piece.GetColor() == enemyColor && piece.GetPieceType() == pieceType {
 					fmt.Println("check piece: ", piece, " pos: ", newPos)
 					return true
 				}
+				break
+			}
+			// TODO: improve this s**t
+			if pieceType == PAWN || pieceType == KING || pieceType == KNIGHT {
 				break
 			}
 		}
