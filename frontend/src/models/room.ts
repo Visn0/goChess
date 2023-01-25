@@ -59,7 +59,18 @@ class Rooms {
         }
 
         this._rooms.value = rooms.map((i) => Room.createFromJSON(i))
-        this._rooms.value = this._rooms.value.sort((r1, r2) => (r1.id > r2.id ? 1 : -1))
+        this._rooms.value = this._rooms.value.sort((r1, r2) => {
+            // We want most recent not full rooms first
+            if (r1.isRoomFull()) {
+                return 1
+            }
+
+            if (r2.isRoomFull()) {
+                return -1
+            }
+
+            return r1.id > r2.id ? -1 : 1
+        })
     }
 
     public setMyRoom(myRoom: Room) {
