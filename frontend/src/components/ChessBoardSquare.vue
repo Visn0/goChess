@@ -25,7 +25,12 @@ function squareClick() {
         <span v-show="displayRank" class="position-absolute top-0 start-0 rank">{{ rank }}</span>
         <span v-show="displayFile" class="position-absolute bottom-0 end-0 file">{{ file }}</span>
         <div class="piece">
-            <ChessPiece v-if="square.piece" :piece="square.piece" :selected="square.isSelected()" />
+            <ChessPiece
+                v-if="square.piece"
+                :piece="square.piece"
+                :selected="square.isSelected()"
+                :king-check="square.isKingCheck()"
+            />
         </div>
         <div v-if="square.isValidMove()" class="position-absolute top-0 h-100 w-100">
             <div class="valid-move"></div>

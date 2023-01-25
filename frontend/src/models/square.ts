@@ -26,12 +26,18 @@ class Square {
         return this.selected.value
     }
 
+    private _isKingCheck: Ref<boolean>
+    public isKingCheck(): boolean {
+        return this._isKingCheck.value
+    }
+
     constructor(file: File, rank: Rank, piece: Piece | null) {
         this.file = file
         this.rank = rank
         this._piece = ref(piece)
         this._isValidMove = ref(false)
         this.selected = ref(false)
+        this._isKingCheck = ref(false)
 
         this.id = `${String.fromCharCode(65 + file)}${rank + 1}`
         this.color = (file + rank) % 2 === 0 ? `${Color.BLACK}-square` : `${Color.WHITE}-square`
@@ -59,6 +65,14 @@ class Square {
 
     public unsetAsSelected() {
         this.selected.value = false
+    }
+
+    public setAsKingCheck() {
+        this._isKingCheck.value = true
+    }
+
+    public unsetAsKingCheck() {
+        this._isKingCheck.value = false
     }
 
     public equals(s: Square): boolean {

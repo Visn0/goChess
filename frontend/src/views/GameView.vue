@@ -77,28 +77,44 @@ function abandon() {
                             @click="promotePiece(PieceType.ROOK)"
                             class="rounded promote-piece white-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.ROOK)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.ROOK)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.KNIGHT)"
                             class="rounded promote-piece black-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.KNIGHT)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.KNIGHT)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.BISHOP)"
                             class="rounded promote-piece white-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.BISHOP)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.BISHOP)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                         <button
                             type="button"
                             @click="promotePiece(PieceType.QUEEN)"
                             class="rounded promote-piece black-piece"
                         >
-                            <ChessPiece :piece="new Piece(colorDown, PieceType.QUEEN)" :selected="false" />
+                            <ChessPiece
+                                :piece="new Piece(colorDown, PieceType.QUEEN)"
+                                :selected="false"
+                                :king-check="false"
+                            />
                         </button>
                     </div>
                     <div class="modal-footer">
