@@ -43,6 +43,11 @@ func (g *Game) Move(m *Move, promoteTo *PieceType) {
 		g.checkPawnMove(m, p.(*Pawn), promoteTo)
 	} else if p.GetPieceType() == KING {
 		g.checkCastleMove(m, p.(*King))
+		if g.ColotToMove == WHITE {
+			g.Board.whiteKingPos = m.To
+		} else {
+			g.Board.blackKingPos = m.To
+		}
 	} else {
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)

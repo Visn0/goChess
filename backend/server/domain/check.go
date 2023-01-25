@@ -14,8 +14,11 @@ func (g *Game) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
 }
 
 func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {
+	if pieceType == PAWN {
+		directions = []Direction{{-directions[0].x, -1}, {-directions[0].x, 1}}
+	}
 	for _, d := range directions {
-		fmt.Println("check dir: ", d, " pos: ", pos)
+		fmt.Println("pos: ", pos, "check ", pieceType.String(), " dir: ", d)
 		dCum := &Direction{0, 0}
 		for {
 			dCum.x += d.x
