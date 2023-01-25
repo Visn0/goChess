@@ -79,6 +79,19 @@ class Game {
         return this._pendingPromotion.value
     }
 
+    private kingCheckSquare: Square | null
+    public setKingCheck(square: Square | null) {
+        if (this.kingCheckSquare) {
+            this.kingCheckSquare.unsetAsKingCheck()
+        }
+
+        if (square) {
+            square.setAsKingCheck()
+        }
+
+        this.kingCheckSquare = square
+    }
+
     constructor(board: Board, repository: ConnectionRepository) {
         this._board = board
         this._repository = repository

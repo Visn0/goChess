@@ -5,13 +5,16 @@ import type { Piece } from '..//models/piece'
 const props = defineProps<{
     piece: Piece
     selected: boolean
+    kingCheck: boolean
 }>()
 
 const styleSelected = 'selected'
+const styleKingCheck = 'king-check'
 const styleDefault = ''
 let squareColor = styleDefault
 watch(props, () => {
     squareColor = props.selected ? styleSelected : styleDefault
+    squareColor += props.kingCheck ? ` ${styleKingCheck}` : ''
 })
 </script>
 
@@ -34,6 +37,16 @@ watch(props, () => {
 
 .selected {
     background-color: rgba(67, 240, 102, 0.54) !important;
+    box-shadow: inset 0px 0px 2.5vmin rgba(0, 0, 0, 0.24);
+}
+
+.king-check {
+    /* background-color: rgba(194, 25, 78, 0.54) !important; */
+    background-color: rgba(163, 29, 49, 0.54) !important;
+}
+
+.selected.king-check {
+    background-color: rgba(179, 32, 54, 0.64) !important;
     box-shadow: inset 0px 0px 2.5vmin rgba(0, 0, 0, 0.24);
 }
 
