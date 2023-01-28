@@ -44,6 +44,10 @@ const (
 	KING
 )
 
+func (p PieceType) String() string {
+	return [...]string{"PAWN", "ROOK", "KNIGHT", "BISHOP", "QUEEN", "KING"}[p]
+}
+
 type Color bool
 
 const (
