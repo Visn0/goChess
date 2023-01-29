@@ -18,6 +18,9 @@ class StartGameAction {
     public Invoke(body: string) {
         const p: StartGameParams = JSON.parse(body)
         this.game.start(p.opponentName, p.playerColor, p.duration)
+    
+        const modal = document.getElementById('wait-player-modal') as HTMLElement
+        modal.hidden = true
     }
 }
 

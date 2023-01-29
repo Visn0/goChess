@@ -124,6 +124,19 @@ function abandon() {
             </div>
         </div>
 
+        <div
+            id="wait-player-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <h5 class="modal-title">Waiting player</h5>
+                </div>
+            </div>
+        </div>
+
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
                 <div class="py-1 d-flex justify-content-between">
