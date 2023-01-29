@@ -19,7 +19,7 @@ const myPlayerID = myPlayerIDStore.id
 let board: Board
 let game: Game
 let colorDown = ref(Color.WHITE)
-let oponentPlayerID = ref('')
+let oponentPlayerID = ref('Player 2')
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         router.push({ name: 'rooms' })
