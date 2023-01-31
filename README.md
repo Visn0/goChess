@@ -1,33 +1,55 @@
-# goChess
-Next competitor of chess.com
+# GoChess
 
 ## Description
-The project consists of a clone of the chess game. With the intention of learning DDD, a [Hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) has been used. So far, the game allows creating matches, connecting to them and playing the game, including calculation of valid moves, check detection and others.
+
+The project consists of a chess game. With the intention of learning Domain Driven Design (DDD), a [Hexagonal architecture](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>) has been used. So far, the game allows creating matches, connecting to them and playing the game, including calculation of valid moves, check detection and so on.
 
 The project is developed using **Golang** and **[goFiber](https://gofiber.io/)** for the backend and **[Vue.js](https://vuejs.org/)** for frontend.
 
 ## Technologies summary
-- **Frontend**: [Vue.js](https://vuejs.org/), HTML, CSS
-- **Backend**: Golang1.18, Hexagonal architecture, REST Api.
+
+- **Frontend**: [Vue.js](https://vuejs.org/), HTML, CSS, [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/), WebSockets,
+- **Backend**: [go1.18](https://go.dev/), Hexagonal Architecture, WebSockets.
 
 <!-- HOW TO RUN -->
+
 ## How to run the project
-First of all, you need to install <a href="https://golang.org/">Golang1.17</a> following the official documentation. Then, move to the root directory of this project and run:  
+
+### Prerequisites
+
+<ul>
+  <li><a href="https://nodejs.org/en/">Node.js</a> version 18.x.</li>
+  <li><a href="https://go.dev/">Golang</a> version 1.18.</li>
+</ul>
+
+### Local deploy
+
+In the root folder of the project:
+
 ```bash
-$ go get github.com/labstack/echo/v4
+# To install project dependencies (this may take a few minutes).
+# Required only the first time.
+$ make install_project
 ```
-Then, if you are in a Windows machine:
-```shell
-C:\user> runserver.bat
-```
-If you are in a Linux machine:
+
 ```bash
-foo@bar:~$ go run *
+# To run the frontend
+$ make up
 ```
-Once the server is up and running, open your browser and type ```localhost:8080``` and you will see the chess.
+
+In another shell:
+
+```bash
+# To run the backend
+$ make up.backend
+```
+
+Once the server is up and running, open your browser and type `http://localhost:5173/` and you will see the chess.
 
 <!-- AUTHORS -->
+
 ## Authors
+
 <ul>
   <li>
     <p>
@@ -56,4 +78,3 @@ Once the server is up and running, open your browser and type ```localhost:8080`
     </p>
   </li>
 </ul>
-
