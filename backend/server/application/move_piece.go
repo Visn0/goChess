@@ -61,7 +61,7 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 		log.Println("##> King not found: ", nextColorToMove)
 		panic("King not found")
 	}
-	if uc.game.PositionIsUnderAttack(enemyKingPos, !nextColorToMove) {
+	if uc.game.Board.PositionIsUnderAttack(enemyKingPos, !nextColorToMove) {
 		output.KingCheck = enemyKingPos
 		log.Println("##> King is under attack: ", nextColorToMove, enemyKingPos)
 	}

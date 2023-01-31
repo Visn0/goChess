@@ -2,18 +2,18 @@ package domain
 
 import "fmt"
 
-func (g *Game) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
+func (b *Board) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
 	for i := 0; i < N_PIECE_TYPES; i++ {
 		pieceType := PieceType(i)
 		directions := getPieceDirection(pieceType, enemyColor)
-		if g.positionIsUnderAttackUsingDirections(pos, pieceType, enemyColor, directions) {
+		if b.positionIsUnderAttackUsingDirections(pos, pieceType, enemyColor, directions) {
 			return true
 		}
 	}
 	return false
 }
 
-func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {
+func (b *Board) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {
 	if pieceType == PAWN {
 		directions = []Direction{{-directions[0].x, -1}, {-directions[0].x, 1}}
 	}
@@ -27,7 +27,7 @@ func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType Pie
 			if !newPos.Valid() {
 				break
 			}
-			piece := g.Board.GetPiece(newPos.Rank, newPos.File)
+			piece := b.GetPiece(newPos.Rank, newPos.File)
 			if piece != nil {
 				if piece.GetColor() == enemyColor && piece.GetPieceType() == pieceType {
 					fmt.Println("check piece: ", piece, " pos: ", newPos)
@@ -35,7 +35,7 @@ func (g *Game) positionIsUnderAttackUsingDirections(pos *Position, pieceType Pie
 				}
 				break
 			}
-			// TODO: improve this s**t
+			// TODO: improve this
 			if pieceType == PAWN || pieceType == KING || pieceType == KNIGHT {
 				break
 			}

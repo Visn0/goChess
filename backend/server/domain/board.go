@@ -10,6 +10,31 @@ func NewBoard() *Board {
 	return NewBoardFromFEN(INIT_BOARD)
 }
 
+func (b *Board) Copy() *Board {
+	newBoard := &Board{
+		board: make([][]IPiece, 8),
+		whiteKingPos: &Position{
+			Rank: b.whiteKingPos.Rank,
+			File: b.whiteKingPos.File,
+		},
+		blackKingPos: &Position{
+			Rank: b.blackKingPos.Rank,
+			File: b.blackKingPos.File,
+		},
+	}
+	for i := range newBoard.board {
+		newBoard.board[i] = make([]IPiece, 8)
+	}
+	for rank := range b.board {
+		for file := range b.board[rank] {
+			if b.board[rank][file] != nil {
+				newBoard.board[rank][file] = b.board[rank][file].Copy()
+			}
+		}
+	}
+	return newBoard
+}
+
 // Fill board with pieces using FEN
 func NewBoardFromFEN(fen string) *Board {
 	b := &Board{
@@ -111,4 +136,13 @@ func (b *Board) GetKingPos(color Color) *Position {
 		return b.whiteKingPos
 	}
 	return b.blackKingPos
+}
+
+func (b *Board) MovePiece(from, to *Position) {
+	p := b.GetPiece(from.Rank, from.File)
+	if p == nil {
+		panic("No piece at from position")
+	}
+	b.RemovePiece(from.Rank, from.File)
+	b.SetPiece(to.Rank, to.File, p)
 }

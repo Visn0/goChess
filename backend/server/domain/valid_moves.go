@@ -2,8 +2,10 @@ package domain
 
 import (
 	"fmt"
+	"log"
 )
 
+// GetValidMoves returns a list of valid moves for a piece at a given position
 func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	fmt.Println("Getting valid moves for", rank, file)
 	p := g.Board.GetPiece(rank, file)
@@ -17,6 +19,7 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	}
 	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetPieceType())
 	positions := g.getPieceValidMovesHandler(p.GetPieceType())(rank, file, p)
+	positions = g.filterMovesIfCheck(rank, file, p, positions)
 	return positions
 }
 
@@ -170,4 +173,38 @@ func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions 
 			}
 		}
 	}
+}
+
+// Remove all positions that will put the king in check
+// TODO: has some bugs during castling and en passant
+// TODO: not the most efficient way to do this (implement it with a copy of the board)
+func (g *Game) filterMovesIfCheck(rank Rank, file File, p IPiece, positions []*Position) []*Position {
+	filteredPositions := []*Position{}
+	for _, pos := range positions {
+		if !g.isCheckAfterMove(&Position{Rank: rank, File: file}, pos) {
+			filteredPositions = append(filteredPositions, pos)
+		}
+	}
+	return filteredPositions
+}
+
+// Check if the move will put the king in check
+func (g *Game) isCheckAfterMove(from, to *Position) bool {
+	boardCopy := g.Board.Copy()
+	boardCopy.MovePiece(from, to) //TODO: doesn't work perfectly for castling or en passant yet
+	// Check if the king is in check
+	enemyKingPos := g.Board.GetKingPos(g.ColotToMove)
+	// If the king is moved, update the king position
+	if enemyKingPos.Rank == from.Rank && enemyKingPos.File == from.File {
+		enemyKingPos = to
+	}
+
+	if enemyKingPos == nil {
+		log.Println("##> King not found: ", g.ColotToMove)
+		panic("King not found")
+	}
+	if boardCopy.PositionIsUnderAttack(enemyKingPos, !g.ColotToMove) {
+		return true
+	}
+	return false
 }

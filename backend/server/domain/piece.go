@@ -10,6 +10,7 @@ type Direction struct {
 }
 
 type IPiece interface {
+	Copy() IPiece
 	SetPiece(pieceType PieceType, color Color)
 	GetPieceType() PieceType
 	GetColor() Color
@@ -167,9 +168,28 @@ func (p *PieceBase) SetPiece(pieceType PieceType, color Color) {
 	p.FirstMove = true
 }
 
+func (p *PieceBase) Copy() IPiece {
+	return &PieceBase{
+		PieceType: p.PieceType,
+		Color:     p.Color,
+		FirstMove: p.FirstMove,
+	}
+}
+
 func (p *Pawn) SetPiece(pieceType PieceType, color Color) {
 	p.PieceBase.SetPiece(pieceType, color)
 	p.EnPassantNeighbourPos = nil
+}
+
+func (p *Pawn) Copy() IPiece {
+	return &Pawn{
+		PieceBase: PieceBase{
+			PieceType: p.PieceType,
+			Color:     p.Color,
+			FirstMove: p.FirstMove,
+		},
+		EnPassantNeighbourPos: p.EnPassantNeighbourPos,
+	}
 }
 
 func (p *PieceBase) GetPieceType() PieceType {
