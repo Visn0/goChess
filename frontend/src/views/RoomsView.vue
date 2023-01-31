@@ -21,6 +21,7 @@ import router from '@/router'
 import { useGameStore } from '@/stores/game'
 import { GotTimersAction } from '@/actions/receive/got_timers'
 import { StartGameAction } from '@/actions/receive/start_game'
+import { AbandonAction } from '@/actions/receive/abandon_action'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -39,7 +40,8 @@ const routeActions: RouteActions = new RouteActions(
         ['start-game', new StartGameAction(game)],
         ['request-moves', new MovesReceivedAction(game)],
         ['move-piece', new PieceMovedAction(game)],
-        ['get-timers', new GotTimersAction(game)]
+        ['get-timers', new GotTimersAction(game)],
+        ['abandon', new AbandonAction(game)]
     ])
 )
 repository.addOnWebSocketMessageEventListener(routeActions.route())
