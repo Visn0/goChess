@@ -173,9 +173,9 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 	}
 
 	for {
-		if room.Game.ColotToMove != player.Color {
+		/*if room.Game.ColotToMove != player.Color {
 			continue
-		}
+		}*/
 		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
@@ -213,6 +213,15 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error getting player timers: ", err)
 			}
+
+		case "abandon":
+			abandonController := infrastructure.NewAbandonWsController(cEnemy)
+			err := abandonController.Invoke()
+			if err != nil {
+				log.Println("Error abandon game: ", err)
+			}
+			break
+
 		default:
 			log.Println("Unknown action")
 		}

@@ -36,6 +36,12 @@ onBeforeMount(() => {
         const modal = document.getElementById('wait-player-modal') as HTMLElement
         modal.hidden = true
     })
+
+    watch(game.abandoned.bind(game), () => {
+
+        const modal = document.getElementById('abandon-modal') as HTMLElement
+        modal.hidden = false
+    })
 })
 
 function squareClick(file: File, rank: Rank) {
@@ -56,6 +62,11 @@ function cancelPromotion() {
 
 function abandon() {
     AbandonAction(game.repository)
+    router.push({ name: 'rooms' })
+}
+
+function goRooms() {
+    router.push({ name: 'rooms' })
 }
 </script>
 
@@ -135,7 +146,24 @@ function abandon() {
         >
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
-                    <h5 class="modal-title">Waiting player</h5>
+                    <h5 class="modal-title">Waiting for player</h5>
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="abandon-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+            hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Enemy player abandoned the game</h5> 
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+                    </div>
                 </div>
             </div>
         </div>

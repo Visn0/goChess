@@ -20,6 +20,15 @@ class Game {
         return this._started.value
     }
 
+    private _abandoned: Ref<boolean>
+    public setAbandoned(n:boolean) { 
+        this._abandoned.value = n
+
+    }
+    public abandoned(): boolean {
+        return this._abandoned.value
+    }
+
     private opponentID: string
     public getOpponentID(): string {
         return this.opponentID
@@ -96,6 +105,7 @@ class Game {
         this._board = board
         this._repository = repository
         this._started = ref(false)
+        this._abandoned = ref(false)
         this.opponentID = ''
         this.myColor = Color.WHITE
         this.myTurn = ref(false)
