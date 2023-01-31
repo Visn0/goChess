@@ -39,24 +39,27 @@ func (g *Game) Move(m *Move, promoteTo *PieceType) {
 	}
 	g.removeEnPassantStatesIfNotThisPiece(p)
 
-	if p.GetPieceType() == PAWN {
+	switch p.GetPieceType() {
+	case PAWN:
 		g.checkPawnMove(m, p.(*Pawn), promoteTo)
-	} else if p.GetPieceType() == KING {
+
+	case KING:
 		g.checkCastleMove(m, p.(*King))
 		if g.ColotToMove == WHITE {
 			g.Board.whiteKingPos = m.To
 		} else {
 			g.Board.blackKingPos = m.To
 		}
-	} else {
+	default:
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)
 	}
+
 	g.ColotToMove = Color(!bool(g.ColotToMove))
 }
 
 func (g *Game) removeEnPassantStatesIfNotThisPiece(p IPiece) {
-	var currentPieceIdx int = -1
+	var currentPieceIdx = -1
 	for i, pawn := range g.EnPassantPieces {
 		if pawn == p {
 			currentPieceIdx = i
@@ -87,7 +90,7 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo *PieceType) {
 			// 2 spaces forward
 			g.Board.SetPiece(m.To.Rank, m.To.File, pawn)
 			g.Board.RemovePiece(m.From.Rank, m.From.File)
-			// Set en passant left neighbour
+			// Set en passant left neighbor
 			leftPos := &Position{m.To.Rank, m.To.File - 1}
 			if leftPos.Valid() {
 				leftPiece := g.Board.GetPiece(leftPos.Rank, leftPos.File)
@@ -96,7 +99,7 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo *PieceType) {
 					g.EnPassantPieces = append(g.EnPassantPieces, leftPiece.(*Pawn))
 				}
 			}
-			// Set en passant right neighbour
+			// Set en passant right neighbor
 			rightPos := &Position{m.To.Rank, m.To.File + 1}
 			if rightPos.Valid() {
 				rightPiece := g.Board.GetPiece(rightPos.Rank, rightPos.File)
@@ -139,7 +142,6 @@ func (g *Game) checkPawnMove(m *Move, pawn *Pawn, promoteTo *PieceType) {
 }
 
 func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo *PieceType) bool {
-
 	var piece IPiece
 	if promoteTo != nil {
 		fmt.Println("Promoting pawn", m.To, promoteTo)
@@ -170,7 +172,6 @@ func (g *Game) checkPawnPromotion(m *Move, pawn *Pawn, promoteTo *PieceType) boo
 }
 
 func (g *Game) checkCastleMove(m *Move, king *King) {
-
 	distance := m.To.File - m.From.File
 	// Check if king is moving 2 spaces
 	if king.FirstMove && distance == 2 || distance == -2 {

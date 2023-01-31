@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"math/big"
 )
 
 type File int
@@ -33,7 +33,7 @@ const (
 
 type PieceType int
 
-const N_PIECE_TYPES = 6
+const NPieceTypes = 6
 
 const (
 	PAWN PieceType = iota
@@ -56,9 +56,8 @@ const (
 )
 
 func GetRandomColor() Color {
-	s := rand.NewSource(time.Now().Unix())
-	r := rand.New(s)
-	n := r.Int()
+	bigInt, _ := rand.Int(rand.Reader, big.NewInt(100))
+	n := bigInt.Int64()
 
 	if n%2 == 0 {
 		return WHITE
@@ -69,12 +68,11 @@ func GetRandomColor() Color {
 func ColorToString(color Color) string {
 	if color == WHITE {
 		return "white"
-	} else {
-		return "black"
 	}
+	return "black"
 }
 
 const (
-	INIT_BOARD  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-	EMPTY_BOARD = "8/8/8/8/8/8/8/8"
+	InitBoardFen  = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+	EmptyBoardFen = "8/8/8/8/8/8/8/8"
 )

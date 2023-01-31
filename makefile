@@ -23,3 +23,12 @@ up:
 
 up.backend:
 	cd backend; go run main.go
+
+backend-fmt-lint:
+	make backend-fmt backend-lint	
+	
+backend-fmt:
+	cd backend; go fmt ./...
+
+backend-lint: 
+	cd backend; docker run --rm -v $(PWD)/backend:/app -w /app golangci/golangci-lint:v1.50.1 golangci-lint run

@@ -25,7 +25,6 @@ func NewGetTimersAction(c domain.ConnectionRepository, p1, p2 *domain.Player) *G
 }
 
 func (uc *GetTimersAction) Invoke() error {
-	// log.Println("==> Request timers: ")
 	t1 := uc.player.TimeLeft()
 	t2 := uc.enemy.TimeLeft()
 
@@ -35,6 +34,5 @@ func (uc *GetTimersAction) Invoke() error {
 		EnemyTime:  t2,
 	}
 
-	// log.Println("##> Request timers output: ", shared.ToJSONString(output))
 	return uc.c.SendWebSocketMessage(output)
 }

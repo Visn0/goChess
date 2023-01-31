@@ -20,7 +20,7 @@ type MovePieceOutput struct {
 	KingCheck *domain.Position  `json:"kingCheck"`
 }
 
-func newMovePieceOutput(src *domain.Position, dst *domain.Position, promoteTo *domain.PieceType) *MovePieceOutput {
+func newMovePieceOutput(src, dst *domain.Position, promoteTo *domain.PieceType) *MovePieceOutput {
 	return &MovePieceOutput{
 		Action:    "move-piece",
 		Src:       src,

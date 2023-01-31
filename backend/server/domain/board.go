@@ -7,7 +7,7 @@ type Board struct {
 }
 
 func NewBoard() *Board {
-	return NewBoardFromFEN(INIT_BOARD)
+	return NewBoardFromFEN(InitBoardFen)
 }
 
 func (b *Board) Copy() *Board {

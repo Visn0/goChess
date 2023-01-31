@@ -70,7 +70,7 @@ func (s *Server) initMiddleware() {
 // The server instantiates the router (routes for http and ws conections).
 func (s *Server) initRouter() {
 	s.initWebsocket()
-	s.initHttp()
+	s.initHTTP()
 }
 
 func (s *Server) Run() {
@@ -219,6 +219,6 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 	}
 }
 
-func (s *Server) initHttp() {
-	s.app.Get("/rooms", infrastructure.NewGetRoomsHttpController(s.roomManager).Invoke)
+func (s *Server) initHTTP() {
+	s.app.Get("/rooms", infrastructure.NewGetRoomsHTTPController(s.roomManager).Invoke)
 }

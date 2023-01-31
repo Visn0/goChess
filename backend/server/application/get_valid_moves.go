@@ -2,8 +2,6 @@ package application
 
 import (
 	"chess/server/domain"
-	"chess/server/shared"
-	"log"
 
 	"fmt"
 )
@@ -31,7 +29,6 @@ func NewGetValidMovesAction(c domain.ConnectionRepository, game *domain.Game) *G
 }
 
 func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
-	// log.Println("==> Request moves params: ", shared.ToJSONString(p))
 	validMoves := uc.game.GetValidMoves(p.Rank, p.File)
 	if validMoves == nil {
 		fmt.Println("No valid moves found")
@@ -43,6 +40,5 @@ func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
 		ValidMoves: validMoves,
 	}
 
-	log.Println("##> Request moves output: ", shared.ToJSONString(output))
 	return uc.c.SendWebSocketMessage(output)
 }
