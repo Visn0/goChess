@@ -103,6 +103,10 @@
 				rank: 5
 			}
 			promoteTo: "queen", // "" if not promotion
+			kingCheck: { // null if not check, otherwise: position of king
+				rank:1
+				file:1
+			}
 		}
 	}
 }
