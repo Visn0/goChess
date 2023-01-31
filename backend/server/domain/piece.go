@@ -25,7 +25,7 @@ type PieceBase struct {
 	FirstMove bool
 }
 
-var PIECE_DIRECTION = map[PieceType][]Direction{
+var PieceDirection = map[PieceType][]Direction{
 	PAWN: {
 		{1, 0},
 	},
@@ -214,7 +214,7 @@ func (p *PieceBase) IsEnemy(piece IPiece) bool {
 }
 
 func getPieceDirection(t PieceType, color Color) []Direction {
-	dir := PIECE_DIRECTION[t]
+	dir := PieceDirection[t]
 	if t == PAWN && color == BLACK {
 		return []Direction{{-1, 0}}
 	}

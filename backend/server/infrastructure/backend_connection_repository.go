@@ -18,7 +18,6 @@ func NewBackendConnectionRepository(ws *shared.WsConn) *BackendConnectionReposit
 func (r *BackendConnectionRepository) SendWebSocketMessage(msg interface{}) error {
 	err := r.ws.WriteJSON(msg)
 	if err != nil {
-
 		return chesserror.NewError(chesserror.GenericError, "Error writing message into Websocket").WithCause(err)
 	}
 	return nil

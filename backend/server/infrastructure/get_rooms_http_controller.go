@@ -4,19 +4,19 @@ import (
 	"chess/server/application"
 	"chess/server/domain"
 
-	"github.com/gofiber/fiber/v2"
+	fiber "github.com/gofiber/fiber/v2"
 )
 
-type GetRoomsHttpController struct {
+type GetRoomsHTTPController struct {
 	uc *application.GetRoomsAction
 }
 
-func NewGetRoomsHttpController(rm *domain.RoomManager) *GetRoomsHttpController {
-	return &GetRoomsHttpController{
+func NewGetRoomsHTTPController(rm *domain.RoomManager) *GetRoomsHTTPController {
+	return &GetRoomsHTTPController{
 		uc: application.NewGetRoomsAction(rm),
 	}
 }
 
-func (c *GetRoomsHttpController) Invoke(ctx *fiber.Ctx) error {
+func (c *GetRoomsHTTPController) Invoke(ctx *fiber.Ctx) error {
 	return ctx.JSON(c.uc.Invoke())
 }

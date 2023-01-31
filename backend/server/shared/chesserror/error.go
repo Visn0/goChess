@@ -5,24 +5,24 @@ import (
 	"net/http"
 )
 
-type chessError struct {
+type ChessError struct {
 	action  string
 	key     string
 	message string
 	cause   string
 }
 
-func NewError(key, message string) *chessError {
-	return &chessError{
+func NewError(key, message string) *ChessError {
+	return &ChessError{
 		key:     key,
 		message: message,
 		cause:   "",
 	}
 }
 
-func (c *chessError) MarshalJSON() ([]byte, error) {
+func (c *ChessError) MarshalJSON() ([]byte, error) {
 	type err struct {
-		HttpCode int    `json:"httpCode"`
+		HTTPCode int    `json:"httpCode"`
 		Key      string `json:"key"`
 		Message  string `json:"message"`
 		Cause    string `json:"cause,omitempty"`
@@ -35,7 +35,7 @@ func (c *chessError) MarshalJSON() ([]byte, error) {
 	}
 
 	m["error"] = &err{
-		HttpCode: c.getHttpCode(c.key),
+		HTTPCode: c.getHTTPCode(c.key),
 		Key:      c.key,
 		Message:  c.message,
 		Cause:    c.cause,
@@ -44,21 +44,21 @@ func (c *chessError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-func (c *chessError) String() string {
+func (c *ChessError) String() string {
 	b, _ := json.Marshal(c)
 	return string(b)
 }
 
-func (c *chessError) Error() string {
+func (c *ChessError) Error() string {
 	return c.String()
 }
 
-func (c *chessError) WithCause(err error) *chessError {
+func (c *ChessError) WithCause(err error) *ChessError {
 	c.cause = err.Error()
 	return c
 }
 
-func (c *chessError) getHttpCode(key string) int {
+func (c *ChessError) getHTTPCode(key string) int {
 	switch key {
 	case ResourceAlreadyExists:
 		return http.StatusConflict
@@ -73,8 +73,8 @@ func (c *chessError) getHttpCode(key string) int {
 	}
 }
 
-func WithAction(err error, action string) *chessError {
-	if e, ok := err.(*chessError); ok {
+func WithAction(err error, action string) *ChessError {
+	if e, ok := err.(*ChessError); ok {
 		e.action = action
 		return e
 	}

@@ -1,7 +1,6 @@
 package domain
 
 import (
-	// "chess/server/application"
 	"chess/server/shared/chesserror"
 	"fmt"
 )

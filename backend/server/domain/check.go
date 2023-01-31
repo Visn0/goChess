@@ -3,7 +3,7 @@ package domain
 import "fmt"
 
 func (b *Board) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
-	for i := 0; i < N_PIECE_TYPES; i++ {
+	for i := 0; i < NPieceTypes; i++ {
 		pieceType := PieceType(i)
 		directions := getPieceDirection(pieceType, enemyColor)
 		if b.positionIsUnderAttackUsingDirections(pos, pieceType, enemyColor, directions) {
@@ -13,7 +13,8 @@ func (b *Board) PositionIsUnderAttack(pos *Position, enemyColor Color) bool {
 	return false
 }
 
-func (b *Board) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType, enemyColor Color, directions []Direction) bool {
+func (b *Board) positionIsUnderAttackUsingDirections(pos *Position, pieceType PieceType,
+	enemyColor Color, directions []Direction) bool {
 	if pieceType == PAWN {
 		directions = []Direction{{-directions[0].x, -1}, {-directions[0].x, 1}}
 	}

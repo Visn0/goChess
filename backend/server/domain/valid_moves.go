@@ -19,7 +19,7 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	}
 	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetPieceType())
 	positions := g.getPieceValidMovesHandler(p.GetPieceType())(rank, file, p)
-	positions = g.filterMovesIfCheck(rank, file, p, positions)
+	positions = g.filterMovesIfCheck(rank, file, positions)
 	return positions
 }
 
@@ -155,7 +155,7 @@ func (g *Game) getKingValidMoves(rank Rank, file File, p IPiece) []*Position {
 	return positions
 }
 
-func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions *([]*Position)) {
+func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions *[]*Position) {
 	// Check if king can castle
 	if p.(*King).FirstMove {
 		// Check if king can castle kingside
@@ -166,7 +166,9 @@ func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions 
 			}
 		}
 		// Check if king can castle queenside
-		if g.Board.GetPiece(rank, file-1) == nil && g.Board.GetPiece(rank, file-2) == nil && g.Board.GetPiece(rank, file-3) == nil {
+		if g.Board.GetPiece(rank, file-1) == nil &&
+			g.Board.GetPiece(rank, file-2) == nil &&
+			g.Board.GetPiece(rank, file-3) == nil {
 			rook := g.Board.GetPiece(rank, file-4)
 			if rook != nil && rook.GetPieceType() == ROOK && rook.(*Rook).FirstMove {
 				*positions = append(*positions, &Position{Rank: rank, File: file - 2})
@@ -178,7 +180,7 @@ func (g *Game) getKingCastlePositions(rank Rank, file File, p IPiece, positions 
 // Remove all positions that will put the king in check
 // TODO: has some bugs during castling and en passant
 // TODO: not the most efficient way to do this (implement it with a copy of the board)
-func (g *Game) filterMovesIfCheck(rank Rank, file File, p IPiece, positions []*Position) []*Position {
+func (g *Game) filterMovesIfCheck(rank Rank, file File, positions []*Position) []*Position {
 	filteredPositions := []*Position{}
 	for _, pos := range positions {
 		if !g.isCheckAfterMove(&Position{Rank: rank, File: file}, pos) {
