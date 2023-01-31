@@ -9,7 +9,6 @@ type AbandonWsController struct {
 	uc *application.AbandonAction
 }
 
-
 func NewAbandonWsController(c domain.ConnectionRepository) *AbandonWsController {
 	return &AbandonWsController{
 		uc: application.NewAbandonAction(c),

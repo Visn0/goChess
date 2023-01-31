@@ -21,9 +21,8 @@ class Game {
     }
 
     private _abandoned: Ref<boolean>
-    public setAbandoned(n:boolean) { 
+    public setAbandoned(n: boolean) {
         this._abandoned.value = n
-
     }
     public abandoned(): boolean {
         return this._abandoned.value

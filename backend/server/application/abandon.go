@@ -5,22 +5,22 @@ import (
 )
 
 type AbandonOutput struct {
-	Action     string `json:"action"`
+	Action string `json:"action"`
 }
 
 type AbandonAction struct {
-	c      domain.ConnectionRepository
+	c domain.ConnectionRepository
 }
 
 func NewAbandonAction(c domain.ConnectionRepository) *AbandonAction {
 	return &AbandonAction{
-		c:      c,
+		c: c,
 	}
 }
 
 func (uc *AbandonAction) Invoke() error {
 	output := AbandonOutput{
-		Action:     "abandon",
+		Action: "abandon",
 	}
 
 	return uc.c.SendWebSocketMessage(output)

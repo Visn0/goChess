@@ -220,7 +220,6 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error abandon game: ", err)
 			}
-			break
 
 		default:
 			log.Println("Unknown action")

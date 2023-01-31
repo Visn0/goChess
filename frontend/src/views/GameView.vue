@@ -32,13 +32,12 @@ onBeforeMount(() => {
     watch(game.started.bind(game), () => {
         colorDown.value = game.getMyColor()
         oponentPlayerID.value = game.getOpponentID()
-        
+
         const modal = document.getElementById('wait-player-modal') as HTMLElement
         modal.hidden = true
     })
 
     watch(game.abandoned.bind(game), () => {
-
         const modal = document.getElementById('abandon-modal') as HTMLElement
         modal.hidden = false
     })
@@ -138,12 +137,7 @@ function goRooms() {
             </div>
         </div>
 
-        <div
-            id="wait-player-modal"
-            class="modal"
-            tabindex="-1"
-            style="display: block"
-        >
+        <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <h5 class="modal-title">Waiting for player</h5>
@@ -151,18 +145,14 @@ function goRooms() {
             </div>
         </div>
 
-        <div
-            id="abandon-modal"
-            class="modal"
-            tabindex="-1"
-            style="display: block"
-            hidden="true"
-        >
+        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
-                        <h5 class="modal-title">Enemy player abandoned the game</h5> 
-                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+                        <h5 class="modal-title">Enemy player abandoned the game</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
+                            Go rooms
+                        </button>
                     </div>
                 </div>
             </div>
