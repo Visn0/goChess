@@ -32,6 +32,9 @@ onBeforeMount(() => {
     watch(game.started.bind(game), () => {
         colorDown.value = game.getMyColor()
         oponentPlayerID.value = game.getOpponentID()
+        
+        const modal = document.getElementById('wait-player-modal') as HTMLElement
+        modal.hidden = true
     })
 })
 
@@ -50,6 +53,7 @@ function cancelPromotion() {
     const modal = document.getElementById('promotion-modal') as HTMLElement
     modal.hidden = true
 }
+
 
 function abandon() {
     AbandonAction(game.repository)
