@@ -1,5 +1,9 @@
 # GoChess
 
+<span style="color:red">
+It's in development!
+</span>
+
 ## Description
 
 The project consists of a chess game. With the intention of learning Domain Driven Design (DDD), a [Hexagonal architecture](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>) has been used. So far, the game allows creating matches, connecting to them and playing the game, including calculation of valid moves, check detection and so on.
