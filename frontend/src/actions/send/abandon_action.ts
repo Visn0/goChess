@@ -12,6 +12,7 @@ class AbandonMessage implements Message {
 function AbandonAction(repository: ConnectionRepository) {
     const m = new AbandonMessage()
     repository.sendWebSocketMessage(m)
+    repository.closeWebSocketConnection()
 }
 
 export { AbandonAction, AbandonMessage }

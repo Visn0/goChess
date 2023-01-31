@@ -54,7 +54,6 @@ function cancelPromotion() {
     modal.hidden = true
 }
 
-
 function abandon() {
     AbandonAction(game.repository)
 }
