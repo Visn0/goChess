@@ -17,6 +17,7 @@ type MovePieceOutput struct {
 	Src       *domain.Position  `json:"src"`
 	Dst       *domain.Position  `json:"dst"`
 	PromoteTo *domain.PieceType `json:"promoteTo"`
+	EndGame   string            `json:"endGame"`
 	KingCheck *domain.Position  `json:"kingCheck"`
 }
 
@@ -45,6 +46,27 @@ func NewMovePieceAction(c domain.ConnectionRepository, cEnemy domain.ConnectionR
 	}
 }
 
+func (uc *MovePieceAction) setGameStatus(enemyColor domain.Color, output *MovePieceOutput) {
+	enemyKingPos := uc.game.Board.GetKingPos(enemyColor)
+	if enemyKingPos == nil {
+		log.Println("##> Enemy King not found: ", enemyColor)
+		panic("")
+	}
+	if uc.game.Board.PositionIsUnderAttack(enemyKingPos, !enemyColor) {
+		output.KingCheck = enemyKingPos
+		log.Println("##> Enemy King is under attack: ", enemyColor, enemyKingPos)
+	}
+	enemyHasMoves := uc.game.CalculateValidMoves(enemyColor)
+	if !enemyHasMoves {
+		log.Println("##> Enemy has no valid moves: ", enemyColor)
+		if output.KingCheck != nil {
+			output.EndGame = "checkmate"
+		} else {
+			output.EndGame = "draw"
+		}
+	}
+}
+
 func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 	log.Println("==> Move piece params: ", shared.ToJSONString(p))
 	move := &domain.Move{
@@ -52,21 +74,17 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 		To:   p.Dst,
 	}
 
-	uc.game.Move(move, p.PromoteTo)
-	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
+	playerColor := uc.game.ColotToMove
+	enemyColor := !playerColor
 
-	nextColorToMove := uc.game.ColotToMove
-	enemyKingPos := uc.game.Board.GetKingPos(nextColorToMove)
-	if enemyKingPos == nil {
-		log.Println("##> King not found: ", nextColorToMove)
-		panic("King not found")
-	}
-	if uc.game.Board.PositionIsUnderAttack(enemyKingPos, !nextColorToMove) {
-		output.KingCheck = enemyKingPos
-		log.Println("##> King is under attack: ", nextColorToMove, enemyKingPos)
-	}
+	uc.game.Move(move, p.PromoteTo)
+	uc.game.ColotToMove = enemyColor
+
+	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
+	uc.setGameStatus(enemyColor, output)
+
 	log.Println("##> Move piece output: ", shared.ToJSONString(output))
-	log.Println("##> Player to move: ", nextColorToMove)
+	log.Println("##> Player to move: ", enemyColor)
 	err := uc.c.SendWebSocketMessage(output)
 	if err != nil {
 		return nil

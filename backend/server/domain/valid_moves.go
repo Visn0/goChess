@@ -5,6 +5,25 @@ import (
 	"log"
 )
 
+// CalculateValidMoves calculates valid moves for all pieces of a given color
+// and returns true if the player has valid moves
+func (g *Game) CalculateValidMoves(color Color) bool {
+	playerHasValidMoves := false
+	for rank := 0; rank < 8; rank++ {
+		for file := 0; file < 8; file++ {
+			p := g.Board.GetPiece(Rank(rank), File(file))
+			if p != nil && p.GetColor() == color {
+				validMoves := g.GetValidMoves(Rank(rank), File(file))
+				if len(validMoves) > 0 {
+					p.SetValidMoves(validMoves)
+					playerHasValidMoves = true
+				}
+			}
+		}
+	}
+	return playerHasValidMoves
+}
+
 // GetValidMoves returns a list of valid moves for a piece at a given position
 func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	fmt.Println("Getting valid moves for", rank, file)
@@ -20,6 +39,10 @@ func (g *Game) GetValidMoves(rank Rank, file File) []*Position {
 	fmt.Printf("Piece at %d %d is %+v\n", rank, file, p.GetPieceType())
 	positions := g.getPieceValidMovesHandler(p.GetPieceType())(rank, file, p)
 	positions = g.filterMovesIfCheck(rank, file, positions)
+	precalculatedPositions := p.GetValidMoves()
+	if len(precalculatedPositions) > 0 && len(positions) != len(precalculatedPositions) {
+		log.Println("WARNING: Precalculated moves and calculated moves do not match")
+	}
 	return positions
 }
 

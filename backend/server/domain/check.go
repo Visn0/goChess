@@ -19,7 +19,7 @@ func (b *Board) positionIsUnderAttackUsingDirections(pos *Position, pieceType Pi
 		directions = []Direction{{-directions[0].x, -1}, {-directions[0].x, 1}}
 	}
 	for _, d := range directions {
-		fmt.Println("pos: ", pos, "check ", pieceType.String(), " dir: ", d)
+		// fmt.Println("pos: ", pos, "check ", pieceType.String(), " dir: ", d)
 		dCum := &Direction{0, 0}
 		for {
 			dCum.x += d.x

@@ -171,11 +171,16 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			return
 		}
 	}
+	if player.Color == domain.WHITE {
+		ok := room.Game.CalculateValidMoves(domain.WHITE)
+		if !ok {
+			log.Println("Error calculating first valid moves")
+			return
+		}
+	}
 
 	for {
-		/*if room.Game.ColotToMove != player.Color {
-			continue
-		}*/
+		// Blocking when waiting for the enemy player action
 		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
@@ -220,7 +225,8 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error abandon game: ", err)
 			}
-
+			// Connection is closed by the client
+			// TODO: Remove room from room manager
 		default:
 			log.Println("Unknown action")
 		}
