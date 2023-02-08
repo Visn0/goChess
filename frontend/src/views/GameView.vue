@@ -12,6 +12,8 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
+import { DrawResponseAction } from '@/actions/send/draw_response_action'
+import { DrawRequestAction } from '@/actions/send/draw_request_action'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -43,6 +45,11 @@ onBeforeMount(() => {
                 const modal = document.getElementById('endgame-modal') as HTMLElement
                 const text = document.getElementById('endgame-text') as HTMLElement
                 text.innerText = "Enemy player abandoned the game"
+                modal.hidden = false
+                break
+            }
+            case 'draw-request': {
+                const modal = document.getElementById('draw-request-modal') as HTMLElement
                 modal.hidden = false
                 break
             }
@@ -79,8 +86,19 @@ function abandon() {
     router.push({ name: 'rooms' })
 }
 
-function draw() {
+function drawRquest() {
+    DrawRequestAction(game.repository)
+}
 
+function acceptDraw() {
+    DrawResponseAction(game.repository, true)
+    game.setEndGameReason('draw')
+    game.setEndGame(true)
+}
+
+function declineDraw() {
+    DrawResponseAction(game.repository, false)
+    game.setEndGame(false)
 }
 
 function goRooms() {
@@ -178,6 +196,23 @@ function goRooms() {
             </div>
         </div>
 
+        <!--Draw request modal-->>
+        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Do you wanna draw?</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="acceptDraw()">
+                            Accept
+                        </button>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="declineDraw()">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
                 <div class="py-1 d-flex justify-content-between">
@@ -195,7 +230,7 @@ function goRooms() {
                 <!-- Buttons -->
                 <div class="mt-1">
                     <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">Abandon</button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="draw()">Draw</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="drawRquest()">Draw</button>
                 </div>
             </div>
         </div>
