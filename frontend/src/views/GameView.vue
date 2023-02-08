@@ -37,9 +37,24 @@ onBeforeMount(() => {
         modal.hidden = true
     })
 
-    watch(game.abandoned.bind(game), () => {
-        const modal = document.getElementById('abandon-modal') as HTMLElement
-        modal.hidden = false
+    watch(game.endGame.bind(game), () => {
+        switch(game.getEndGameReason()) {
+            case 'abandon': {
+                const modal = document.getElementById('endgame-modal') as HTMLElement
+                const text = document.getElementById('endgame-text') as HTMLElement
+                text.innerText = "Enemy player abandoned the game"
+                modal.hidden = false
+                break
+            }
+            case 'draw': {
+                const modal = document.getElementById('endgame-modal') as HTMLElement
+                const text = document.getElementById('endgame-text') as HTMLElement
+                text.innerText = "The game ended in a draw"
+                modal.hidden = false
+                break
+            }
+        }
+        
     })
 })
 
@@ -62,6 +77,10 @@ function cancelPromotion() {
 function abandon() {
     AbandonAction(game.repository)
     router.push({ name: 'rooms' })
+}
+
+function draw() {
+
 }
 
 function goRooms() {
@@ -145,11 +164,12 @@ function goRooms() {
             </div>
         </div>
 
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <!--End game modal-->
+        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
-                        <h5 class="modal-title">Enemy player abandoned the game</h5>
+                        <h5 id="endgame-text" class="modal-title"></h5>
                         <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
                             Go rooms
                         </button>
@@ -174,10 +194,8 @@ function goRooms() {
 
                 <!-- Buttons -->
                 <div class="mt-1">
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">
-                        Abandon
-                    </button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2">Draw</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">Abandon</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="draw()">Draw</button>
                 </div>
             </div>
         </div>

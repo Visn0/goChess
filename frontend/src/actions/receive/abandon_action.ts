@@ -8,7 +8,8 @@ class AbandonAction {
     }
 
     public Invoke() {
-        this.game.setAbandoned(true)
+        this.game.setEndGameReason('abandon')
+        this.game.setEndGame(true)
         this.game.repository.closeWebSocketConnection()
     }
 }
