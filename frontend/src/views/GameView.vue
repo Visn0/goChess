@@ -40,23 +40,26 @@ onBeforeMount(() => {
     })
 
     watch(game.endGame.bind(game), () => {
+        const modal = document.getElementById('endgame-modal') as HTMLElement
+        const text = document.getElementById('endgame-text') as HTMLElement
         switch(game.getEndGameReason()) {
             case 'abandon': {
-                const modal = document.getElementById('endgame-modal') as HTMLElement
-                const text = document.getElementById('endgame-text') as HTMLElement
                 text.innerText = "Enemy player abandoned the game"
                 modal.hidden = false
                 break
             }
             case 'draw-request': {
-                const modal = document.getElementById('draw-request-modal') as HTMLElement
-                modal.hidden = false
+                const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+                drawmodal.hidden = false
                 break
             }
             case 'draw': {
-                const modal = document.getElementById('endgame-modal') as HTMLElement
-                const text = document.getElementById('endgame-text') as HTMLElement
                 text.innerText = "The game ended in a draw"
+                modal.hidden = false
+                break
+            }
+            case 'checkmate': {
+                text.innerText = ""
                 modal.hidden = false
                 break
             }
