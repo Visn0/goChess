@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"encoding/json"
+	"fmt"
 )
 
 type Direction struct {
@@ -17,12 +17,15 @@ type IPiece interface {
 	GetValidDirections() []Direction
 	String() string
 	IsEnemy(piece IPiece) bool
+	GetValidMoves() []*Position
+	SetValidMoves([]*Position)
 }
 
 type PieceBase struct {
 	PieceType
 	Color
-	FirstMove bool
+	FirstMove  bool
+	validMoves []*Position
 }
 
 var PieceDirection = map[PieceType][]Direction{
@@ -101,67 +104,6 @@ func setNewPiece(piece IPiece, pieceType PieceType, color Color) {
 	}
 }
 
-func NewPawn(color Color) *Pawn {
-	return &Pawn{
-		PieceBase: PieceBase{
-			PieceType: PAWN,
-			Color:     color,
-			FirstMove: true,
-		},
-		EnPassantNeighbourPos: nil,
-	}
-}
-
-func NewRook(color Color) *Rook {
-	return &Rook{
-		PieceBase: PieceBase{
-			PieceType: ROOK,
-			Color:     color,
-			FirstMove: true,
-		},
-	}
-}
-
-func NewKnight(color Color) *Knight {
-	return &Knight{
-		PieceBase: PieceBase{
-			PieceType: KNIGHT,
-			Color:     color,
-			FirstMove: true,
-		},
-	}
-}
-
-func NewBishop(color Color) *Bishop {
-	return &Bishop{
-		PieceBase: PieceBase{
-			PieceType: BISHOP,
-			Color:     color,
-			FirstMove: true,
-		},
-	}
-}
-
-func NewQueen(color Color) *Queen {
-	return &Queen{
-		PieceBase: PieceBase{
-			PieceType: QUEEN,
-			Color:     color,
-			FirstMove: true,
-		},
-	}
-}
-
-func NewKing(color Color) *King {
-	return &King{
-		PieceBase: PieceBase{
-			PieceType: KING,
-			Color:     color,
-			FirstMove: true,
-		},
-	}
-}
-
 func (p *PieceBase) SetPiece(pieceType PieceType, color Color) {
 	p.PieceType = pieceType
 	p.Color = color
@@ -197,8 +139,7 @@ func (p *PieceBase) GetPieceType() PieceType {
 }
 
 func (p *PieceBase) String() string {
-	j, _ := json.MarshalIndent(p, "", " ")
-	return string(j)
+	return fmt.Sprintf("{Type: %s, Color: %s, FirstMove: %v}", p.PieceType, p.Color, p.FirstMove)
 }
 
 func (p *PieceBase) GetValidDirections() []Direction {
@@ -219,4 +160,12 @@ func getPieceDirection(t PieceType, color Color) []Direction {
 		return []Direction{{-1, 0}}
 	}
 	return dir
+}
+
+func (p *PieceBase) GetValidMoves() []*Position {
+	return p.validMoves
+}
+
+func (p *PieceBase) SetValidMoves(moves []*Position) {
+	p.validMoves = moves
 }
