@@ -74,11 +74,11 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 		To:   p.Dst,
 	}
 
-	playerColor := uc.game.ColotToMove
+	playerColor := uc.game.ColorToMove
 	enemyColor := !playerColor
 
 	uc.game.Move(move, p.PromoteTo)
-	uc.game.ColotToMove = enemyColor
+	uc.game.ColorToMove = enemyColor
 
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
 	uc.setGameStatus(enemyColor, output)

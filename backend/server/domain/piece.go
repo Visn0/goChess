@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"encoding/json"
+	"fmt"
 )
 
 type Direction struct {
@@ -139,11 +139,7 @@ func (p *PieceBase) GetPieceType() PieceType {
 }
 
 func (p *PieceBase) String() string {
-	j, err := json.MarshalIndent(p, "", " ")
-	if err != nil {
-		return err.Error()
-	}
-	return string(j)
+	return fmt.Sprintf("{Type: %s, Color: %s, FirstMove: %v}", p.PieceType, p.Color, p.FirstMove)
 }
 
 func (p *PieceBase) GetValidDirections() []Direction {

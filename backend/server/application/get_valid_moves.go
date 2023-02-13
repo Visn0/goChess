@@ -29,8 +29,7 @@ func NewGetValidMovesAction(c domain.ConnectionRepository, game *domain.Game) *G
 }
 
 func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
-	// validMoves := uc.game.GetValidMoves(p.Rank, p.File)
-	piece := uc.game.Board.GetPiece(p.Rank, p.File)
+	piece := uc.game.Board.GetPiece(&domain.Position{Rank: p.Rank, File: p.File})
 	validMoves := piece.GetValidMoves()
 	if validMoves == nil {
 		fmt.Println("No valid moves found")
