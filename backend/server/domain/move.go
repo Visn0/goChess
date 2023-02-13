@@ -54,8 +54,6 @@ func (g *Game) Move(m *Move, promoteTo *PieceType) {
 		g.Board.SetPiece(m.To.Rank, m.To.File, p)
 		g.Board.RemovePiece(m.From.Rank, m.From.File)
 	}
-
-	g.ColotToMove = Color(!bool(g.ColotToMove))
 }
 
 func (g *Game) removeEnPassantStatesIfNotThisPiece(p IPiece) {

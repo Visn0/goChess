@@ -103,6 +103,7 @@
 				rank: 5
 			}
 			promoteTo: "queen", // "" if not promotion
+			endGame: "checkmate" // "checkmate", "draw", "null"
 			kingCheck: { // null if not check, otherwise: position of king
 				rank:1
 				file:1
@@ -124,8 +125,6 @@
 		"enemyTime": 600000,
 	}
 }
-
-
 
 ###############################################
 ## StartGame
