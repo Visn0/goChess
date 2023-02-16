@@ -39,9 +39,10 @@ func (g *Game) Move(m *Move, promoteTo *PieceType) {
 
 	switch p.GetPieceType() {
 	case PAWN:
+		// fmt.Println("pawn move", m.From, m.To)
 		g.checkPawnMove(m, p.(*Pawn), promoteTo)
-
 	case KING:
+		// fmt.Println("king move", m.From, m.To)
 		g.checkCastleMove(m, p.(*King))
 		if g.ColorToMove == WHITE {
 			g.Board.whiteKingPos = m.To

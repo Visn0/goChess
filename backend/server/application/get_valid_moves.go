@@ -30,6 +30,14 @@ func NewGetValidMovesAction(c domain.ConnectionRepository, game *domain.Game) *G
 
 func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
 	piece := uc.game.Board.GetPiece(&domain.Position{Rank: p.Rank, File: p.File})
+	if piece == nil {
+		fmt.Println("No piece found at given position")
+		return nil
+	}
+	if piece.GetColor() != uc.game.ColorToMove {
+		fmt.Println("Not your turn")
+		return nil
+	}
 	validMoves := piece.GetValidMoves()
 	if validMoves == nil {
 		fmt.Println("No valid moves found")
