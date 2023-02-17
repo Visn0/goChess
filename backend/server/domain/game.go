@@ -2,7 +2,7 @@ package domain
 
 type Game struct {
 	Board           *Board
-	ColotToMove     Color
+	ColorToMove     Color
 	LastMoves       []*Move
 	EnPassantPieces []*Pawn
 }
@@ -10,7 +10,7 @@ type Game struct {
 func NewGame() *Game {
 	return &Game{
 		Board:           NewBoard(),
-		ColotToMove:     WHITE,
+		ColorToMove:     WHITE,
 		EnPassantPieces: make([]*Pawn, 0, 2),
 	}
 }

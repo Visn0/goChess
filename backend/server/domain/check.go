@@ -28,7 +28,7 @@ func (b *Board) positionIsUnderAttackUsingDirections(pos *Position, pieceType Pi
 			if !newPos.Valid() {
 				break
 			}
-			piece := b.GetPiece(newPos.Rank, newPos.File)
+			piece := b.GetPiece(newPos)
 			if piece != nil {
 				if piece.GetColor() == enemyColor && piece.GetPieceType() == pieceType {
 					fmt.Println("check piece: ", piece, " pos: ", newPos)

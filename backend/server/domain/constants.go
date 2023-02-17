@@ -55,6 +55,13 @@ const (
 	BLACK Color = true
 )
 
+func (c Color) String() string {
+	if c == WHITE {
+		return "WHITE"
+	}
+	return "BLACK"
+}
+
 func GetRandomColor() Color {
 	bigInt, _ := rand.Int(rand.Reader, big.NewInt(100))
 	n := bigInt.Int64()
