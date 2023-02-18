@@ -59,7 +59,8 @@ onBeforeMount(() => {
                 break
             }
             case 'checkmate': {
-                text.innerText = ""
+                const winner = game.isMyTurn() ? "lose" : "win"
+                text.innerText = "You " + winner + " the game"
                 modal.hidden = false
                 break
             }

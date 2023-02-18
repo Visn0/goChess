@@ -8,6 +8,7 @@ class PieceMovedParams {
     public dst: CoordinateParams
     public promoteTo: number | null
     public kingCheck: CoordinateParams | null
+    public endGame: string
 }
 
 class CoordinateParams {
@@ -35,6 +36,14 @@ class PieceMovedAction {
         }
 
         this.game.changeTurn()
+        
+        console.log(p.endGame)
+        if (p.endGame != '' ) 
+        {
+            this.game.setEndGameReason(p.endGame)
+            this.game.setEndGame(true)
+            this.game.repository.closeWebSocketConnection() 
+        }
     }
 
     private movePiece(p: PieceMovedParams) {
