@@ -37,8 +37,7 @@ class PieceMovedAction {
 
         this.game.changeTurn()
         
-        console.log(p.endGame)
-        if (p.endGame != '' ) 
+        if (p.endGame) 
         {
             this.game.setEndGameReason(p.endGame)
             this.game.setEndGame(true)
