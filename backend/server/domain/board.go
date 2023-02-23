@@ -59,30 +59,31 @@ func NewBoardFromFEN(fen string) *Board {
 		}
 		p := fenCharToPiece(string(piece))
 		if p != nil {
+			pos := &Position{rank, file}
 			if p.GetPieceType() == KING {
 				if p.GetColor() == WHITE {
-					b.whiteKingPos = &Position{rank, file}
+					b.whiteKingPos = pos
 				} else {
-					b.blackKingPos = &Position{rank, file}
+					b.blackKingPos = pos
 				}
 			}
-			b.SetPiece(rank, file, p)
+			b.SetPiece(pos, p)
 			file++
 		}
 	}
 	return b
 }
 
-func (b *Board) GetPiece(rank Rank, file File) IPiece {
-	return b.board[rank][file]
+func (b *Board) GetPiece(pos *Position) IPiece {
+	return b.board[pos.Rank][pos.File]
 }
 
-func (b *Board) SetPiece(rank Rank, file File, p IPiece) {
-	b.board[rank][file] = p
+func (b *Board) SetPiece(pos *Position, p IPiece) {
+	b.board[pos.Rank][pos.File] = p
 }
 
-func (b *Board) RemovePiece(rank Rank, file File) {
-	b.board[rank][file] = nil
+func (b *Board) RemovePiece(pos *Position) {
+	b.board[pos.Rank][pos.File] = nil
 }
 
 func fenCharToPiece(fen string) IPiece {
@@ -138,11 +139,11 @@ func (b *Board) GetKingPos(color Color) *Position {
 	return b.blackKingPos
 }
 
-func (b *Board) MovePiece(from, to *Position) {
-	p := b.GetPiece(from.Rank, from.File)
+func (b *Board) ExecuteMove(m *Move) {
+	p := b.GetPiece(m.From)
 	if p == nil {
 		panic("No piece at from position")
 	}
-	b.RemovePiece(from.Rank, from.File)
-	b.SetPiece(to.Rank, to.File, p)
+	b.RemovePiece(m.From)
+	b.SetPiece(m.To, p)
 }

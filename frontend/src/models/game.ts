@@ -20,12 +20,20 @@ class Game {
         return this._started.value
     }
 
-    private _abandoned: Ref<boolean>
-    public setAbandoned(n: boolean) {
-        this._abandoned.value = n
+    private _endGame: Ref<boolean>
+    public setEndGame(n: boolean) {
+        this._endGame.value = n
     }
-    public abandoned(): boolean {
-        return this._abandoned.value
+    public endGame(): boolean {
+        return this._endGame.value
+    }
+
+    private endGameReason: string
+    public setEndGameReason(n: string) {
+        this.endGameReason = n
+    }
+    public getEndGameReason(): string {
+        return this.endGameReason
     }
 
     private opponentID: string
@@ -104,7 +112,8 @@ class Game {
         this._board = board
         this._repository = repository
         this._started = ref(false)
-        this._abandoned = ref(false)
+        this._endGame = ref(false)
+        this.endGameReason = ''
         this.opponentID = ''
         this.myColor = Color.WHITE
         this.myTurn = ref(false)

@@ -1,7 +1,7 @@
 import type { Game } from '@/models/game'
 import { EndGameReason } from '@/models/constants'
 
-class AbandonAction {
+class RequestDrawAction {
     private game: Game
 
     constructor(game: Game) {
@@ -9,10 +9,9 @@ class AbandonAction {
     }
 
     public Invoke() {
-        this.game.setEndGameReason(EndGameReason.ABANDON)
+        this.game.setEndGameReason(EndGameReason.DRAW_REQUEST)
         this.game.setEndGame(true)
-        this.game.repository.closeWebSocketConnection()
     }
 }
 
-export { AbandonAction }
+export { RequestDrawAction }

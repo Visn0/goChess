@@ -8,6 +8,7 @@ class PieceMovedParams {
     public dst: CoordinateParams
     public promoteTo: number | null
     public kingCheck: CoordinateParams | null
+    public endGame: string
 }
 
 class CoordinateParams {
@@ -32,6 +33,14 @@ class PieceMovedAction {
             this.game.setKingCheck(kingCheckSquare)
         } else {
             this.game.setKingCheck(null)
+        }
+        
+        if (p.endGame) 
+        {
+            this.game.setEndGameReason(p.endGame)
+            this.game.setEndGame(true)
+            this.game.repository.closeWebSocketConnection() 
+            return
         }
 
         this.game.changeTurn()

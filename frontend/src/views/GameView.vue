@@ -12,6 +12,9 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
+import { ResponseDrawAction } from '@/actions/send/response_draw_action'
+import { RequestDrawAction } from '@/actions/send/request_draw_action'
+import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -37,9 +40,32 @@ onBeforeMount(() => {
         modal.hidden = true
     })
 
-    watch(game.abandoned.bind(game), () => {
-        const modal = document.getElementById('abandon-modal') as HTMLElement
-        modal.hidden = false
+    watch(game.endGame.bind(game), () => {
+        const modal = document.getElementById('endgame-modal') as HTMLElement
+        const text = document.getElementById('endgame-text') as HTMLElement
+        switch(game.getEndGameReason()) {
+            case EndGameReason.ABANDON: 
+                text.innerText = "Enemy player abandoned the game"
+                modal.hidden = false
+                break
+    
+            case EndGameReason.DRAW_REQUEST: 
+                const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+                drawmodal.hidden = false
+                break
+            
+            case EndGameReason.DRAW: 
+                text.innerText = "The game ended in a draw"
+                modal.hidden = false
+                break
+            
+            case EndGameReason.CHECKMATE: 
+                const winner = game.isMyTurn() ? "lose" : "win"
+                text.innerText = "You " + winner + " the game"
+                modal.hidden = false
+                break 
+        }
+        
     })
 })
 
@@ -62,6 +88,21 @@ function cancelPromotion() {
 function abandon() {
     AbandonAction(game.repository)
     router.push({ name: 'rooms' })
+}
+
+function requestDraw() {
+    RequestDrawAction(game.repository)
+}
+
+function acceptDraw() {
+    ResponseDrawAction(game.repository, true)
+    game.setEndGameReason('draw')
+    game.setEndGame(true)
+}
+
+function declineDraw() {
+    ResponseDrawAction(game.repository, false)
+    game.setEndGame(false)
 }
 
 function goRooms() {
@@ -145,13 +186,31 @@ function goRooms() {
             </div>
         </div>
 
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <!--End game modal-->
+        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
-                        <h5 class="modal-title">Enemy player abandoned the game</h5>
+                        <h5 id="endgame-text" class="modal-title"></h5>
                         <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
                             Go rooms
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Draw request modal-->>
+        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Do you wanna draw?</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="acceptDraw()">
+                            Accept
+                        </button>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="declineDraw()">
+                            Decline
                         </button>
                     </div>
                 </div>
@@ -174,10 +233,8 @@ function goRooms() {
 
                 <!-- Buttons -->
                 <div class="mt-1">
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">
-                        Abandon
-                    </button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2">Draw</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">Abandon</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="requestDraw()">Draw</button>
                 </div>
             </div>
         </div>
