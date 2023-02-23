@@ -1,6 +1,7 @@
 import type { Game } from '@/models/game'
+import { EndGameReason } from '@/models/constants'
 
-class DrawRequestAction {
+class RequestDrawAction {
     private game: Game
 
     constructor(game: Game) {
@@ -8,9 +9,9 @@ class DrawRequestAction {
     }
 
     public Invoke() {
-        this.game.setEndGameReason('draw-request')
+        this.game.setEndGameReason(EndGameReason.DRAW_REQUEST)
         this.game.setEndGame(true)
     }
 }
 
-export { DrawRequestAction }
+export { RequestDrawAction }

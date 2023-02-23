@@ -12,8 +12,9 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
-import { DrawResponseAction } from '@/actions/send/draw_response_action'
-import { DrawRequestAction } from '@/actions/send/draw_request_action'
+import { ResponseDrawAction } from '@/actions/send/response_draw_action'
+import { RequestDrawAction } from '@/actions/send/request_draw_action'
+import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -43,27 +44,26 @@ onBeforeMount(() => {
         const modal = document.getElementById('endgame-modal') as HTMLElement
         const text = document.getElementById('endgame-text') as HTMLElement
         switch(game.getEndGameReason()) {
-            case 'abandon': {
+            case EndGameReason.ABANDON: 
                 text.innerText = "Enemy player abandoned the game"
                 modal.hidden = false
                 break
-            }
-            case 'draw-request': {
+    
+            case EndGameReason.DRAW_REQUEST: 
                 const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
                 drawmodal.hidden = false
                 break
-            }
-            case 'draw': {
+            
+            case EndGameReason.DRAW: 
                 text.innerText = "The game ended in a draw"
                 modal.hidden = false
                 break
-            }
-            case 'checkmate': {
+            
+            case EndGameReason.CHECKMATE: 
                 const winner = game.isMyTurn() ? "lose" : "win"
                 text.innerText = "You " + winner + " the game"
                 modal.hidden = false
-                break
-            }
+                break 
         }
         
     })
@@ -90,18 +90,18 @@ function abandon() {
     router.push({ name: 'rooms' })
 }
 
-function drawRquest() {
-    DrawRequestAction(game.repository)
+function requestDraw() {
+    RequestDrawAction(game.repository)
 }
 
 function acceptDraw() {
-    DrawResponseAction(game.repository, true)
+    ResponseDrawAction(game.repository, true)
     game.setEndGameReason('draw')
     game.setEndGame(true)
 }
 
 function declineDraw() {
-    DrawResponseAction(game.repository, false)
+    ResponseDrawAction(game.repository, false)
     game.setEndGame(false)
 }
 
@@ -234,7 +234,7 @@ function goRooms() {
                 <!-- Buttons -->
                 <div class="mt-1">
                     <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">Abandon</button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="drawRquest()">Draw</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="requestDraw()">Draw</button>
                 </div>
             </div>
         </div>

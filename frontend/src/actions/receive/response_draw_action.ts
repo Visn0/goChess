@@ -1,9 +1,10 @@
 import type { Game } from '@/models/game'
+import { EndGameReason } from '@/models/constants'
 
 class DrawResponseParams {
     public response: boolean
 }
-class DrawResponseAction {
+class ResponseDrawAction {
     private game: Game
 
     constructor(game: Game) {
@@ -15,11 +16,11 @@ class DrawResponseAction {
 
         if(p.response)
         {
-            this.game.setEndGameReason('draw')
+            this.game.setEndGameReason(EndGameReason.DRAW)
             this.game.setEndGame(true)
             this.game.repository.closeWebSocketConnection()
         }
     }
 }
 
-export { DrawResponseAction }
+export { ResponseDrawAction }

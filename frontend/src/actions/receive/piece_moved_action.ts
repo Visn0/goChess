@@ -34,15 +34,16 @@ class PieceMovedAction {
         } else {
             this.game.setKingCheck(null)
         }
-
-        this.game.changeTurn()
         
         if (p.endGame) 
         {
             this.game.setEndGameReason(p.endGame)
             this.game.setEndGame(true)
             this.game.repository.closeWebSocketConnection() 
+            return
         }
+
+        this.game.changeTurn()
     }
 
     private movePiece(p: PieceMovedParams) {

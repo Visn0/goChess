@@ -1,6 +1,6 @@
 import type { ConnectionRepository, Message } from '@/models/connection_repository/connection_repository'
 
-class DrawRequestMessage implements Message {
+class RequestDrawMessage implements Message {
     action: string
     body: null
 
@@ -9,9 +9,9 @@ class DrawRequestMessage implements Message {
     }
 }
 
-function DrawRequestAction(repository: ConnectionRepository) {
-    const m = new DrawRequestMessage()
+function RequestDrawAction(repository: ConnectionRepository) {
+    const m = new RequestDrawMessage()
     repository.sendWebSocketMessage(m)
 }
 
-export { DrawRequestAction, DrawRequestMessage }
+export { RequestDrawAction, RequestDrawMessage }

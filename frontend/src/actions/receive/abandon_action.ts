@@ -1,4 +1,5 @@
 import type { Game } from '@/models/game'
+import { EndGameReason } from '@/models/constants'
 
 class AbandonAction {
     private game: Game
@@ -8,7 +9,7 @@ class AbandonAction {
     }
 
     public Invoke() {
-        this.game.setEndGameReason('abandon')
+        this.game.setEndGameReason(EndGameReason.ABANDON)
         this.game.setEndGame(true)
         this.game.repository.closeWebSocketConnection()
     }
