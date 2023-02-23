@@ -2,7 +2,7 @@ import type { Game } from '@/models/game'
 import { EndGameReason } from '@/models/constants'
 
 class DrawResponseParams {
-    public response: boolean
+    public drawResponse: boolean
 }
 class ResponseDrawAction {
     private game: Game
@@ -14,7 +14,7 @@ class ResponseDrawAction {
     public Invoke(body: string) {
         const p: DrawResponseParams = JSON.parse(body)
 
-        if (p.response) {
+        if (p.drawResponse) {
             this.game.setEndGameReason(EndGameReason.DRAW)
             this.game.setEndGame(true)
             this.game.repository.closeWebSocketConnection()

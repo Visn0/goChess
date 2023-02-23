@@ -243,6 +243,21 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error abandon game: ", err)
 			}
+		
+		case "request-draw":
+			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
+			err := requestDrawController.Invoke()
+			if err != nil {
+				log.Println("Error reques draw: ", err)
+			}
+		
+		case "response-draw":
+			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
+			err := responseDrawController.Invoke(reqBody)
+			if err != nil {
+				log.Println("Error reques draw: ", err)
+			}
+
 			// Connection is closed by the client
 			// TODO: Remove room from room manager
 		default:

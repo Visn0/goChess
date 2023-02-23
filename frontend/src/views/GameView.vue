@@ -13,7 +13,7 @@ import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
 import { ResponseDrawAction } from '@/actions/send/response_draw_action'
-import { RequestDrawAction } from '@/actions/send/request_draw_action'
+import { ReceiveDrawRequestAction } from '@/actions/send/request_draw_action'
 import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
@@ -53,11 +53,19 @@ onBeforeMount(() => {
             case EndGameReason.DRAW_REQUEST: {
                 const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
                 drawmodal.hidden = false
+                game.setEndGame(false)
                 break
             }
 
             case EndGameReason.DRAW: {
                 text.innerText = 'The game ended in a draw'
+                modal.hidden = false
+                break
+            }
+
+            case EndGameReason.CHECKMATE: {
+                const winner = game.isMyTurn() ? 'win' : 'lose'
+                text.innerText = 'You ' + winner + ' the game'
                 modal.hidden = false
                 break
             }
@@ -99,13 +107,15 @@ function abandon() {
 }
 
 function requestDraw() {
-    RequestDrawAction(game.repository)
+    ReceiveDrawRequestAction(game.repository)
 }
 
 function acceptDraw() {
-    ResponseDrawAction(game.repository, true)
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
     game.setEndGameReason('draw')
     game.setEndGame(true)
+    ResponseDrawAction(game.repository, true) 
 }
 
 function declineDraw() {

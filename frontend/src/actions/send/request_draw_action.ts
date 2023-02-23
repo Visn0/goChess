@@ -5,13 +5,13 @@ class RequestDrawMessage implements Message {
     body: null
 
     constructor() {
-        this.action = 'draw-request'
+        this.action = 'request-draw'
     }
 }
 
-function RequestDrawAction(repository: ConnectionRepository) {
+function ReceiveDrawRequestAction(repository: ConnectionRepository) {
     const m = new RequestDrawMessage()
     repository.sendWebSocketMessage(m)
 }
 
-export { RequestDrawAction, RequestDrawMessage }
+export { ReceiveDrawRequestAction, RequestDrawMessage }
