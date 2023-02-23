@@ -60,10 +60,14 @@ onBeforeMount(() => {
                 break
             
             case EndGameReason.CHECKMATE: 
-                const winner = game.isMyTurn() ? "lose" : "win"
+                const winner = game.isMyTurn() ? "win" : "lose"
                 text.innerText = "You " + winner + " the game"
                 modal.hidden = false
                 break 
+
+            default:
+                game.setEndGame(false)
+                console.log('Error in endgame swtich')
         }
         
     })
@@ -201,7 +205,7 @@ function goRooms() {
         </div>
 
         <!--Draw request modal-->>
-        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="false">
+        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
