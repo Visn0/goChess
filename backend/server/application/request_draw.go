@@ -20,7 +20,7 @@ func NewRequestDrawAction(c domain.ConnectionRepository) *RequestDrawAction {
 
 func (uc *RequestDrawAction) Invoke() error {
 	output := RequestDrawOutput{
-		Action: "receive-draw-request",
+		Action: "draw-request",
 	}
 
 	return uc.c.SendWebSocketMessage(output)

@@ -23,6 +23,7 @@ import { GotTimersAction } from '@/actions/receive/got_timers'
 import { StartGameAction } from '@/actions/receive/start_game'
 import { AbandonAction } from '@/actions/receive/abandon_action'
 import { ReceiveDrawRequestAction } from '@/actions/receive/receive_draw_request_action'
+import { ReceiveDrawResponseAction } from '@/actions/receive/receive_draw_response_action'
 
 const playerIDStore = usePlayerIDStore()
 
@@ -45,7 +46,9 @@ const routeActions: RouteActions = new RouteActions(
         ['move-piece', new PieceMovedAction(game)],
         ['get-timers', new GotTimersAction(game)],
         ['abandon', new AbandonAction(game)],
-        ['receive-draw-request', new ReceiveDrawRequestAction(game)]
+        ['draw-request', new ReceiveDrawRequestAction(game)],
+        ['draw-response', new ReceiveDrawResponseAction(game)]
+
     ])
 )
 repository.addOnWebSocketMessageEventListener(routeActions.route())

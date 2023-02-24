@@ -12,8 +12,8 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
+import { RequestDrawAction } from '@/actions/send/request_draw_action'
 import { ResponseDrawAction } from '@/actions/send/response_draw_action'
-import { ReceiveDrawRequestAction } from '@/actions/send/request_draw_action'
 import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
@@ -44,6 +44,7 @@ onBeforeMount(() => {
         const modal = document.getElementById('endgame-modal') as HTMLElement
         const text = document.getElementById('endgame-text') as HTMLElement
         switch (game.getEndGameReason()) {
+
             case EndGameReason.ABANDON: {
                 text.innerText = 'Enemy player abandoned the game'
                 modal.hidden = false
@@ -63,10 +64,10 @@ onBeforeMount(() => {
                 break
             }
 
-            case EndGameReason.CHECKMATE: {
-                const winner = game.isMyTurn() ? 'win' : 'lose'
-                text.innerText = 'You ' + winner + ' the game'
-                modal.hidden = false
+            case EndGameReason.DRAWDECLINED: {
+                const declinedraw = document.getElementById('draw-decline-modal') as HTMLElement
+                declinedraw.hidden = false
+                game.setEndGame(false)
                 break
             }
 
@@ -107,7 +108,7 @@ function abandon() {
 }
 
 function requestDraw() {
-    ReceiveDrawRequestAction(game.repository)
+    RequestDrawAction(game.repository)
 }
 
 function acceptDraw() {
@@ -119,6 +120,8 @@ function acceptDraw() {
 }
 
 function declineDraw() {
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
     ResponseDrawAction(game.repository, false)
     game.setEndGame(false)
 }
@@ -248,6 +251,15 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
                             Decline
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!--Draw decline modal-->>
+        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <h5 class="modal-title">Oponent player decline draw</h5>
                 </div>
             </div>
         </div>

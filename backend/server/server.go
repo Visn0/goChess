@@ -252,6 +252,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			}
 		
 		case "response-draw":
+			fmt.Println("drawresponse")
 			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
 			err := responseDrawController.Invoke(reqBody)
 			if err != nil {
