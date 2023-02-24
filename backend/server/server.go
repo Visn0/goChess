@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"path"
 	"sync"
 
 	"github.com/buger/jsonparser"
@@ -36,10 +37,13 @@ type Server struct {
 }
 
 func NewServer(addr, port string) *Server {
+	app := fiber.New()
+	app.Use(cors.New())
+
 	return &Server{
 		addr:               addr,
 		port:               port,
-		app:                fiber.New(),
+		app:                app,
 		wsConnections:      make(map[*shared.WsConn]struct{}),
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
@@ -48,9 +52,21 @@ func NewServer(addr, port string) *Server {
 	}
 }
 
+func (s *Server) Static(prefix, root string, singlePageApp bool, config ...fiber.Static) {
+	s.app.Static(prefix, root, config...)
+
+	if singlePageApp {
+		s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
+			return ctx.SendFile(path.Join(root, "index.html"))
+		})
+		s.app.Get("/game", func(ctx *fiber.Ctx) error {
+			return ctx.SendFile(path.Join(root, "index.html"))
+		})
+	}
+}
+
 // The server instantiates the middleware (proxy)
 func (s *Server) initMiddleware() {
-	s.app.Use(cors.New())
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
 		if !c.IsFromLocal() {

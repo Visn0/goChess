@@ -64,4 +64,15 @@ enum EndGameReason {
     CHECKMATE = 'checkmate'
 }
 
-export { File, fileToString, rankToString, Rank, Color, PieceType, pieceTypeToNumber, numberToPieceType, EndGameReason, constants }
+export {
+    File,
+    fileToString,
+    rankToString,
+    Rank,
+    Color,
+    PieceType,
+    pieceTypeToNumber,
+    numberToPieceType,
+    EndGameReason,
+    constants
+}

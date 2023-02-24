@@ -1,4 +1,7 @@
-install_project: setup_nodejs 
+BUILD_DIR=build
+BACKEND_BUILD_DIR=backend/build
+
+install_project: 
 	npm --prefix frontend/ install
 
 clean:
@@ -28,3 +31,21 @@ backend-fmt:
 
 backend-lint: 
 	cd backend; docker run --rm -v $(PWD)/backend:/app -w /app golangci/golangci-lint:v1.50.1 golangci-lint run
+
+builddir: 
+	@if [ -d $(BUILD_DIR) ]; then\
+		rm -rf $(BUILD_DIR);\
+	fi;
+	mkdir $(BUILD_DIR);
+
+build: build.frontend build.backend
+	mv frontend/dist $(BUILD_DIR)/dist
+	mv backend/backendexec $(BUILD_DIR)/.
+
+build.frontend:
+	npm --prefix frontend/ run build	
+
+build.backend: builddir
+	cd backend; go build -o backendexec	
+
+.PHONY: fmt-lint frontend-fmt frontend-lint up up.backend backend-fmt-lint builddir build build.frontend build.backend ec2

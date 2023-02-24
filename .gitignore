@@ -48,3 +48,5 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+*.local
+build

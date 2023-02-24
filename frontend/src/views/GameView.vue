@@ -43,33 +43,37 @@ onBeforeMount(() => {
     watch(game.endGame.bind(game), () => {
         const modal = document.getElementById('endgame-modal') as HTMLElement
         const text = document.getElementById('endgame-text') as HTMLElement
-        switch(game.getEndGameReason()) {
-            case EndGameReason.ABANDON: 
-                text.innerText = "Enemy player abandoned the game"
+        switch (game.getEndGameReason()) {
+            case EndGameReason.ABANDON: {
+                text.innerText = 'Enemy player abandoned the game'
                 modal.hidden = false
                 break
-    
-            case EndGameReason.DRAW_REQUEST: 
+            }
+
+            case EndGameReason.DRAW_REQUEST: {
                 const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
                 drawmodal.hidden = false
                 break
-            
-            case EndGameReason.DRAW: 
-                text.innerText = "The game ended in a draw"
+            }
+
+            case EndGameReason.DRAW: {
+                text.innerText = 'The game ended in a draw'
                 modal.hidden = false
                 break
-            
-            case EndGameReason.CHECKMATE: 
-                const winner = game.isMyTurn() ? "win" : "lose"
-                text.innerText = "You " + winner + " the game"
-                modal.hidden = false
-                break 
+            }
 
-            default:
+            case EndGameReason.CHECKMATE: {
+                const winner = game.isMyTurn() ? 'win' : 'lose'
+                text.innerText = 'You ' + winner + ' the game'
+                modal.hidden = false
+                break
+            }
+
+            default: {
                 game.setEndGame(false)
                 console.log('Error in endgame swtich')
+            }
         }
-        
     })
 })
 
@@ -112,9 +116,32 @@ function declineDraw() {
 function goRooms() {
     router.push({ name: 'rooms' })
 }
+
+function createPiece(color: Color, pieceType: PieceType): Piece {
+    return new Piece(color, pieceType)
+}
 </script>
 
 <template>
+    <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <h5 class="modal-title">Waiting for player</h5>
+            </div>
+        </div>
+    </div>
+
+    <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-body">
+                    <h5 class="modal-title">Enemy player abandoned the game</h5>
+                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main v-if="!gameStore.isEmpty">
         <div
             id="promotion-modal"
@@ -136,7 +163,7 @@ function goRooms() {
                             class="rounded promote-piece white-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.ROOK)"
+                                :piece="createPiece(colorDown, PieceType.ROOK)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -147,7 +174,7 @@ function goRooms() {
                             class="rounded promote-piece black-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.KNIGHT)"
+                                :piece="createPiece(colorDown, PieceType.KNIGHT)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -158,7 +185,7 @@ function goRooms() {
                             class="rounded promote-piece white-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.BISHOP)"
+                                :piece="createPiece(colorDown, PieceType.BISHOP)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -169,7 +196,7 @@ function goRooms() {
                             class="rounded promote-piece black-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.QUEEN)"
+                                :piece="createPiece(colorDown, PieceType.QUEEN)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -237,8 +264,16 @@ function goRooms() {
 
                 <!-- Buttons -->
                 <div class="mt-1">
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">Abandon</button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="requestDraw()">Draw</button>
+                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">
+                        Abandon
+                    </button>
+                    <button
+                        type="button"
+                        class="col-4 btn btn-dark btn-sm border border-light m-2"
+                        @click="requestDraw()"
+                    >
+                        Draw
+                    </button>
                 </div>
             </div>
         </div>
