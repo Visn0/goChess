@@ -22,6 +22,7 @@ class BackendConnectionRepository implements ConnectionRepository {
             url += `/${this.wsPath}`
         }
 
+        console.log('WS url: ', url)
         this.connection = new WebSocket(url)
         if (onOpenListener) {
             this.connection.onopen = onOpenListener

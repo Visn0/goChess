@@ -30,8 +30,7 @@ const rooms = new Rooms()
 const board = new Board()
 board.initFromFenNotation(constants.StartingPosition)
 
-const url = import.meta.env.VITE_APP_API_URL
-console.log(url)
+const url = import.meta.env.VITE_APP_API_HOST
 const repository = new BackendConnectionRepository(url, 'ws')
 const game = new Game(board, repository)
 

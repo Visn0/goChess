@@ -69,10 +69,13 @@ func (s *Server) Static(prefix, root string, singlePageApp bool, config ...fiber
 func (s *Server) initMiddleware() {
 	s.app.Use(func(c *fiber.Ctx) error {
 		// ONLY ALLOW LOCAL REQUESTS
-		if !c.IsFromLocal() {
-			log.Println("Blocked request")
-			return nil
-		}
+		// if !c.IsFromLocal() {
+		// 	log.Println("Blocked request")
+		// 	return nil
+		// }
+
+		fmt.Printf("### HEADER Connection: %s\n", c.Context().Request.Header.Peek("Connection"))
+		fmt.Printf("### HEADER Upgrade: %s\n", c.Context().Request.Header.Peek("Upgrade"))
 		if websocket.IsWebSocketUpgrade(c) { // Returns true if the client requested upgrade to the WebSocket protocol
 			log.Println("Websocket upgraded")
 			return c.Next()
