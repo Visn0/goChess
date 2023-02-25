@@ -46,6 +46,8 @@ build.frontend:
 	npm --prefix frontend/ run build	
 
 build.backend: builddir
-	cd backend; go build -o backendexec	
+	cd backend; go build -o backendexec		
+	echo 'PORT=80' > backend/.env
+	echo 'SERVE_SINGLE_PAGE_APP=true' >> backend/.env
 
 .PHONY: fmt-lint frontend-fmt frontend-lint up up.backend backend-fmt-lint builddir build build.frontend build.backend ec2

@@ -1,16 +1,14 @@
 import type { ConnectionRepository, Message } from './connection_repository'
 
 class BackendConnectionRepository implements ConnectionRepository {
-    private host: string
-    private port: string
+    private url: string
     private wsPath: string
 
     private connection: WebSocket | null
     private onWebSocketMessageListener: (e: MessageEvent) => void
 
-    constructor(host: string, port: string, wsPath: string) {
-        this.host = host
-        this.port = port
+    constructor(url: string, wsPath: string) {
+        this.url = url
         this.wsPath = wsPath
         this.connection = null
     }
@@ -19,7 +17,7 @@ class BackendConnectionRepository implements ConnectionRepository {
         this.closeWebSocketConnection()
 
         const protocol = window.location.protocol.includes('s') ? 'wss' : 'ws'
-        let url = `${protocol}://${this.host}:${this.port}`
+        let url = `${protocol}://${this.url}`
         if (this.wsPath !== '') {
             url += `/${this.wsPath}`
         }
@@ -65,7 +63,7 @@ class BackendConnectionRepository implements ConnectionRepository {
 
     public sendHTTPRequest(method: string, path: string, body: any): Promise<Response> {
         const protocol = window.location.protocol.includes('s') ? 'https' : 'http'
-        let url = `${protocol}://${this.host}:${this.port}`
+        let url = `${protocol}://${this.url}`
         if (path !== '') {
             url += `/${path}`
         }
