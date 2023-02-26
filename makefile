@@ -51,7 +51,9 @@ build.backend: builddir
 	echo 'PORT=8081' > backend/.env
 	echo 'SERVE_SINGLE_PAGE_APP=true' >> backend/.env	
 
-deploy.local: build
+deploy.local: 
+	echo 'VITE_APP_API_HOST=localhost:8081' > frontend/.env.production.local
+	make build
 	cd $(BUILD_DIR); ./backendexec
 
 deploy.aws: build

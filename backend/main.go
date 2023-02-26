@@ -26,6 +26,6 @@ func main() {
 
 	cfg := newConfig()
 	s := server.NewServer("", fmt.Sprintf(":%s", cfg.Port))
-	s.Static("/", "./dist", cfg.ServeSinglePageApp)
+	s.Static("/app", "./dist", cfg.ServeSinglePageApp)
 	s.Run()
 }

@@ -8,12 +8,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"path"
 	"sync"
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/redirect/v2"
 	websocket "github.com/gofiber/websocket/v2"
 )
 
@@ -53,14 +55,17 @@ func NewServer(addr, port string) *Server {
 }
 
 func (s *Server) Static(prefix, root string, singlePageApp bool, config ...fiber.Static) {
-	s.app.Static(prefix, root, config...)
-
 	if singlePageApp {
-		s.app.Get("/rooms", func(ctx *fiber.Ctx) error {
-			return ctx.SendFile(path.Join(root, "index.html"))
-		})
-		s.app.Get("/game", func(ctx *fiber.Ctx) error {
-			return ctx.SendFile(path.Join(root, "index.html"))
+		s.app.Static(prefix, root, config...)
+
+		s.app.Use(redirect.New(redirect.Config{
+			Rules: map[string]string{
+				"/": "/app",
+			},
+			StatusCode: http.StatusMovedPermanently,
+		}))
+		s.app.Get(fmt.Sprintf("%s/*", prefix), func(c *fiber.Ctx) error {
+			return c.SendFile(path.Join(root, "index.html"))
 		})
 	}
 }
