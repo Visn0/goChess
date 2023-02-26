@@ -56,7 +56,9 @@ deploy.local:
 	make build
 	cd $(BUILD_DIR); ./backendexec
 
-deploy.aws: build
+deploy.aws: 
+	rm -rf frontend/.env.production.local
+	make build 
 	scp -i "~/.ssh/chess-carlos-keypair.pem" -r ./build ubuntu@ec2-35-180-164-238.eu-west-3.compute.amazonaws.com:.
 
 .PHONY: fmt-lint frontend-fmt frontend-lint up up.backend backend-fmt-lint builddir build build.frontend build.backend deploy.local
