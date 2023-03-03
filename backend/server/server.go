@@ -248,7 +248,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
 			err := requestDrawController.Invoke()
 			if err != nil {
-				log.Println("Error reques draw: ", err)
+				log.Println("Error request draw: ", err)
 			}
 		
 		case "response-draw":
@@ -256,7 +256,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
 			err := responseDrawController.Invoke(reqBody)
 			if err != nil {
-				log.Println("Error reques draw: ", err)
+				log.Println("Error response draw: ", err)
 			}
 
 			// Connection is closed by the client

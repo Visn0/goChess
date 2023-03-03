@@ -80,8 +80,8 @@ onBeforeMount(() => {
 
             default: {
                 game.setEndGame(false)
-                console.log('Error in endgame swtich')
-            }
+                console.log('Error in endgame switch')
+            }  
         }
     })
 })
