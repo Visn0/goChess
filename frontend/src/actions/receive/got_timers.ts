@@ -1,12 +1,13 @@
 import { ReceiveParams } from './receive_params'
 import type { Game } from '@/models/game'
+import type { ReceiveAction } from './receive_action'
 
 class GotTimersParams extends ReceiveParams {
     playerTime: number
     enemyTime: number
 }
 
-class GotTimersAction {
+class GotTimersAction implements ReceiveAction {
     private game: Game
 
     constructor(game: Game) {

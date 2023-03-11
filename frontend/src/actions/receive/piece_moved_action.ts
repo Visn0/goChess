@@ -2,12 +2,14 @@ import { PieceType, File, Rank, numberToPieceType } from '@/models/constants'
 import type { Game } from '@/models/game'
 import { Piece } from '@/models/piece'
 import type { Square } from '@/models/square'
+import type { ReceiveAction } from './receive_action'
 
 class PieceMovedParams {
     public src: CoordinateParams
     public dst: CoordinateParams
     public promoteTo: number | null
     public kingCheck: CoordinateParams | null
+    public endGame: string
 }
 
 class CoordinateParams {
@@ -15,7 +17,7 @@ class CoordinateParams {
     public rank: Rank
 }
 
-class PieceMovedAction {
+class PieceMovedAction implements ReceiveAction {
     private game: Game
 
     constructor(game: Game) {
@@ -32,6 +34,13 @@ class PieceMovedAction {
             this.game.setKingCheck(kingCheckSquare)
         } else {
             this.game.setKingCheck(null)
+        }
+
+        if (p.endGame) {
+            this.game.setEndGameReason(p.endGame)
+            this.game.setEndGame(true)
+            this.game.repository.closeWebSocketConnection()
+            return
         }
 
         this.game.changeTurn()

@@ -1,6 +1,7 @@
 import type { File, Rank } from '@/models/constants'
 import type { Game } from '@/models/game'
 import type { Square } from '@/models/square'
+import type { ReceiveAction } from './receive_action'
 
 class MovesReceivedParams {
     validMoves: Array<CoordinateParams>
@@ -11,7 +12,7 @@ class CoordinateParams {
     public rank: Rank
 }
 
-class MovesReceivedAction {
+class MovesReceivedAction implements ReceiveAction {
     private game: Game
 
     constructor(game: Game) {

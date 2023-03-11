@@ -17,7 +17,7 @@ const router = createRouter({
             component: RoomsView
         },
         {
-            path: '/game/:color',
+            path: '/game',
             name: 'game',
             component: GameView
         }
