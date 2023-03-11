@@ -8,7 +8,7 @@ class ResponseDrawMessage implements Message {
 
     constructor(drawAccepted: boolean) {
         this.action = 'drawResponse'
-        this.body = { drawAccepted: drawAccepted}
+        this.body = { drawAccepted: drawAccepted }
     }
 }
 

@@ -10,6 +10,7 @@ function RequestRoomsAction(repository: ConnectionRepository, rooms: Rooms) {
         .sendHTTPRequest('GET', 'rooms', null)
         .then((response) => response.json())
         .then((jsonBody: RequestRoomsReponse) => {
+            console.log('GetRooms: ', jsonBody)
             rooms.setRooms(jsonBody.rooms)
         })
         .catch((err) => console.log(err))

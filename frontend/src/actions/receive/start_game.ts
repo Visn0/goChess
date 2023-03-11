@@ -1,6 +1,7 @@
 import type { Color } from '@/models/constants'
 import { ReceiveParams } from './receive_params'
 import type { Game } from '@/models/game'
+import type { ReceiveAction } from './receive_action'
 
 class StartGameParams extends ReceiveParams {
     playerColor: Color
@@ -8,7 +9,7 @@ class StartGameParams extends ReceiveParams {
     duration: number
 }
 
-class StartGameAction {
+class StartGameAction implements ReceiveAction {
     private game: Game
 
     constructor(game: Game) {

@@ -14,8 +14,7 @@ class ResponseDrawAction {
     public Invoke(body: string) {
         const p: DrawResponseParams = JSON.parse(body)
 
-        if(p.response)
-        {
+        if (p.response) {
             this.game.setEndGameReason(EndGameReason.DRAW)
             this.game.setEndGame(true)
             this.game.repository.closeWebSocketConnection()
