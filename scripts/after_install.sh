@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Load Go env variables
 source ~/.bash_go_config
 
@@ -5,7 +7,7 @@ source ~/.bash_go_config
 cd $HOME/go/goChess
 
 # Install project dependencies
-make install_project
+make install_dependencies
 
 # Run project compilation
 make build

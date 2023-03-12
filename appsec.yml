@@ -4,7 +4,7 @@ files:
   - source: scripts/upstart/gochess.service
     destination: /etc/systemd/system/
   - source: /
-    destination: /home/ubuntu/go/goChess/build
+    destination: /home/ubuntu/go/goChess
 permissions:
   - object: /
     pattern: "**"

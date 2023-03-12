@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Update system
 apt-get -y update
 
@@ -36,7 +38,6 @@ wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz -o "/tmp/go.tar.gz"
 # Decompress and put Go files in the installation path
 tar -C /usr/local -xzf "/tmp/go.tar.gz"
 mv /usr/local/go "${GO_ROOT}"
-
 
 # Set config file so everytime a shell is opened, it sets the env GOROOT and PATH 
 # variables with the root of Go installation, so "go" command can be used
