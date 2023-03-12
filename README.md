@@ -33,12 +33,12 @@ In the root folder of the project:
 ```bash
 # To install project dependencies (this may take a few minutes).
 # Required only the first time.
-$ make install_project
+$ make install_dependencies
 ```
 
 ```bash
 # To run the frontend
-$ make up
+$ make up.frontend
 ```
 
 In another shell:

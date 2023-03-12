@@ -1,37 +1,31 @@
-BUILD_DIR=build
-BACKEND_BUILD_DIR=backend/build
+BUILD_DIR=$(PWD)/build
 
-install_project: 
-	npm --prefix frontend/ install	
-	cd backend; go mod tidy;
+# Frontend variables
+FRONTEND_DIR=frontend
+MAKE_FRONTEND=$(MAKE) -C $(FRONTEND_DIR)
 
-clean:
-	# Remove the resulting files of transpiling TypeScript files
-	rm -rf frontend/dist frontend/.parcel-cache
+# Backend variables
+BACKEND_BINARY_NAME=gochessbin
+BACKEND_DIR=backend
+MAKE_BACKEND=$(MAKE) -C $(BACKEND_DIR)
 
-fmt-lint: frontend-fmt frontend-lint
+install_dependencies: 
+	$(MAKE_FRONTEND) install_dependencies
+	$(MAKE_BACKEND) install_dependencies
 
-frontend-fmt:
-	npm --prefix frontend/ run fmt
-
-frontend-lint:
-	npm --prefix frontend/ run type-check
-	npm --prefix frontend/ run lint
-
-up:
-	npm --prefix frontend/ run dev
+up.frontend:
+	$(MAKE_FRONTEND) up
 
 up.backend:
-	cd backend; go run main.go
+	$(MAKE_BACKEND) up
 
-backend-fmt-lint:
-	make backend-fmt backend-lint	
-	
-backend-fmt:
-	cd backend; go fmt ./...
+fmt:
+	$(MAKE_FRONTEND) fmt
+	$(MAKE_BACKEND) fmt
 
-backend-lint: 
-	cd backend; docker run --rm -v $(PWD)/backend:/app -w /app golangci/golangci-lint:v1.50.1 golangci-lint run
+lint: 
+	$(MAKE_FRONTEND) lint
+	$(MAKE_BACKEND) lint
 
 builddir: 
 	@if [ -d $(BUILD_DIR) ]; then\
@@ -39,23 +33,19 @@ builddir:
 	fi;
 	mkdir $(BUILD_DIR);
 
-build: build.frontend build.backend
-	mv frontend/dist $(BUILD_DIR)/dist
-	mv backend/backendexec $(BUILD_DIR)/.
-	mv backend/.env $(BUILD_DIR)/.
-
-build.frontend:
-	npm --prefix frontend/ run build	
-
-build.backend: builddir
-	cd backend; go build -o backendexec		
-	echo 'PORT=8081' > backend/.env
-	echo 'SERVE_SINGLE_PAGE_APP=true' >> backend/.env	
-	echo 'SINGLE_PAGE_APP_FOLDER=$(BUILD_DIR)/dist' >> backend/.env		
+build: clean builddir
+	$(MAKE_FRONTEND) build
+	$(MAKE_BACKEND) build BUILD_DIR=$(BUILD_DIR) BINARY_NAME=$(BACKEND_BINARY_NAME)
+	mv $(FRONTEND_DIR)/dist $(BUILD_DIR)/dist
+	mv $(BACKEND_DIR)/$(BACKEND_BINARY_NAME) $(BUILD_DIR)/.
+	mv $(BACKEND_DIR)/.env $(BUILD_DIR)/.
 
 deploy.local: 
-	echo 'VITE_APP_API_HOST=localhost:8081' > frontend/.env.production.local
-	make build
-	cd $(BUILD_DIR); ./backendexec
+	echo 'VITE_APP_API_HOST=localhost:8081' > $(FRONTEND_DIR)/.env.production.local
+	$(MAKE) build
+	cd $(BUILD_DIR); ./$(BACKEND_BINARY_NAME)
 
-.PHONY: fmt-lint frontend-fmt frontend-lint up up.backend backend-fmt-lint builddir build build.frontend build.backend deploy.local
+clean:
+	rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/.parcel-cache $(BUILD_DIR)
+
+.PHONY: install_project up.frontend up.backend fmt lint builddir build deploy.local clean
