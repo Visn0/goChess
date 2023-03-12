@@ -15,6 +15,7 @@ import (
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/redirect/v2"
 	websocket "github.com/gofiber/websocket/v2"
 )
@@ -41,6 +42,7 @@ type Server struct {
 func NewServer(addr, port string) *Server {
 	app := fiber.New()
 	app.Use(cors.New())
+	app.Use(recover.New())
 
 	return &Server{
 		addr:               addr,
