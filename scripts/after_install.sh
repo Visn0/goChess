@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load Go env variables
-source ~/.bash_go_config
+source /etc/profile.d/bash_go_config.sh
 
 # Navigate to project directory
 cd $HOME/go/goChess

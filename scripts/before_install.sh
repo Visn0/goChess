@@ -15,6 +15,8 @@ curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
 
 chmod +x nodesource_setup.sh
 bash nodesource_setup.sh
+sudo apt-get -y install nodejs
+sudo dpkg -i --force-overwrite /var/cache/apt/archives/nodejs_18.15.0-deb-1nodesource1_amd64.deb
 
 ########################################
 #####          INSTALL GO          #####
@@ -41,16 +43,13 @@ mv /usr/local/go "${GO_ROOT}"
 
 # Set config file so everytime a shell is opened, it sets the env GOROOT and PATH 
 # variables with the root of Go installation, so "go" command can be used
-cd ~/
-
-# In case the .bashrc_backup doesnt exists, we do not care
-echo "# Go settings"                                  >  .bash_go_config
-echo "export GOROOT=${GO_ROOT}"                       >> .bash_go_config
-echo "export GOPATH=${HOME}/go"                       >> .bash_go_config
-echo "export PATH=${GOROOT}/bin:$GOPATH/bin:${PATH}"  >> .bash_go_config
+echo "# Go settings"                                  >  ~/.bash_go_config
+echo "export GOROOT=${GO_ROOT}"                       >> ~/.bash_go_config
+echo "export GOPATH=${HOME}/go"                       >> ~/.bash_go_config
+echo "export PATH=${GOROOT}/bin:$GOPATH/bin:${PATH}"  >> ~/.bash_go_config
 
 # In case the machine is restarted, we want this env variables to be loaded automatically
-cp .bash_go_config /etc/profile.d/bash_go_config.sh
+cp ~/.bash_go_config /etc/profile.d/bash_go_config.sh
 
 # Install other dependencies
 DEBIAN_FRONTED=noninteractive apt-get install -y pkg-config libssl-dev
