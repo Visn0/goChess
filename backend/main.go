@@ -9,8 +9,9 @@ import (
 )
 
 type Config struct {
-	Port               string `env:"PORT" envDefault:"8081"`
-	ServeSinglePageApp bool   `env:"SERVE_SINGLE_PAGE_APP" envDefault:"false"`
+	Port                string `env:"PORT" envDefault:"8081"`
+	ServeSinglePageApp  bool   `env:"SERVE_SINGLE_PAGE_APP" envDefault:"false"`
+	SinglePageAppFolder string `env:"SINGLE_PAGE_APP_FOLDER" envDefault:"./dist"`
 }
 
 func newConfig() *Config {
@@ -26,6 +27,6 @@ func main() {
 
 	cfg := newConfig()
 	s := server.NewServer("", fmt.Sprintf(":%s", cfg.Port))
-	s.Static("/app", "./dist", cfg.ServeSinglePageApp)
+	s.Static("/app", cfg.SinglePageAppFolder, cfg.ServeSinglePageApp)
 	s.Run()
 }

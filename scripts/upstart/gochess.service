@@ -1,0 +1,12 @@
+[Unit]
+Description=Go Chess application
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+ExecStart=$HOME/go/goChess/build
+EnvironmentFile=$HOME/go/goChess/build/.env
+
+[Install]
+WantedBy=multi-user.target
