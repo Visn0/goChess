@@ -5,7 +5,7 @@ Description=Go Chess application
 Type=simple
 Restart=always
 RestartSec=5s
-ExecStart=/home/ubuntu/go/goChess/build
+ExecStart=/home/ubuntu/go/goChess/build/gochessbin
 EnvironmentFile=/home/ubuntu/go/goChess/build/.env
 
 [Install]
