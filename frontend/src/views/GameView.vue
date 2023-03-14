@@ -123,25 +123,6 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
 </script>
 
 <template>
-    <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-                <h5 class="modal-title">Waiting for player</h5>
-            </div>
-        </div>
-    </div>
-
-    <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-                <div class="modal-body">
-                    <h5 class="modal-title">Enemy player abandoned the game</h5>
-                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <main v-if="!gameStore.isEmpty">
         <div
             id="promotion-modal"
@@ -209,12 +190,25 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
             </div>
         </div>
 
+        <!--Waiting player modal-->
         <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <h5 class="modal-title">Waiting for player</h5>
                 </div>
             </div>
+        </div>
+
+        <!--Abandon modal-->
+        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-body">
+                    <h5 class="modal-title">Enemy player abandoned the game</h5>
+                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+                </div>
+            </div>
+        </div>
         </div>
 
         <!--End game modal-->
@@ -231,7 +225,7 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
             </div>
         </div>
 
-        <!--Draw request modal-->>
+        <!--Draw request modal-->
         <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
