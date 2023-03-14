@@ -1,7 +1,7 @@
 import type { Game } from '@/models/game'
 import { EndGameReason } from '@/models/constants'
 
-class RequestDrawAction {
+class ReceiveDrawRequestAction {
     private game: Game
 
     constructor(game: Game) {
@@ -14,4 +14,4 @@ class RequestDrawAction {
     }
 }
 
-export { RequestDrawAction }
+export { ReceiveDrawRequestAction }

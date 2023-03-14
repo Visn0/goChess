@@ -70,7 +70,7 @@ Once the server is up and running, open your browser and type `http://localhost:
         </ul>
     </p>
   </li>
-    <li>
+  <li>
     <p>
       <b>Carlos Eduardo Arismendi Sánchez</b>:
         <ul>
@@ -79,6 +79,19 @@ Once the server is up and running, open your browser and type `http://localhost:
           </li>
           <li>
             Email: <a href="mailto:carlos.arismendisanchez@gmail.com">carlos.arismendisanchez@gmail.com</a>
+          </li>
+        </ul>
+    </p>
+  </li>
+  <li>
+    <p>
+      <b>Jonathan Santos Castro</b>:
+        <ul>
+          <li>
+            LinkedIn: <a href="https://www.linkedin.com/in/jonathan-santos24/">https://www.linkedin.com/in/jonathan-santos24/</a>
+          </li>
+          <li>
+            Email: <a href="mailto:jonathan.santoscastro24@gmail.com">jonathan.santoscastro24@gmail.com</a>
           </li>
         </ul>
     </p>

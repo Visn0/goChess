@@ -5,7 +5,7 @@ class RequestDrawMessage implements Message {
     body: null
 
     constructor() {
-        this.action = 'draw-request'
+        this.action = 'request-draw'
     }
 }
 

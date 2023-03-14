@@ -3,18 +3,22 @@ import type { ConnectionRepository, Message } from '@/models/connection_reposito
 class ResponseDrawMessage implements Message {
     action: string
     body: {
-        drawAccepted: boolean
+        drawResponse: boolean
     }
 
-    constructor(drawAccepted: boolean) {
-        this.action = 'drawResponse'
-        this.body = { drawAccepted: drawAccepted }
+    constructor(drawResponse: boolean) {
+        this.action = 'response-draw'
+        this.body = { drawResponse: drawResponse }
     }
 }
 
-function ResponseDrawAction(repository: ConnectionRepository, drawAccepted: boolean) {
-    const m = new ResponseDrawMessage(drawAccepted)
+function ResponseDrawAction(repository: ConnectionRepository, drawResponse: boolean) {
+    const m = new ResponseDrawMessage(drawResponse)
     repository.sendWebSocketMessage(m)
+
+    if (drawResponse) {
+        repository.closeWebSocketConnection()
+    }
 }
 
 export { ResponseDrawAction, ResponseDrawMessage }

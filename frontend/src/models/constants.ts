@@ -61,6 +61,7 @@ enum EndGameReason {
     ABANDON = 'abandon',
     DRAW_REQUEST = 'draw-request',
     DRAW = 'draw',
+    DRAWDECLINED = 'drawdeclined',
     CHECKMATE = 'checkmate'
 }
 

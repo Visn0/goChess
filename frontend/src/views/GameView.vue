@@ -12,8 +12,8 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
-import { ResponseDrawAction } from '@/actions/send/response_draw_action'
 import { RequestDrawAction } from '@/actions/send/request_draw_action'
+import { ResponseDrawAction } from '@/actions/send/response_draw_action'
 import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
@@ -53,12 +53,20 @@ onBeforeMount(() => {
             case EndGameReason.DRAW_REQUEST: {
                 const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
                 drawmodal.hidden = false
+                game.setEndGame(false)
                 break
             }
 
             case EndGameReason.DRAW: {
                 text.innerText = 'The game ended in a draw'
                 modal.hidden = false
+                break
+            }
+
+            case EndGameReason.DRAWDECLINED: {
+                const declinedraw = document.getElementById('draw-decline-modal') as HTMLElement
+                declinedraw.hidden = false
+                game.setEndGame(false)
                 break
             }
 
@@ -71,7 +79,7 @@ onBeforeMount(() => {
 
             default: {
                 game.setEndGame(false)
-                console.log('Error in endgame swtich')
+                console.log('Error in endgame switch')
             }
         }
     })
@@ -103,12 +111,16 @@ function requestDraw() {
 }
 
 function acceptDraw() {
-    ResponseDrawAction(game.repository, true)
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
     game.setEndGameReason('draw')
     game.setEndGame(true)
+    ResponseDrawAction(game.repository, true)
 }
 
 function declineDraw() {
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
     ResponseDrawAction(game.repository, false)
     game.setEndGame(false)
 }
@@ -119,6 +131,12 @@ function goRooms() {
 
 function createPiece(color: Color, pieceType: PieceType): Piece {
     return new Piece(color, pieceType)
+}
+
+function closemodal(name: string) {
+    console.log('no teneis ni idea')
+    const modal = document.getElementById(name) as HTMLElement
+    modal.hidden = true
 }
 </script>
 
@@ -200,19 +218,21 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
         </div>
 
         <!--Abandon modal-->
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-                <div class="modal-body">
-                    <h5 class="modal-title">Enemy player abandoned the game</h5>
-                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('abandon-modal')">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Enemy player abandoned the game</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
+                            Go rooms
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
 
         <!--End game modal-->
-        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('endgame-modal')">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -238,6 +258,15 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
                             Decline
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Draw decline modal-->
+        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('draw-decline-modal')">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <h5 class="modal-title">Oponent player decline draw</h5>
                 </div>
             </div>
         </div>
