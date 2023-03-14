@@ -19,12 +19,10 @@ class ReceiveDrawResponseAction {
             this.game.setEndGameReason(EndGameReason.DRAW)
             this.game.setEndGame(true)
             this.game.repository.closeWebSocketConnection()
-        }
-        else {
+        } else {
             this.game.setEndGameReason(EndGameReason.DRAWDECLINED)
             this.game.setEndGame(true)
         }
-
     }
 }
 

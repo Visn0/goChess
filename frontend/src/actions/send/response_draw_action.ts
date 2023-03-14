@@ -16,10 +16,9 @@ function ResponseDrawAction(repository: ConnectionRepository, drawResponse: bool
     const m = new ResponseDrawMessage(drawResponse)
     repository.sendWebSocketMessage(m)
 
-    if (drawResponse) { 
-        repository.closeWebSocketConnection() 
+    if (drawResponse) {
+        repository.closeWebSocketConnection()
     }
-    
 }
 
 export { ResponseDrawAction, ResponseDrawMessage }

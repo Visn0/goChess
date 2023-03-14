@@ -44,7 +44,6 @@ onBeforeMount(() => {
         const modal = document.getElementById('endgame-modal') as HTMLElement
         const text = document.getElementById('endgame-text') as HTMLElement
         switch (game.getEndGameReason()) {
-
             case EndGameReason.ABANDON: {
                 text.innerText = 'Enemy player abandoned the game'
                 modal.hidden = false
@@ -81,7 +80,7 @@ onBeforeMount(() => {
             default: {
                 game.setEndGame(false)
                 console.log('Error in endgame switch')
-            }  
+            }
         }
     })
 })
@@ -116,7 +115,7 @@ function acceptDraw() {
     drawmodal.hidden = true
     game.setEndGameReason('draw')
     game.setEndGame(true)
-    ResponseDrawAction(game.repository, true) 
+    ResponseDrawAction(game.repository, true)
 }
 
 function declineDraw() {
@@ -214,14 +213,16 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
 
         <!--Abandon modal-->
         <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-light">
-                <div class="modal-body">
-                    <h5 class="modal-title">Enemy player abandoned the game</h5>
-                    <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">Go rooms</button>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Enemy player abandoned the game</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
+                            Go rooms
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
         <!--End game modal-->
@@ -254,8 +255,8 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
                 </div>
             </div>
         </div>
-        
-        <!--Draw decline modal-->>
+
+        <!--Draw decline modal-->
         <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">

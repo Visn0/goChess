@@ -48,7 +48,6 @@ const routeActions: RouteActions = new RouteActions(
         ['abandon', new AbandonAction(game)],
         ['draw-request', new ReceiveDrawRequestAction(game)],
         ['draw-response', new ReceiveDrawResponseAction(game)]
-
     ])
 )
 repository.addOnWebSocketMessageEventListener(routeActions.route())
