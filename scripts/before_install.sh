@@ -2,12 +2,13 @@
 
 # Update system
 apt-get -y update
+apt-get -y install make
 
 ########################################
 #####        INSTALL NODEJS        #####
 ########################################
 # Remove older nodejs version 
-sudo apt remove nodejs npm
+apt remove nodejs npm
 
 # Install new nodejs version
 cd ~
