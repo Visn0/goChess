@@ -132,6 +132,12 @@ function goRooms() {
 function createPiece(color: Color, pieceType: PieceType): Piece {
     return new Piece(color, pieceType)
 }
+
+function closemodal(name: string) {
+    console.log('no teneis ni idea')
+    const modal = document.getElementById(name) as HTMLElement
+    modal.hidden = true
+}
 </script>
 
 <template>
@@ -212,7 +218,7 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
         </div>
 
         <!--Abandon modal-->
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('abandon-modal')">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -226,7 +232,7 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
         </div>
 
         <!--End game modal-->
-        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('endgame-modal')">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -257,7 +263,7 @@ function createPiece(color: Color, pieceType: PieceType): Piece {
         </div>
 
         <!--Draw decline modal-->
-        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('draw-decline-modal')">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <h5 class="modal-title">Oponent player decline draw</h5>
