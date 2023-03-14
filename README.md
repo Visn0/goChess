@@ -8,7 +8,7 @@ It's in development!
 
 You can play it here [https://gochess](https://www.youtube.com/watch?v=oHg5SJYRHA0)
 
-If it doesn't work try here [https://gochess/app/](http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/)
+If it doesn't work try here [http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/](http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/)
 
 ## Description
 
