@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">GoChess</a>
+            <RouterLink :to="{ path: '/' }" class="navbar-brand">GoChess</RouterLink>
             <button
                 class="navbar-toggler"
                 type="button"
