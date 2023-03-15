@@ -1,6 +1,7 @@
 import { Room, Rooms } from '@/models/room'
 import { RoomPlayer } from '@/models/room_player'
 import { ReceiveParams } from './receive_params'
+import type { ReceiveAction } from './receive_action'
 
 class RoomCreatedParams extends ReceiveParams {
     httpCode: number
@@ -16,7 +17,7 @@ class RoomPlayerParams {
     id: string
 }
 
-class RoomCreatedAction {
+class RoomCreatedAction implements ReceiveAction {
     private rooms: Rooms
 
     constructor(rooms: Rooms) {

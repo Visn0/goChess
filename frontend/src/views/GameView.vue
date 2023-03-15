@@ -12,6 +12,9 @@ import { usePlayerIDStore } from '@/stores/playerID'
 import { onBeforeMount, ref, watch } from 'vue'
 import { Piece } from '@/models/piece'
 import { AbandonAction } from '@/actions/send/abandon_action'
+import { RequestDrawAction } from '@/actions/send/request_draw_action'
+import { ResponseDrawAction } from '@/actions/send/response_draw_action'
+import { EndGameReason } from '@/models/constants'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -37,9 +40,48 @@ onBeforeMount(() => {
         modal.hidden = true
     })
 
-    watch(game.abandoned.bind(game), () => {
-        const modal = document.getElementById('abandon-modal') as HTMLElement
-        modal.hidden = false
+    watch(game.endGame.bind(game), () => {
+        const modal = document.getElementById('endgame-modal') as HTMLElement
+        const text = document.getElementById('endgame-text') as HTMLElement
+        switch (game.getEndGameReason()) {
+            case EndGameReason.ABANDON: {
+                text.innerText = 'Enemy player abandoned the game'
+                modal.hidden = false
+                break
+            }
+
+            case EndGameReason.DRAW_REQUEST: {
+                const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+                drawmodal.hidden = false
+                game.setEndGame(false)
+                break
+            }
+
+            case EndGameReason.DRAW: {
+                text.innerText = 'The game ended in a draw'
+                modal.hidden = false
+                break
+            }
+
+            case EndGameReason.DRAWDECLINED: {
+                const declinedraw = document.getElementById('draw-decline-modal') as HTMLElement
+                declinedraw.hidden = false
+                game.setEndGame(false)
+                break
+            }
+
+            case EndGameReason.CHECKMATE: {
+                const winner = game.isMyTurn() ? 'win' : 'lose'
+                text.innerText = 'You ' + winner + ' the game'
+                modal.hidden = false
+                break
+            }
+
+            default: {
+                game.setEndGame(false)
+                console.log('Error in endgame switch')
+            }
+        }
     })
 })
 
@@ -64,8 +106,37 @@ function abandon() {
     router.push({ name: 'rooms' })
 }
 
+function requestDraw() {
+    RequestDrawAction(game.repository)
+}
+
+function acceptDraw() {
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
+    game.setEndGameReason('draw')
+    game.setEndGame(true)
+    ResponseDrawAction(game.repository, true)
+}
+
+function declineDraw() {
+    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
+    drawmodal.hidden = true
+    ResponseDrawAction(game.repository, false)
+    game.setEndGame(false)
+}
+
 function goRooms() {
     router.push({ name: 'rooms' })
+}
+
+function createPiece(color: Color, pieceType: PieceType): Piece {
+    return new Piece(color, pieceType)
+}
+
+function closemodal(name: string) {
+    console.log('no teneis ni idea')
+    const modal = document.getElementById(name) as HTMLElement
+    modal.hidden = true
 }
 </script>
 
@@ -91,7 +162,7 @@ function goRooms() {
                             class="rounded promote-piece white-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.ROOK)"
+                                :piece="createPiece(colorDown, PieceType.ROOK)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -102,7 +173,7 @@ function goRooms() {
                             class="rounded promote-piece black-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.KNIGHT)"
+                                :piece="createPiece(colorDown, PieceType.KNIGHT)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -113,7 +184,7 @@ function goRooms() {
                             class="rounded promote-piece white-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.BISHOP)"
+                                :piece="createPiece(colorDown, PieceType.BISHOP)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -124,7 +195,7 @@ function goRooms() {
                             class="rounded promote-piece black-piece"
                         >
                             <ChessPiece
-                                :piece="new Piece(colorDown, PieceType.QUEEN)"
+                                :piece="createPiece(colorDown, PieceType.QUEEN)"
                                 :selected="false"
                                 :king-check="false"
                             />
@@ -137,6 +208,7 @@ function goRooms() {
             </div>
         </div>
 
+        <!--Waiting player modal-->
         <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
@@ -145,7 +217,8 @@ function goRooms() {
             </div>
         </div>
 
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+        <!--Abandon modal-->
+        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('abandon-modal')">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -154,6 +227,46 @@ function goRooms() {
                             Go rooms
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!--End game modal-->
+        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('endgame-modal')">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 id="endgame-text" class="modal-title"></h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
+                            Go rooms
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Draw request modal-->
+        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-body">
+                        <h5 class="modal-title">Do you wanna draw?</h5>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="acceptDraw()">
+                            Accept
+                        </button>
+                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="declineDraw()">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Draw decline modal-->
+        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('draw-decline-modal')">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-light">
+                    <h5 class="modal-title">Oponent player decline draw</h5>
                 </div>
             </div>
         </div>
@@ -177,7 +290,13 @@ function goRooms() {
                     <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2" @click="abandon()">
                         Abandon
                     </button>
-                    <button type="button" class="col-4 btn btn-dark btn-sm border border-light m-2">Draw</button>
+                    <button
+                        type="button"
+                        class="col-4 btn btn-dark btn-sm border border-light m-2"
+                        @click="requestDraw()"
+                    >
+                        Draw
+                    </button>
                 </div>
             </div>
         </div>

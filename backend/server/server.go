@@ -8,11 +8,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
+	"path"
 	"sync"
 
 	"github.com/buger/jsonparser"
 	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/redirect/v2"
 	websocket "github.com/gofiber/websocket/v2"
 )
 
@@ -36,10 +40,14 @@ type Server struct {
 }
 
 func NewServer(addr, port string) *Server {
+	app := fiber.New()
+	app.Use(cors.New())
+	app.Use(recover.New())
+
 	return &Server{
 		addr:               addr,
 		port:               port,
-		app:                fiber.New(),
+		app:                app,
 		wsConnections:      make(map[*shared.WsConn]struct{}),
 		wsConnectionsMutex: sync.Mutex{},
 		register:           make(chan subEvent),
@@ -48,15 +56,25 @@ func NewServer(addr, port string) *Server {
 	}
 }
 
+func (s *Server) Static(prefix, root string, singlePageApp bool, config ...fiber.Static) {
+	if singlePageApp {
+		s.app.Static(prefix, root, config...)
+
+		s.app.Use(redirect.New(redirect.Config{
+			Rules: map[string]string{
+				"/": "/app",
+			},
+			StatusCode: http.StatusMovedPermanently,
+		}))
+		s.app.Get(fmt.Sprintf("%s/*", prefix), func(c *fiber.Ctx) error {
+			return c.SendFile(path.Join(root, "index.html"))
+		})
+	}
+}
+
 // The server instantiates the middleware (proxy)
 func (s *Server) initMiddleware() {
-	s.app.Use(cors.New())
 	s.app.Use(func(c *fiber.Ctx) error {
-		// ONLY ALLOW LOCAL REQUESTS
-		if !c.IsFromLocal() {
-			log.Println("Blocked request")
-			return nil
-		}
 		if websocket.IsWebSocketUpgrade(c) { // Returns true if the client requested upgrade to the WebSocket protocol
 			log.Println("Websocket upgraded")
 			return c.Next()
@@ -226,6 +244,22 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error abandon game: ", err)
 			}
+		
+		case "request-draw":
+			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
+			err := requestDrawController.Invoke()
+			if err != nil {
+				log.Println("Error request draw: ", err)
+			}
+		
+		case "response-draw":
+			fmt.Println("drawresponse")
+			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
+			err := responseDrawController.Invoke(reqBody)
+			if err != nil {
+				log.Println("Error response draw: ", err)
+			}
+
 			// Connection is closed by the client
 			// TODO: Remove room from room manager
 		default:

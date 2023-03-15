@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import router from '@/router'
 import { usePlayerIDStore } from '@/stores/playerID'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const MaxPlayerIDLength = 15
 const playerIDStore = usePlayerIDStore()
 let playerID = ref('')
 playerID.value = !playerIDStore.isEmpty ? playerIDStore.id : ''
 
-function confirmNickname() {
+function confirmNickname(event: Event) {
+    event.preventDefault()
+
     playerIDStore.set(playerID.value)
     router.push({ name: 'rooms' })
 }
@@ -17,6 +19,13 @@ watch(playerID, () => {
     if (playerID.value.length > MaxPlayerIDLength) {
         playerID.value = playerID.value.slice(0, MaxPlayerIDLength)
     }
+})
+
+onMounted(() => {
+    // When loading the page, set the cursor on the input text field so the user
+    // can directly write its name without the need of clicking on the form
+    const inputNickElement = document.getElementById('input-nickname')
+    inputNickElement?.focus()
 })
 </script>
 
@@ -31,6 +40,7 @@ watch(playerID, () => {
                     <div class="mb-3">
                         <label for="input-nickname" class="form-label text-light">Choose your nickname</label>
                         <input
+                            tabindex="1"
                             type="text"
                             class="form-control"
                             id="input-nickname"
@@ -39,7 +49,8 @@ watch(playerID, () => {
                         />
                     </div>
                     <button
-                        type="button"
+                        tabindex="2"
+                        type="submit"
                         :disabled="playerID.length === 0"
                         class="btn btn-green w-100"
                         @click="confirmNickname"

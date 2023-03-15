@@ -57,4 +57,23 @@ const constants = {
     StartingPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 }
 
-export { File, fileToString, rankToString, Rank, Color, PieceType, pieceTypeToNumber, numberToPieceType, constants }
+enum EndGameReason {
+    ABANDON = 'abandon',
+    DRAW_REQUEST = 'draw-request',
+    DRAW = 'draw',
+    DRAWDECLINED = 'drawdeclined',
+    CHECKMATE = 'checkmate'
+}
+
+export {
+    File,
+    fileToString,
+    rankToString,
+    Rank,
+    Color,
+    PieceType,
+    pieceTypeToNumber,
+    numberToPieceType,
+    EndGameReason,
+    constants
+}

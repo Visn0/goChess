@@ -22,7 +22,7 @@ func (c *MovePieceWsController) Invoke(body []byte) error {
 	var p application.MovePieceParams
 	err := json.Unmarshal(body, &p)
 	if err != nil {
-		log.Println("Error unmarshalling request create room:", err)
+		log.Println("Error unmarshalling move piece params:", err)
 		return err
 	}
 

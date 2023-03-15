@@ -1,8 +1,14 @@
 # GoChess
 
 <span style="color:red">
+
 It's in development!
+
 </span>
+
+You can play it here [https://gochess](https://www.youtube.com/watch?v=oHg5SJYRHA0)
+
+If it doesn't work try here [http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/](http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/)
 
 ## Description
 
@@ -33,12 +39,12 @@ In the root folder of the project:
 ```bash
 # To install project dependencies (this may take a few minutes).
 # Required only the first time.
-$ make install_project
+$ make install_dependencies
 ```
 
 ```bash
 # To run the frontend
-$ make up
+$ make up.frontend
 ```
 
 In another shell:
@@ -68,7 +74,7 @@ Once the server is up and running, open your browser and type `http://localhost:
         </ul>
     </p>
   </li>
-    <li>
+  <li>
     <p>
       <b>Carlos Eduardo Arismendi Sánchez</b>:
         <ul>
@@ -77,6 +83,19 @@ Once the server is up and running, open your browser and type `http://localhost:
           </li>
           <li>
             Email: <a href="mailto:carlos.arismendisanchez@gmail.com">carlos.arismendisanchez@gmail.com</a>
+          </li>
+        </ul>
+    </p>
+  </li>
+  <li>
+    <p>
+      <b>Jonathan Santos Castro</b>:
+        <ul>
+          <li>
+            LinkedIn: <a href="https://www.linkedin.com/in/jonathan-santos24/">https://www.linkedin.com/in/jonathan-santos24/</a>
+          </li>
+          <li>
+            Email: <a href="mailto:jonathan.santoscastro24@gmail.com">jonathan.santoscastro24@gmail.com</a>
           </li>
         </ul>
     </p>
