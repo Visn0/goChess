@@ -196,30 +196,32 @@ func (g *Game) getKingCastlePositions(pos *Position, p IPiece, positions *[]*Pos
 // TODO: not the most efficient way to do this (implement it with a copy of the board)
 func (g *Game) filterMovesIfCheck(from *Position, positions []*Position) []*Position {
 	filteredPositions := []*Position{}
+	// fmt.Println("From: ", from, " To: ", positions)
 	for _, pos := range positions {
 		move := &Move{From: from, To: pos}
 		if !g.isCheckAfterMove(move) {
 			filteredPositions = append(filteredPositions, pos)
 		}
 	}
+	// fmt.Println(filteredPositions)
 	return filteredPositions
 }
 
 // Check if the move will put the king in check
 func (g *Game) isCheckAfterMove(move *Move) bool {
-	boardCopy := g.Board.Copy()
-	boardCopy.ExecuteMove(move) //TODO: doesn't work perfectly for castling or en passant yet
-	// Check if the king is in check
-	enemyKingPos := g.Board.GetKingPos(g.ColorToMove)
+	gameCopy := g.Copy()
+	gameCopy.Move(move, nil) //TODO: doesn't work perfectly for castling or en passant yet
+	playerColor := gameCopy.ColorToMove
+	enemyColor := !gameCopy.ColorToMove
+	// Check if player king is in check
+	kingPos := gameCopy.Board.GetKingPos(playerColor)
 	// If the king is moved, update the king position
-	if enemyKingPos.Rank == move.From.Rank && enemyKingPos.File == move.From.File {
-		enemyKingPos = move.To
+	if kingPos.Rank == move.From.Rank && kingPos.File == move.From.File {
+		kingPos = move.To
 	}
-	if enemyKingPos == nil {
-		fmt.Println("King not found: " + g.ColorToMove.String())
+	if kingPos == nil {
+		fmt.Println("King not found: " + gameCopy.ColorToMove.String())
 	}
-	if boardCopy.PositionIsUnderAttack(enemyKingPos, !g.ColorToMove) {
-		return true
-	}
-	return false
+	// fmt.Println("King pos: " + kingPos.String())
+	return gameCopy.Board.PositionIsUnderAttack(kingPos, enemyColor)
 }

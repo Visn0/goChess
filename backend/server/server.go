@@ -195,6 +195,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			log.Println("Error calculating first valid moves")
 			return
 		}
+		fmt.Println("Calculating valid moves for white player")
 	}
 
 	for {
@@ -227,8 +228,8 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			player.StopTimer()
 			enemy.StartTimer()
 
-			fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
-			fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
+			// fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
+			// fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
 
 		case "get-timers":
 			getTimersController := infrastructure.NewGetTimersWsController(c, player, enemy)

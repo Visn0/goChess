@@ -2,7 +2,7 @@ package application
 
 import (
 	"chess/server/domain"
-	"chess/server/shared"
+	"fmt"
 	"log"
 )
 
@@ -68,7 +68,7 @@ func (uc *MovePieceAction) setGameStatus(enemyColor domain.Color, output *MovePi
 }
 
 func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
-	log.Println("==> Move piece params: ", shared.ToJSONString(p))
+	// log.Println("==> Move piece params: ", shared.ToJSONString(p))
 	move := &domain.Move{
 		From: p.Src,
 		To:   p.Dst,
@@ -78,12 +78,13 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 	enemyColor := !playerColor
 
 	uc.game.Move(move, p.PromoteTo)
+	fmt.Println("Game EnpassantPieces: ", uc.game.EnPassantPieces)
 	uc.game.ColorToMove = enemyColor
 
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
 	uc.setGameStatus(enemyColor, output)
 
-	log.Println("##> Move piece output: ", shared.ToJSONString(output))
+	// log.Println("##> Move piece output: ", shared.ToJSONString(output))
 	log.Println("##> Player to move: ", enemyColor)
 	err := uc.c.SendWebSocketMessage(output)
 	if err != nil {

@@ -111,11 +111,23 @@ func (p *PieceBase) SetPiece(pieceType PieceType, color Color) {
 }
 
 func (p *PieceBase) Copy() IPiece {
-	return &PieceBase{
-		PieceType: p.PieceType,
-		Color:     p.Color,
-		FirstMove: p.FirstMove,
+	var piece IPiece
+	switch p.PieceType {
+	case PAWN:
+		piece = &Pawn{}
+	case ROOK:
+		piece = &Rook{}
+	case KNIGHT:
+		piece = &Knight{}
+	case BISHOP:
+		piece = &Bishop{}
+	case QUEEN:
+		piece = &Queen{}
+	case KING:
+		piece = &King{}
 	}
+	piece.SetPiece(p.PieceType, p.Color)
+	return piece
 }
 
 func (p *Pawn) SetPiece(pieceType PieceType, color Color) {
