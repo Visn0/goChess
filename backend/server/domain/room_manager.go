@@ -35,3 +35,9 @@ func (rm *RoomManager) AddRoom(room *Room) {
 	defer rm.mu.Unlock()
 	rm.rooms[room.ID] = room
 }
+
+func (rm *RoomManager) RemoveRoom(id string) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+	delete(rm.rooms, id)
+}
