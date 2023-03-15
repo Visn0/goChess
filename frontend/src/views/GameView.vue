@@ -218,7 +218,14 @@ function closemodal(name: string) {
         </div>
 
         <!--Abandon modal-->
-        <div id="abandon-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('abandon-modal')">
+        <div
+            id="abandon-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+            hidden="true"
+            @click="closemodal('abandon-modal')"
+        >
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -232,7 +239,14 @@ function closemodal(name: string) {
         </div>
 
         <!--End game modal-->
-        <div id="endgame-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('endgame-modal')">
+        <div
+            id="endgame-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+            hidden="true"
+            @click="closemodal('endgame-modal')"
+        >
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <div class="modal-body">
@@ -263,7 +277,14 @@ function closemodal(name: string) {
         </div>
 
         <!--Draw decline modal-->
-        <div id="draw-decline-modal" class="modal" tabindex="-1" style="display: block" hidden="true" @click="closemodal('draw-decline-modal')">
+        <div
+            id="draw-decline-modal"
+            class="modal"
+            tabindex="-1"
+            style="display: block"
+            hidden="true"
+            @click="closemodal('draw-decline-modal')"
+        >
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-dark text-light">
                     <h5 class="modal-title">Oponent player decline draw</h5>

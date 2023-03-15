@@ -111,8 +111,7 @@ func (s *Server) initWebsocket() {
 
 		_, message, err := wsConn.ReadMessage()
 		if err != nil {
-			// Error reading because of an unexpected disconnect (probably)
-			log.Println("Some error:", err)
+			log.Println("Error during ws connection:", err)
 			return
 		}
 
@@ -186,14 +185,14 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			log.Println("Error starting game: ", err)
 			_ = c.SendWebSocketMessage(err)
 			_ = cEnemy.SendWebSocketMessage(err)
+			s.roomManager.RemoveRoom(room.ID)
 			return
 		}
 	}
 	if player.Color == domain.WHITE {
 		ok := room.Game.CalculateValidMoves(domain.WHITE)
 		if !ok {
-			log.Println("Error calculating first valid moves")
-			return
+			panic("Error calculating first valid moves")
 		}
 		fmt.Println("Calculating valid moves for white player")
 	}
@@ -203,7 +202,18 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
-			player = nil
+			// _ = c.SendWebSocketMessage(err)
+			// room.RemovePlayer(player)
+			if room.GetRoomSize() > 1 {
+				log.Println("Trying to send abandon message to enemy")
+				abandonController := infrastructure.NewAbandonWsController(cEnemy)
+				err := abandonController.Invoke()
+				if err != nil {
+					log.Println("Error abandon game: ", err)
+				}
+				room.RemovePlayer(player)
+				s.roomManager.RemoveRoom(room.ID)
+			}
 			return
 		}
 
@@ -244,14 +254,14 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if err != nil {
 				log.Println("Error abandon game: ", err)
 			}
-		
+
 		case "request-draw":
 			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
 			err := requestDrawController.Invoke()
 			if err != nil {
 				log.Println("Error request draw: ", err)
 			}
-		
+
 		case "response-draw":
 			fmt.Println("drawresponse")
 			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)

@@ -9,8 +9,8 @@ type ResponseDrawParam struct {
 }
 
 type ResponseDrawOutput struct {
-	Action string `json:"action"`
-	DrawResponse bool `json:"drawResponse"`
+	Action       string `json:"action"`
+	DrawResponse bool   `json:"drawResponse"`
 }
 
 type ResponseDrawAction struct {
@@ -25,7 +25,7 @@ func NewResponseDrawAction(c domain.ConnectionRepository) *ResponseDrawAction {
 
 func (uc *ResponseDrawAction) Invoke(drawResponse bool) error {
 	output := ResponseDrawOutput{
-		Action: "draw-response",
+		Action:       "draw-response",
 		DrawResponse: drawResponse,
 	}
 
