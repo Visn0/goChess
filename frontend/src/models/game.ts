@@ -148,20 +148,29 @@ class Game {
         }
 
         if (this._srcSquare !== null) {
+            // Click same selected piece => unselect piece
             if (this._srcSquare.equals(square)) {
                 this.unselectSrcSquare()
                 return
             }
 
+            // Click other piece of same color => change selected piece
+            if (square.getPiece()?.color === this._srcSquare.square.getPiece()?.color) {
+                this.unselectSrcSquare()
+                this.selectSquare(square)
+                return
+            }
+
+            // Click a square that is not a valid move => unselect piece
             if (!this._srcSquare.canInnerPieceMoveTo(square)) {
                 this.unselectSrcSquare()
                 return
             }
 
+            // Click a square that can promote a pawn => show promotion options
             if (this.canPromote(this._srcSquare, square)) {
                 this.dstPromotedPawn = square
                 this._pendingPromotion.value = true
-                // show piece options to player
                 return
             }
 
