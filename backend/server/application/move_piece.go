@@ -2,6 +2,7 @@ package application
 
 import (
 	"chess/server/domain"
+	"chess/server/shared"
 	"fmt"
 	"log"
 )
@@ -32,16 +33,15 @@ func newMovePieceOutput(src, dst *domain.Position, promoteTo *domain.PieceType) 
 }
 
 type MovePieceAction struct {
-	c      domain.ConnectionRepository
-	cEnemy domain.ConnectionRepository
+	player *domain.Player
+	enemy  *domain.Player
 	game   *domain.Game
 }
 
-func NewMovePieceAction(c domain.ConnectionRepository, cEnemy domain.ConnectionRepository,
-	game *domain.Game) *MovePieceAction {
+func NewMovePieceAction(player, enemy *domain.Player, game *domain.Game) *MovePieceAction {
 	return &MovePieceAction{
-		c:      c,
-		cEnemy: cEnemy,
+		player: player,
+		enemy:  enemy,
 		game:   game,
 	}
 }
@@ -67,8 +67,8 @@ func (uc *MovePieceAction) setGameStatus(enemyColor domain.Color, output *MovePi
 	}
 }
 
-func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
-	// log.Println("==> Move piece params: ", shared.ToJSONString(p))
+func (uc *MovePieceAction) Invoke(p *MovePieceParams) (*MovePieceOutput, error) {
+	log.Println("==> Move piece params: ", shared.ToJSONString(p))
 	move := &domain.Move{
 		From: p.Src,
 		To:   p.Dst,
@@ -84,12 +84,9 @@ func (uc *MovePieceAction) Invoke(p *MovePieceParams) error {
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
 	uc.setGameStatus(enemyColor, output)
 
-	// log.Println("##> Move piece output: ", shared.ToJSONString(output))
-	log.Println("##> Player to move: ", enemyColor)
-	err := uc.c.SendWebSocketMessage(output)
-	if err != nil {
-		return nil
-	}
+	uc.player.StopTimer()
+	uc.enemy.StartTimer()
 
-	return uc.cEnemy.SendWebSocketMessage(output)
+	log.Println("##> Move piece output: ", shared.ToJSONString(output))
+	return output, nil
 }

@@ -15,6 +15,6 @@ func NewAbandonWsController(c domain.ConnectionRepository) *AbandonWsController 
 	}
 }
 
-func (c *AbandonWsController) Invoke() error {
+func (c *AbandonWsController) Invoke(_ []byte) error {
 	return c.uc.Invoke()
 }

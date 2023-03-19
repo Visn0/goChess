@@ -197,21 +197,26 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		fmt.Println("Calculating valid moves for white player")
 	}
 
+	wsRouter := NewWsRouter()
+	wsRouter.Add("request-moves", infrastructure.NewGetValidMovesWsController(c, room.Game).Invoke)
+	wsRouter.Add("move-piece", infrastructure.NewMovePieceWsController(player, enemy, c, cEnemy, room.Game).Invoke)
+	wsRouter.Add("get-timers", infrastructure.NewGetTimersWsController(c, player, enemy).Invoke)
+	wsRouter.Add("abandon", infrastructure.NewAbandonWsController(cEnemy).Invoke)
+	wsRouter.Add("request-draw", infrastructure.NewRequestDrawWsController(cEnemy).Invoke)
+	wsRouter.Add("response-draw", infrastructure.NewResponseDrawWsController(cEnemy).Invoke)
+
 	for {
 		// Blocking when waiting for the enemy player action
 		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
-			// _ = c.SendWebSocketMessage(err)
-			// room.RemovePlayer(player)
 			if room.GetRoomSize() > 1 {
 				log.Println("Trying to send abandon message to enemy")
-				abandonController := infrastructure.NewAbandonWsController(cEnemy)
-				err := abandonController.Invoke()
+				wsRouter.Handle("abandon", nil)
 				if err != nil {
 					log.Println("Error abandon game: ", err)
 				}
-				room.RemovePlayer(player)
+				_ = room.RemovePlayer(player)
 				s.roomManager.RemoveRoom(room.ID)
 			}
 			return
@@ -220,61 +225,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")
 
-		switch reqAction {
-		case "request-moves":
-			getValidMovesController := infrastructure.NewGetValidMovesWsController(c, room.Game)
-			err := getValidMovesController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error getting valid moves: ", err)
-			}
-
-		case "move-piece":
-			movePieceController := infrastructure.NewMovePieceWsController(c, cEnemy, room.Game)
-			err := movePieceController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error getting move piece: ", err)
-			}
-
-			player.StopTimer()
-			enemy.StartTimer()
-
-			// fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
-			// fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
-
-		case "get-timers":
-			getTimersController := infrastructure.NewGetTimersWsController(c, player, enemy)
-			err := getTimersController.Invoke()
-			if err != nil {
-				log.Println("Error getting player timers: ", err)
-			}
-
-		case "abandon":
-			abandonController := infrastructure.NewAbandonWsController(cEnemy)
-			err := abandonController.Invoke()
-			if err != nil {
-				log.Println("Error abandon game: ", err)
-			}
-
-		case "request-draw":
-			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
-			err := requestDrawController.Invoke()
-			if err != nil {
-				log.Println("Error request draw: ", err)
-			}
-
-		case "response-draw":
-			fmt.Println("drawresponse")
-			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
-			err := responseDrawController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error response draw: ", err)
-			}
-
-			// Connection is closed by the client
-			// TODO: Remove room from room manager
-		default:
-			log.Println("Unknown action")
-		}
+		wsRouter.Handle(reqAction, reqBody)
 	}
 }
 

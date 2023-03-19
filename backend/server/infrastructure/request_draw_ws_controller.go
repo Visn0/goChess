@@ -15,6 +15,6 @@ func NewRequestDrawWsController(c domain.ConnectionRepository) *RequestDrawWsCon
 	}
 }
 
-func (c *RequestDrawWsController) Invoke() error {
+func (c *RequestDrawWsController) Invoke(_ []byte) error {
 	return c.uc.Invoke()
 }

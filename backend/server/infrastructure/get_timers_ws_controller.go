@@ -15,6 +15,6 @@ func NewGetTimersWsController(c domain.ConnectionRepository, player, enemy *doma
 	}
 }
 
-func (c *GetTimersWsController) Invoke() error {
+func (c *GetTimersWsController) Invoke(_ []byte) error {
 	return c.uc.Invoke()
 }
