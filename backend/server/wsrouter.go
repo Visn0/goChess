@@ -11,9 +11,9 @@ type WsRouter struct {
 	handlers map[string]WsHandler
 }
 
-func NewWsRouter() *WsRouter {
+func NewWsRouter(paths map[string]WsHandler) *WsRouter {
 	return &WsRouter{
-		handlers: make(map[string]WsHandler),
+		handlers: paths,
 	}
 }
 
@@ -32,7 +32,9 @@ func (r *WsRouter) Handle(path string, body []byte) {
 		return
 	}
 
-	log.Printf("=> Running handler for path %q.\n", path)
+	log.Printf("==> Running handler for path %q.\n", path)
+	log.Println("Input params:")
+	log.Printf("%v", body)
 	err := handler(body)
 	if err != nil {
 		log.Printf("=> Error running handler for path %q: %v", path, err)

@@ -197,13 +197,14 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		fmt.Println("Calculating valid moves for white player")
 	}
 
-	wsRouter := NewWsRouter()
-	wsRouter.Add("request-moves", infrastructure.NewGetValidMovesWsController(c, room.Game).Invoke)
-	wsRouter.Add("move-piece", infrastructure.NewMovePieceWsController(player, enemy, c, cEnemy, room.Game).Invoke)
-	wsRouter.Add("get-timers", infrastructure.NewGetTimersWsController(c, player, enemy).Invoke)
-	wsRouter.Add("abandon", infrastructure.NewAbandonWsController(cEnemy).Invoke)
-	wsRouter.Add("request-draw", infrastructure.NewRequestDrawWsController(cEnemy).Invoke)
-	wsRouter.Add("response-draw", infrastructure.NewResponseDrawWsController(cEnemy).Invoke)
+	wsRouter := NewWsRouter(map[string]WsHandler{
+		"request-moves": infrastructure.NewGetValidMovesWsController(c, room.Game).Invoke,
+		"move-piece":    infrastructure.NewMovePieceWsController(player, enemy, c, cEnemy, room.Game).Invoke,
+		"get-timers":    infrastructure.NewGetTimersWsController(c, player, enemy).Invoke,
+		"abandon":       infrastructure.NewAbandonWsController(cEnemy).Invoke,
+		"request-draw":  infrastructure.NewRequestDrawWsController(cEnemy).Invoke,
+		"response-draw": infrastructure.NewResponseDrawWsController(cEnemy).Invoke,
+	})
 
 	for {
 		// Blocking when waiting for the enemy player action
@@ -213,9 +214,7 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			if room.GetRoomSize() > 1 {
 				log.Println("Trying to send abandon message to enemy")
 				wsRouter.Handle("abandon", nil)
-				if err != nil {
-					log.Println("Error abandon game: ", err)
-				}
+
 				_ = room.RemovePlayer(player)
 				s.roomManager.RemoveRoom(room.ID)
 			}
