@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"chess/server/application"
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 	"encoding/json"
 	"log"
 )
@@ -11,20 +11,28 @@ type MovePieceWsController struct {
 	uc *application.MovePieceAction
 }
 
-func NewMovePieceWsController(ownRepository domain.ConnectionRepository, enemyRepository domain.ConnectionRepository,
-	game *domain.Game) *MovePieceWsController {
+func NewMovePieceWsController() *MovePieceWsController {
 	return &MovePieceWsController{
-		uc: application.NewMovePieceAction(ownRepository, enemyRepository, game),
+		uc: application.NewMovePieceAction(),
 	}
 }
 
-func (c *MovePieceWsController) Invoke(body []byte) error {
+func (c *MovePieceWsController) Invoke(ctx *wsrouter.Context) error {
 	var p application.MovePieceParams
-	err := json.Unmarshal(body, &p)
+	err := json.Unmarshal(ctx.Body, &p)
 	if err != nil {
 		log.Println("Error unmarshalling move piece params:", err)
 		return err
 	}
 
-	return c.uc.Invoke(&p)
+	output, err := c.uc.Invoke(ctx, &p)
+	if err != nil {
+		return nil
+	}
+
+	if err := ctx.OwnRepository.SendWebSocketMessage(output); err != nil {
+		return err
+	}
+
+	return ctx.EnemyRepository.SendWebSocketMessage(output)
 }

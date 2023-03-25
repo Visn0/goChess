@@ -5,6 +5,7 @@ import (
 	"chess/server/domain"
 	"chess/server/infrastructure"
 	"chess/server/shared"
+	"chess/server/shared/wsrouter"
 	"flag"
 	"fmt"
 	"log"
@@ -20,23 +21,13 @@ import (
 	websocket "github.com/gofiber/websocket/v2"
 )
 
-type subEvent struct {
-	Connection *shared.WsConn
-	Body       []byte
-}
-
 type Server struct {
 	addr string
 	port string
 	app  *fiber.App
 
-	wsConnections      map[*shared.WsConn]struct{}
-	wsConnectionsMutex sync.Mutex
-
-	register   chan subEvent
-	unregister chan subEvent
-
 	roomManager *domain.RoomManager
+	wsRouter    *wsrouter.WsRouter
 }
 
 func NewServer(addr, port string) *Server {
@@ -44,15 +35,21 @@ func NewServer(addr, port string) *Server {
 	app.Use(cors.New())
 	app.Use(recover.New())
 
+	wsRouter := wsrouter.NewWsRouter(map[string]wsrouter.WsHandler{
+		"request-moves": infrastructure.NewGetValidMovesWsController().Invoke,
+		"move-piece":    infrastructure.NewMovePieceWsController().Invoke,
+		"get-timers":    infrastructure.NewGetTimersWsController().Invoke,
+		"abandon":       infrastructure.NewAbandonWsController().Invoke,
+		"request-draw":  infrastructure.NewRequestDrawWsController().Invoke,
+		"response-draw": infrastructure.NewResponseDrawWsController().Invoke,
+	})
+
 	return &Server{
-		addr:               addr,
-		port:               port,
-		app:                app,
-		wsConnections:      make(map[*shared.WsConn]struct{}),
-		wsConnectionsMutex: sync.Mutex{},
-		register:           make(chan subEvent),
-		unregister:         make(chan subEvent),
-		roomManager:        domain.NewRoomManager(),
+		addr:        addr,
+		port:        port,
+		app:         app,
+		roomManager: domain.NewRoomManager(),
+		wsRouter:    wsRouter,
 	}
 }
 
@@ -142,7 +139,7 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.wsRouter(room, c, true, wg)
+			s.handleGame(room, c, true, wg)
 
 		case "join-room":
 			log.Println("Request join room")
@@ -154,14 +151,14 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.wsRouter(room, c, false, wg)
+			s.handleGame(room, c, false, wg)
 		}
 
 		wg.Wait()
 	}))
 }
 
-func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	log.Println("Room activated")
@@ -202,16 +199,12 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		_, message, err := player.Ws.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
-			// _ = c.SendWebSocketMessage(err)
-			// room.RemovePlayer(player)
 			if room.GetRoomSize() > 1 {
 				log.Println("Trying to send abandon message to enemy")
-				abandonController := infrastructure.NewAbandonWsController(cEnemy)
-				err := abandonController.Invoke()
-				if err != nil {
-					log.Println("Error abandon game: ", err)
-				}
-				room.RemovePlayer(player)
+				ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, nil)
+				s.wsRouter.Handle("abandon", ctx)
+
+				_ = room.RemovePlayer(player)
 				s.roomManager.RemoveRoom(room.ID)
 			}
 			return
@@ -220,61 +213,8 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")
 
-		switch reqAction {
-		case "request-moves":
-			getValidMovesController := infrastructure.NewGetValidMovesWsController(c, room.Game)
-			err := getValidMovesController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error getting valid moves: ", err)
-			}
-
-		case "move-piece":
-			movePieceController := infrastructure.NewMovePieceWsController(c, cEnemy, room.Game)
-			err := movePieceController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error getting move piece: ", err)
-			}
-
-			player.StopTimer()
-			enemy.StartTimer()
-
-			// fmt.Println("Moved Player: ", player.ID, " color: ", player.Color, " Time left:", player.TimeLeft())
-			// fmt.Println("Turn Player: ", enemy.ID, " color: ", enemy.Color, " Time left:", enemy.TimeLeft())
-
-		case "get-timers":
-			getTimersController := infrastructure.NewGetTimersWsController(c, player, enemy)
-			err := getTimersController.Invoke()
-			if err != nil {
-				log.Println("Error getting player timers: ", err)
-			}
-
-		case "abandon":
-			abandonController := infrastructure.NewAbandonWsController(cEnemy)
-			err := abandonController.Invoke()
-			if err != nil {
-				log.Println("Error abandon game: ", err)
-			}
-
-		case "request-draw":
-			requestDrawController := infrastructure.NewRequestDrawWsController(cEnemy)
-			err := requestDrawController.Invoke()
-			if err != nil {
-				log.Println("Error request draw: ", err)
-			}
-
-		case "response-draw":
-			fmt.Println("drawresponse")
-			responseDrawController := infrastructure.NewResponseDrawWsController(cEnemy)
-			err := responseDrawController.Invoke(reqBody)
-			if err != nil {
-				log.Println("Error response draw: ", err)
-			}
-
-			// Connection is closed by the client
-			// TODO: Remove room from room manager
-		default:
-			log.Println("Unknown action")
-		}
+		ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, reqBody)
+		s.wsRouter.Handle(reqAction, ctx)
 	}
 }
 

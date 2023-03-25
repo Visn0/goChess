@@ -2,8 +2,8 @@ package application
 
 import (
 	"chess/server/domain"
-
-	"fmt"
+	"chess/server/shared/chesserror"
+	"chess/server/shared/wsrouter"
 )
 
 type GetValidMovesParams struct {
@@ -17,37 +17,28 @@ type GetValidMovesOutput struct {
 }
 
 type GetValidMovesAction struct {
-	c    domain.ConnectionRepository
-	game *domain.Game
 }
 
-func NewGetValidMovesAction(c domain.ConnectionRepository, game *domain.Game) *GetValidMovesAction {
-	return &GetValidMovesAction{
-		c:    c,
-		game: game,
-	}
+func NewGetValidMovesAction() *GetValidMovesAction {
+	return &GetValidMovesAction{}
 }
 
-func (uc *GetValidMovesAction) Invoke(p *GetValidMovesParams) error {
-	piece := uc.game.Board.GetPiece(&domain.Position{Rank: p.Rank, File: p.File})
+func (uc *GetValidMovesAction) Invoke(ctx *wsrouter.Context, p *GetValidMovesParams) (*GetValidMovesOutput, error) {
+	piece := ctx.Game.Board.GetPiece(&domain.Position{Rank: p.Rank, File: p.File})
 	if piece == nil {
-		fmt.Println("No piece found at given position")
-		return nil
-	}
-	if piece.GetColor() != uc.game.ColorToMove {
-		fmt.Println("Not your turn")
-		return nil
-	}
-	validMoves := piece.GetValidMoves()
-	if validMoves == nil {
-		fmt.Println("No valid moves found")
-		return nil
+		return nil, chesserror.NewError(chesserror.ResourceNotFound, "No piece found at given position")
 	}
 
-	output := GetValidMovesOutput{
+	if piece.GetColor() != ctx.Game.ColorToMove {
+		return nil, chesserror.NewError(chesserror.GenericError,
+			"Movement not valid: it is not the turn of the given player.")
+	}
+
+	validMoves := piece.GetValidMoves()
+	output := &GetValidMovesOutput{
 		Action:     "request-moves",
 		ValidMoves: validMoves,
 	}
 
-	return uc.c.SendWebSocketMessage(output)
+	return output, nil
 }

@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"chess/server/application"
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 	"encoding/json"
 	"log"
 )
@@ -11,19 +11,24 @@ type GetValidMovesWsController struct {
 	uc *application.GetValidMovesAction
 }
 
-func NewGetValidMovesWsController(r domain.ConnectionRepository, game *domain.Game) *GetValidMovesWsController {
+func NewGetValidMovesWsController() *GetValidMovesWsController {
 	return &GetValidMovesWsController{
-		uc: application.NewGetValidMovesAction(r, game),
+		uc: application.NewGetValidMovesAction(),
 	}
 }
 
-func (c *GetValidMovesWsController) Invoke(body []byte) error {
+func (c *GetValidMovesWsController) Invoke(ctx *wsrouter.Context) error {
 	var p application.GetValidMovesParams
-	err := json.Unmarshal(body, &p)
+	err := json.Unmarshal(ctx.Body, &p)
 	if err != nil {
 		log.Println("Error unmarshalling request create room:", err)
 		return err
 	}
 
-	return c.uc.Invoke(&p)
+	output, err := c.uc.Invoke(ctx, &p)
+	if err != nil {
+		return err
+	}
+
+	return ctx.OwnRepository.SendWebSocketMessage(output)
 }

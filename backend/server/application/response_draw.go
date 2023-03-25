@@ -1,7 +1,7 @@
 package application
 
 import (
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 )
 
 type ResponseDrawParam struct {
@@ -14,20 +14,17 @@ type ResponseDrawOutput struct {
 }
 
 type ResponseDrawAction struct {
-	c domain.ConnectionRepository
 }
 
-func NewResponseDrawAction(c domain.ConnectionRepository) *ResponseDrawAction {
-	return &ResponseDrawAction{
-		c: c,
-	}
+func NewResponseDrawAction() *ResponseDrawAction {
+	return &ResponseDrawAction{}
 }
 
-func (uc *ResponseDrawAction) Invoke(drawResponse bool) error {
+func (uc *ResponseDrawAction) Invoke(ctx *wsrouter.Context, p *ResponseDrawParam) error {
 	output := ResponseDrawOutput{
 		Action:       "draw-response",
-		DrawResponse: drawResponse,
+		DrawResponse: p.DrawResponse,
 	}
 
-	return uc.c.SendWebSocketMessage(output)
+	return ctx.EnemyRepository.SendWebSocketMessage(output)
 }

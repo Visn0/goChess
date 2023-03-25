@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"chess/server/application"
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 	"encoding/json"
 	"log"
 )
@@ -11,19 +11,19 @@ type ResponseDrawWsController struct {
 	uc *application.ResponseDrawAction
 }
 
-func NewResponseDrawWsController(c domain.ConnectionRepository) *ResponseDrawWsController {
+func NewResponseDrawWsController() *ResponseDrawWsController {
 	return &ResponseDrawWsController{
-		uc: application.NewResponseDrawAction(c),
+		uc: application.NewResponseDrawAction(),
 	}
 }
 
-func (c *ResponseDrawWsController) Invoke(body []byte) error {
+func (c *ResponseDrawWsController) Invoke(ctx *wsrouter.Context) error {
 	var p application.ResponseDrawParam
-	err := json.Unmarshal(body, &p)
+	err := json.Unmarshal(ctx.Body, &p)
 	if err != nil {
 		log.Println("Error unmarshalling draw response:", err)
 		return err
 	}
 
-	return c.uc.Invoke(p.DrawResponse)
+	return c.uc.Invoke(ctx, &p)
 }
