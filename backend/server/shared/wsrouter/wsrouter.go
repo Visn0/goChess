@@ -1,11 +1,11 @@
-package server
+package wsrouter
 
 import (
 	"fmt"
 	"log"
 )
 
-type WsHandler func([]byte) error
+type WsHandler func(*Context) error
 
 type WsRouter struct {
 	handlers map[string]WsHandler
@@ -25,7 +25,7 @@ func (r *WsRouter) Add(path string, wsHandler WsHandler) {
 	r.handlers[path] = wsHandler
 }
 
-func (r *WsRouter) Handle(path string, body []byte) {
+func (r *WsRouter) Handle(path string, ctx *Context) {
 	handler, ok := r.handlers[path]
 	if !ok {
 		log.Printf("Path not found: %q", path)
@@ -34,8 +34,8 @@ func (r *WsRouter) Handle(path string, body []byte) {
 
 	log.Printf("==> Running handler for path %q.\n", path)
 	log.Println("Input params:")
-	log.Printf("%v", body)
-	err := handler(body)
+	log.Printf("%v", string(ctx.Body))
+	err := handler(ctx)
 	if err != nil {
 		log.Printf("=> Error running handler for path %q: %v", path, err)
 	}

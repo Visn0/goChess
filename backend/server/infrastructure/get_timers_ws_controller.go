@@ -2,19 +2,19 @@ package infrastructure
 
 import (
 	"chess/server/application"
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 )
 
 type GetTimersWsController struct {
 	uc *application.GetTimersAction
 }
 
-func NewGetTimersWsController(c domain.ConnectionRepository, player, enemy *domain.Player) *GetTimersWsController {
+func NewGetTimersWsController() *GetTimersWsController {
 	return &GetTimersWsController{
-		uc: application.NewGetTimersAction(c, player, enemy),
+		uc: application.NewGetTimersAction(),
 	}
 }
 
-func (c *GetTimersWsController) Invoke(_ []byte) error {
-	return c.uc.Invoke()
+func (c *GetTimersWsController) Invoke(ctx *wsrouter.Context) error {
+	return c.uc.Invoke(ctx)
 }

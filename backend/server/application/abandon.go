@@ -1,7 +1,7 @@
 package application
 
 import (
-	"chess/server/domain"
+	"chess/server/shared/wsrouter"
 )
 
 type AbandonOutput struct {
@@ -9,19 +9,16 @@ type AbandonOutput struct {
 }
 
 type AbandonAction struct {
-	c domain.ConnectionRepository
 }
 
-func NewAbandonAction(c domain.ConnectionRepository) *AbandonAction {
-	return &AbandonAction{
-		c: c,
-	}
+func NewAbandonAction() *AbandonAction {
+	return &AbandonAction{}
 }
 
-func (uc *AbandonAction) Invoke() error {
+func (uc *AbandonAction) Invoke(ctx *wsrouter.Context) error {
 	output := AbandonOutput{
 		Action: "abandon",
 	}
 
-	return uc.c.SendWebSocketMessage(output)
+	return ctx.EnemyRepository.SendWebSocketMessage(output)
 }

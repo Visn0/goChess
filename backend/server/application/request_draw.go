@@ -1,27 +1,22 @@
 package application
 
-import (
-	"chess/server/domain"
-)
+import "chess/server/shared/wsrouter"
 
 type RequestDrawOutput struct {
 	Action string `json:"action"`
 }
 
 type RequestDrawAction struct {
-	c domain.ConnectionRepository
 }
 
-func NewRequestDrawAction(c domain.ConnectionRepository) *RequestDrawAction {
-	return &RequestDrawAction{
-		c: c,
-	}
+func NewRequestDrawAction() *RequestDrawAction {
+	return &RequestDrawAction{}
 }
 
-func (uc *RequestDrawAction) Invoke() error {
+func (uc *RequestDrawAction) Invoke(ctx *wsrouter.Context) error {
 	output := RequestDrawOutput{
 		Action: "draw-request",
 	}
 
-	return uc.c.SendWebSocketMessage(output)
+	return ctx.EnemyRepository.SendWebSocketMessage(output)
 }

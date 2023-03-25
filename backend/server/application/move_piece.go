@@ -3,6 +3,7 @@ package application
 import (
 	"chess/server/domain"
 	"chess/server/shared"
+	"chess/server/shared/wsrouter"
 	"fmt"
 	"log"
 )
@@ -33,30 +34,23 @@ func newMovePieceOutput(src, dst *domain.Position, promoteTo *domain.PieceType) 
 }
 
 type MovePieceAction struct {
-	player *domain.Player
-	enemy  *domain.Player
-	game   *domain.Game
 }
 
-func NewMovePieceAction(player, enemy *domain.Player, game *domain.Game) *MovePieceAction {
-	return &MovePieceAction{
-		player: player,
-		enemy:  enemy,
-		game:   game,
-	}
+func NewMovePieceAction() *MovePieceAction {
+	return &MovePieceAction{}
 }
 
-func (uc *MovePieceAction) setGameStatus(enemyColor domain.Color, output *MovePieceOutput) {
-	enemyKingPos := uc.game.Board.GetKingPos(enemyColor)
+func (uc *MovePieceAction) setGameStatus(ctx *wsrouter.Context, enemyColor domain.Color, output *MovePieceOutput) {
+	enemyKingPos := ctx.Game.Board.GetKingPos(enemyColor)
 	if enemyKingPos == nil {
 		log.Println("##> Enemy King not found: ", enemyColor)
 		panic("")
 	}
-	if uc.game.Board.PositionIsUnderAttack(enemyKingPos, !enemyColor) {
+	if ctx.Game.Board.PositionIsUnderAttack(enemyKingPos, !enemyColor) {
 		output.KingCheck = enemyKingPos
 		log.Println("##> Enemy King is under attack: ", enemyColor, enemyKingPos)
 	}
-	enemyHasMoves := uc.game.CalculateValidMoves(enemyColor)
+	enemyHasMoves := ctx.Game.CalculateValidMoves(enemyColor)
 	if !enemyHasMoves {
 		log.Println("##> Enemy has no valid moves: ", enemyColor)
 		if output.KingCheck != nil {
@@ -67,25 +61,25 @@ func (uc *MovePieceAction) setGameStatus(enemyColor domain.Color, output *MovePi
 	}
 }
 
-func (uc *MovePieceAction) Invoke(p *MovePieceParams) (*MovePieceOutput, error) {
+func (uc *MovePieceAction) Invoke(ctx *wsrouter.Context, p *MovePieceParams) (*MovePieceOutput, error) {
 	log.Println("==> Move piece params: ", shared.ToJSONString(p))
 	move := &domain.Move{
 		From: p.Src,
 		To:   p.Dst,
 	}
 
-	playerColor := uc.game.ColorToMove
+	playerColor := ctx.Game.ColorToMove
 	enemyColor := !playerColor
 
-	uc.game.Move(move, p.PromoteTo)
-	fmt.Println("Game EnpassantPieces: ", uc.game.EnPassantPieces)
-	uc.game.ColorToMove = enemyColor
+	ctx.Game.Move(move, p.PromoteTo)
+	fmt.Println("Game EnpassantPieces: ", ctx.Game.EnPassantPieces)
+	ctx.Game.ColorToMove = enemyColor
 
 	output := newMovePieceOutput(p.Src, p.Dst, p.PromoteTo)
-	uc.setGameStatus(enemyColor, output)
+	uc.setGameStatus(ctx, enemyColor, output)
 
-	uc.player.StopTimer()
-	uc.enemy.StartTimer()
+	ctx.Player.StopTimer()
+	ctx.Enemy.StartTimer()
 
 	log.Println("##> Move piece output: ", shared.ToJSONString(output))
 	return output, nil

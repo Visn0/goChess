@@ -5,6 +5,7 @@ import (
 	"chess/server/domain"
 	"chess/server/infrastructure"
 	"chess/server/shared"
+	"chess/server/shared/wsrouter"
 	"flag"
 	"fmt"
 	"log"
@@ -20,23 +21,13 @@ import (
 	websocket "github.com/gofiber/websocket/v2"
 )
 
-type subEvent struct {
-	Connection *shared.WsConn
-	Body       []byte
-}
-
 type Server struct {
 	addr string
 	port string
 	app  *fiber.App
 
-	wsConnections      map[*shared.WsConn]struct{}
-	wsConnectionsMutex sync.Mutex
-
-	register   chan subEvent
-	unregister chan subEvent
-
 	roomManager *domain.RoomManager
+	wsRouter    *wsrouter.WsRouter
 }
 
 func NewServer(addr, port string) *Server {
@@ -44,15 +35,21 @@ func NewServer(addr, port string) *Server {
 	app.Use(cors.New())
 	app.Use(recover.New())
 
+	wsRouter := wsrouter.NewWsRouter(map[string]wsrouter.WsHandler{
+		"request-moves": infrastructure.NewGetValidMovesWsController().Invoke,
+		"move-piece":    infrastructure.NewMovePieceWsController().Invoke,
+		"get-timers":    infrastructure.NewGetTimersWsController().Invoke,
+		"abandon":       infrastructure.NewAbandonWsController().Invoke,
+		"request-draw":  infrastructure.NewRequestDrawWsController().Invoke,
+		"response-draw": infrastructure.NewResponseDrawWsController().Invoke,
+	})
+
 	return &Server{
-		addr:               addr,
-		port:               port,
-		app:                app,
-		wsConnections:      make(map[*shared.WsConn]struct{}),
-		wsConnectionsMutex: sync.Mutex{},
-		register:           make(chan subEvent),
-		unregister:         make(chan subEvent),
-		roomManager:        domain.NewRoomManager(),
+		addr:        addr,
+		port:        port,
+		app:         app,
+		roomManager: domain.NewRoomManager(),
+		wsRouter:    wsRouter,
 	}
 }
 
@@ -142,7 +139,7 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.wsRouter(room, c, true, wg)
+			s.handleGame(room, c, true, wg)
 
 		case "join-room":
 			log.Println("Request join room")
@@ -154,14 +151,14 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.wsRouter(room, c, false, wg)
+			s.handleGame(room, c, false, wg)
 		}
 
 		wg.Wait()
 	}))
 }
 
-func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	log.Println("Room activated")
@@ -197,15 +194,6 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		fmt.Println("Calculating valid moves for white player")
 	}
 
-	wsRouter := NewWsRouter(map[string]WsHandler{
-		"request-moves": infrastructure.NewGetValidMovesWsController(c, room.Game).Invoke,
-		"move-piece":    infrastructure.NewMovePieceWsController(player, enemy, c, cEnemy, room.Game).Invoke,
-		"get-timers":    infrastructure.NewGetTimersWsController(c, player, enemy).Invoke,
-		"abandon":       infrastructure.NewAbandonWsController(cEnemy).Invoke,
-		"request-draw":  infrastructure.NewRequestDrawWsController(cEnemy).Invoke,
-		"response-draw": infrastructure.NewResponseDrawWsController(cEnemy).Invoke,
-	})
-
 	for {
 		// Blocking when waiting for the enemy player action
 		_, message, err := player.Ws.ReadMessage()
@@ -213,7 +201,8 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 			log.Println("Some error:", err)
 			if room.GetRoomSize() > 1 {
 				log.Println("Trying to send abandon message to enemy")
-				wsRouter.Handle("abandon", nil)
+				ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, nil)
+				s.wsRouter.Handle("abandon", ctx)
 
 				_ = room.RemovePlayer(player)
 				s.roomManager.RemoveRoom(room.ID)
@@ -224,7 +213,8 @@ func (s *Server) wsRouter(room *domain.Room, c domain.ConnectionRepository, isHo
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")
 
-		wsRouter.Handle(reqAction, reqBody)
+		ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, reqBody)
+		s.wsRouter.Handle(reqAction, ctx)
 	}
 }
 
