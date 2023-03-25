@@ -15,6 +15,7 @@ import { AbandonAction } from '@/actions/send/abandon_action'
 import { RequestDrawAction } from '@/actions/send/request_draw_action'
 import { ResponseDrawAction } from '@/actions/send/response_draw_action'
 import { EndGameReason } from '@/models/constants'
+import ChessModal from '@/components/ChessModal.vue'
 
 const myPlayerIDStore = usePlayerIDStore()
 const gameStore = useGameStore()
@@ -23,6 +24,15 @@ let board: Board
 let game: Game
 let colorDown = ref(Color.WHITE)
 let oponentPlayerID = ref('Player 2')
+let gameModalsData = ref({
+    showModal: true,
+    title: 'Waiting for player two',
+    buttons: new Array<{
+        text: string
+        action: Function
+    }>()
+})
+
 onBeforeMount(() => {
     if (gameStore.isEmpty) {
         router.push({ name: 'rooms' })
@@ -35,45 +45,55 @@ onBeforeMount(() => {
     watch(game.started.bind(game), () => {
         colorDown.value = game.getMyColor()
         oponentPlayerID.value = game.getOpponentID()
-
-        const modal = document.getElementById('wait-player-modal') as HTMLElement
-        modal.hidden = true
+        gameModalsData.value.showModal = false
     })
 
     watch(game.endGame.bind(game), () => {
-        const modal = document.getElementById('endgame-modal') as HTMLElement
-        const text = document.getElementById('endgame-text') as HTMLElement
+        let buttons = new Array()
         switch (game.getEndGameReason()) {
             case EndGameReason.ABANDON: {
-                text.innerText = 'Enemy player abandoned the game'
-                modal.hidden = false
+                buttons = [
+                    { text: ' Close', action: () => setGameModalsData('', false, []) },
+                    { text: 'Go rooms', action: goRooms }
+                ]
+                setGameModalsData('Enemy player abandoned the game', true, buttons)
                 break
             }
 
             case EndGameReason.DRAW_REQUEST: {
-                const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
-                drawmodal.hidden = false
+                buttons = [
+                    { text: 'Accept', action: acceptDraw },
+                    { text: 'Decline', action: declineDraw }
+                ]
+                setGameModalsData('Do you wanna draw?', true, buttons)
                 game.setEndGame(false)
                 break
             }
 
             case EndGameReason.DRAW: {
-                text.innerText = 'The game ended in a draw'
-                modal.hidden = false
+                buttons = [
+                    { text: 'Close', action: () => setGameModalsData('', false, []) },
+                    { text: 'Go rooms', action: goRooms }
+                ]
+                setGameModalsData('The game ended in a draw', true, buttons)
                 break
             }
 
             case EndGameReason.DRAWDECLINED: {
-                const declinedraw = document.getElementById('draw-decline-modal') as HTMLElement
-                declinedraw.hidden = false
+                buttons = [{ text: 'Close', action: () => setGameModalsData('', false, []) }]
+                setGameModalsData('Oponent player decline draw', true, buttons)
                 game.setEndGame(false)
                 break
             }
 
             case EndGameReason.CHECKMATE: {
                 const winner = game.isMyTurn() ? 'win' : 'lose'
-                text.innerText = 'You ' + winner + ' the game'
-                modal.hidden = false
+                let title = 'You ' + winner + ' the game'
+                buttons = [
+                    { text: 'Close', action: () => setGameModalsData('', false, []) },
+                    { text: 'Go rooms', action: goRooms }
+                ]
+                setGameModalsData(title, true, buttons)
                 break
             }
 
@@ -84,6 +104,12 @@ onBeforeMount(() => {
         }
     })
 })
+
+function setGameModalsData(title: string, showModal: boolean, buttons: Array<{ text: string; action: Function }>) {
+    gameModalsData.value.title = title
+    gameModalsData.value.buttons = buttons
+    gameModalsData.value.showModal = showModal
+}
 
 function squareClick(file: File, rank: Rank) {
     const square = board.getSquare(file, rank)
@@ -111,16 +137,14 @@ function requestDraw() {
 }
 
 function acceptDraw() {
-    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
-    drawmodal.hidden = true
+    setGameModalsData('', false, [])
     game.setEndGameReason('draw')
-    game.setEndGame(true)
     ResponseDrawAction(game.repository, true)
+    game.setEndGame(true)
 }
 
 function declineDraw() {
-    const drawmodal = document.getElementById('draw-request-modal') as HTMLElement
-    drawmodal.hidden = true
+    setGameModalsData('', false, [])
     ResponseDrawAction(game.repository, false)
     game.setEndGame(false)
 }
@@ -131,12 +155,6 @@ function goRooms() {
 
 function createPiece(color: Color, pieceType: PieceType): Piece {
     return new Piece(color, pieceType)
-}
-
-function closemodal(name: string) {
-    console.log('no teneis ni idea')
-    const modal = document.getElementById(name) as HTMLElement
-    modal.hidden = true
 }
 </script>
 
@@ -208,89 +226,17 @@ function closemodal(name: string) {
             </div>
         </div>
 
-        <!--Waiting player modal-->
-        <div id="wait-player-modal" class="modal" tabindex="-1" style="display: block">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light">
-                    <h5 class="modal-title">Waiting for player</h5>
-                </div>
-            </div>
-        </div>
+        <!--In game Modals-->
 
-        <!--Abandon modal-->
-        <div
-            id="abandon-modal"
-            class="modal"
-            tabindex="-1"
-            style="display: block"
-            hidden="true"
-            @click="closemodal('abandon-modal')"
-        >
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light">
-                    <div class="modal-body">
-                        <h5 class="modal-title">Enemy player abandoned the game</h5>
-                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
-                            Go rooms
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ChessModal
+            id="ChessActionsModal"
+            :showModal="gameModalsData.showModal"
+            :title="gameModalsData.title"
+            :buttons="gameModalsData.buttons"
+            @close="setGameModalsData('', false, [])"
+        ></ChessModal>
 
-        <!--End game modal-->
-        <div
-            id="endgame-modal"
-            class="modal"
-            tabindex="-1"
-            style="display: block"
-            hidden="true"
-            @click="closemodal('endgame-modal')"
-        >
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light">
-                    <div class="modal-body">
-                        <h5 id="endgame-text" class="modal-title"></h5>
-                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="goRooms()">
-                            Go rooms
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--Draw request modal-->
-        <div id="draw-request-modal" class="modal" tabindex="-1" style="display: block" hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light">
-                    <div class="modal-body">
-                        <h5 class="modal-title">Do you wanna draw?</h5>
-                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="acceptDraw()">
-                            Accept
-                        </button>
-                        <button type="button" class="mt-2 w-100 btn btn-sm btn-green" @click="declineDraw()">
-                            Decline
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--Draw decline modal-->
-        <div
-            id="draw-decline-modal"
-            class="modal"
-            tabindex="-1"
-            style="display: block"
-            hidden="true"
-            @click="closemodal('draw-decline-modal')"
-        >
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-light">
-                    <h5 class="modal-title">Oponent player decline draw</h5>
-                </div>
-            </div>
-        </div>
+        <!--Board view-->
 
         <div class="vh-100 position-relative">
             <div class="container h-auto position-absolute top-50 start-50 translate-middle game">
