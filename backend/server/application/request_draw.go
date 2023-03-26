@@ -13,10 +13,10 @@ func NewRequestDrawAction() *RequestDrawAction {
 	return &RequestDrawAction{}
 }
 
-func (uc *RequestDrawAction) Invoke(ctx *wsrouter.Context) error {
-	output := RequestDrawOutput{
+func (uc *RequestDrawAction) Invoke(ctx *wsrouter.Context) *RequestDrawOutput {
+	output := &RequestDrawOutput{
 		Action: "draw-request",
 	}
 
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return output
 }

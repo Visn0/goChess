@@ -38,5 +38,6 @@ func (r *WsRouter) Handle(path string, ctx *Context) {
 	err := handler(ctx)
 	if err != nil {
 		log.Printf("=> Error running handler for path %q: %v", path, err)
+		_ = ctx.OwnRepository.SendWebSocketMessage(err)
 	}
 }

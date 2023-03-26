@@ -25,5 +25,6 @@ func (c *ResponseDrawWsController) Invoke(ctx *wsrouter.Context) error {
 		return err
 	}
 
-	return c.uc.Invoke(ctx, &p)
+	output := c.uc.Invoke(ctx, &p)
+	return ctx.EnemyRepository.SendWebSocketMessage(output)
 }

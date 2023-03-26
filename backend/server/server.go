@@ -1,7 +1,6 @@
 package server
 
 import (
-	"chess/server/application"
 	"chess/server/domain"
 	"chess/server/infrastructure"
 	"chess/server/shared"
@@ -177,7 +176,8 @@ func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, is
 
 	cEnemy := infrastructure.NewBackendConnectionRepository(enemy.Ws)
 	if isHost {
-		err := application.StartGameAction(player, enemy, c, cEnemy, 10*60*1000)
+		ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, nil)
+		err := infrastructure.StartGameActionWsController(ctx, 10*60*1000)
 		if err != nil {
 			log.Println("Error starting game: ", err)
 			_ = c.SendWebSocketMessage(err)

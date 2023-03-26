@@ -196,14 +196,12 @@ func (g *Game) getKingCastlePositions(pos *Position, p IPiece, positions *[]*Pos
 // TODO: not the most efficient way to do this (implement it with a copy of the board)
 func (g *Game) filterMovesIfCheck(from *Position, positions []*Position) []*Position {
 	filteredPositions := []*Position{}
-	// fmt.Println("From: ", from, " To: ", positions)
 	for _, pos := range positions {
 		move := &Move{From: from, To: pos}
 		if !g.isCheckAfterMove(move) {
 			filteredPositions = append(filteredPositions, pos)
 		}
 	}
-	// fmt.Println(filteredPositions)
 	return filteredPositions
 }
 
@@ -222,6 +220,6 @@ func (g *Game) isCheckAfterMove(move *Move) bool {
 	if kingPos == nil {
 		fmt.Println("King not found: " + gameCopy.ColorToMove.String())
 	}
-	// fmt.Println("King pos: " + kingPos.String())
+
 	return gameCopy.Board.PositionIsUnderAttack(kingPos, enemyColor)
 }
