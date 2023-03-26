@@ -27,5 +27,5 @@ func (c *GetValidMovesWsController) Invoke(ctx *wsrouter.Context) error {
 		return err
 	}
 
-	return ctx.OwnRepository.SendWebSocketMessage(output)
+	return ctx.Player.SendWebSocketMessage(output)
 }

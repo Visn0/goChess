@@ -17,5 +17,5 @@ func NewRequestDrawWsController() *RequestDrawWsController {
 
 func (c *RequestDrawWsController) Invoke(ctx *wsrouter.Context) error {
 	output := c.uc.Invoke(ctx)
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return ctx.Enemy.SendWebSocketMessage(output)
 }

@@ -17,5 +17,5 @@ func NewAbandonWsController() *AbandonWsController {
 
 func (c *AbandonWsController) Invoke(ctx *wsrouter.Context) error {
 	output := c.uc.Invoke()
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return ctx.Enemy.SendWebSocketMessage(output)
 }

@@ -57,37 +57,9 @@ func NewGetRoomsAction(rm *domain.RoomManager) *GetRoomsAction {
 }
 
 func (uc *GetRoomsAction) Invoke() *GetRoomsOutput {
-	uc.addTestRooms(uc.rm)
 	rooms := uc.rm.GetRooms()
 	output := newGetRoomsOutput(rooms)
 	log.Println("==> Get rooms output: ", shared.ToJSONString(output))
 
 	return output
-}
-
-func (uc *GetRoomsAction) addTestRooms(rm *domain.RoomManager) {
-	roomTest1 := &domain.Room{
-		ID: "roomTest1",
-		Player1: &domain.Player{
-			Ws: nil,
-			ID: "player1",
-		},
-		Player2: &domain.Player{
-			Ws: nil,
-			ID: "player2",
-		},
-	}
-	roomTest2 := &domain.Room{
-		ID: "roomTest2",
-		Player1: &domain.Player{
-			Ws: nil,
-			ID: "player3",
-		},
-		Player2: &domain.Player{
-			Ws: nil,
-			ID: "player4",
-		},
-	}
-	rm.AddRoom(roomTest1)
-	rm.AddRoom(roomTest2)
 }

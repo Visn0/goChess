@@ -27,9 +27,9 @@ func (c *MovePieceWsController) Invoke(ctx *wsrouter.Context) error {
 		return nil
 	}
 
-	if err := ctx.OwnRepository.SendWebSocketMessage(output); err != nil {
+	if err := ctx.Player.SendWebSocketMessage(output); err != nil {
 		return err
 	}
 
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return ctx.Enemy.SendWebSocketMessage(output)
 }

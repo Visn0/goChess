@@ -23,6 +23,7 @@ func (r *BackendConnectionRepository) SendWebSocketMessage(msg interface{}) erro
 	return nil
 }
 
-func (r *BackendConnectionRepository) GetWebSocketConnection() *shared.WsConn {
-	return r.ws
+func (r *BackendConnectionRepository) ReadMessage() ([]byte, error) {
+	_, msg, err := r.ws.ReadMessage()
+	return msg, err
 }

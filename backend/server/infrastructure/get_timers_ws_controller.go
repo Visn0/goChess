@@ -17,5 +17,5 @@ func NewGetTimersWsController() *GetTimersWsController {
 
 func (c *GetTimersWsController) Invoke(ctx *wsrouter.Context) error {
 	output := c.uc.Invoke(ctx)
-	return ctx.OwnRepository.SendWebSocketMessage(output)
+	return ctx.Player.SendWebSocketMessage(output)
 }
