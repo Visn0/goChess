@@ -6,10 +6,6 @@ It's in development!
 
 </span>
 
-You can play it here [https://gochess](https://www.youtube.com/watch?v=oHg5SJYRHA0)
-
-If it doesn't work try here [http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/](http://ec2-15-188-11-141.eu-west-3.compute.amazonaws.com/)
-
 ## Description
 
 The project consists of a chess game. With the intention of learning Domain Driven Design (DDD), a [Hexagonal architecture](<https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>) has been used. So far, the game allows creating matches, connecting to them and playing the game, including calculation of valid moves, check detection and so on.
@@ -54,7 +50,7 @@ In another shell:
 $ make up.backend
 ```
 
-Once the server is up and running, open your browser and type `http://localhost:5173/` and you will see the chess.
+The server will be running in http://localhost:5173/.
 
 <!-- AUTHORS -->
 
