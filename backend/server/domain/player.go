@@ -1,12 +1,12 @@
 package domain
 
 import (
-	"chess/server/shared"
 	"time"
 )
 
 type Player struct {
-	Ws             *shared.WsConn
+	ConnectionRepository
+
 	ID             string
 	Color          Color
 	TimeConsumedMS int
@@ -14,14 +14,14 @@ type Player struct {
 	paused         bool
 }
 
-func NewPlayer(ws *shared.WsConn, id string) *Player {
+func NewPlayer(repository ConnectionRepository, id string) *Player {
 	return &Player{
-		Ws:             ws,
-		ID:             id,
-		Color:          false,
-		TimeConsumedMS: 0,
-		LastClockTime:  time.Time{},
-		paused:         true,
+		ConnectionRepository: repository,
+		ID:                   id,
+		Color:                false,
+		TimeConsumedMS:       0,
+		LastClockTime:        time.Time{},
+		paused:               true,
 	}
 }
 

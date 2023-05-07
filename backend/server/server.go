@@ -1,7 +1,6 @@
 package server
 
 import (
-	"chess/server/application"
 	"chess/server/domain"
 	"chess/server/infrastructure"
 	"chess/server/shared"
@@ -139,7 +138,7 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.handleGame(room, c, true, wg)
+			s.handleGame(room, true, wg)
 
 		case "join-room":
 			log.Println("Request join room")
@@ -151,14 +150,14 @@ func (s *Server) initWebsocket() {
 				return
 			}
 
-			s.handleGame(room, c, false, wg)
+			s.handleGame(room, false, wg)
 		}
 
 		wg.Wait()
 	}))
 }
 
-func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, isHost bool, wg *sync.WaitGroup) {
+func (s *Server) handleGame(room *domain.Room, isHost bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	log.Println("Room activated")
@@ -175,13 +174,13 @@ func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, is
 		}
 	}
 
-	cEnemy := infrastructure.NewBackendConnectionRepository(enemy.Ws)
 	if isHost {
-		err := application.StartGameAction(player, enemy, c, cEnemy, 10*60*1000)
+		ctx := wsrouter.NewContext(room.Game, player, enemy, nil)
+		err := infrastructure.StartGameActionWsController(ctx, 10*60*1000)
 		if err != nil {
 			log.Println("Error starting game: ", err)
-			_ = c.SendWebSocketMessage(err)
-			_ = cEnemy.SendWebSocketMessage(err)
+			_ = player.SendWebSocketMessage(err)
+			_ = enemy.SendWebSocketMessage(err)
 			s.roomManager.RemoveRoom(room.ID)
 			return
 		}
@@ -196,12 +195,12 @@ func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, is
 
 	for {
 		// Blocking when waiting for the enemy player action
-		_, message, err := player.Ws.ReadMessage()
+		message, err := player.ReadMessage()
 		if err != nil {
 			log.Println("Some error:", err)
 			if room.GetRoomSize() > 1 {
 				log.Println("Trying to send abandon message to enemy")
-				ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, nil)
+				ctx := wsrouter.NewContext(room.Game, player, enemy, nil)
 				s.wsRouter.Handle("abandon", ctx)
 
 				_ = room.RemovePlayer(player)
@@ -213,7 +212,7 @@ func (s *Server) handleGame(room *domain.Room, c domain.ConnectionRepository, is
 		reqAction, _ := jsonparser.GetString(message, "action")
 		reqBody, _, _, _ := jsonparser.Get(message, "body")
 
-		ctx := wsrouter.NewContext(room.Game, player, enemy, c, cEnemy, reqBody)
+		ctx := wsrouter.NewContext(room.Game, player, enemy, reqBody)
 		s.wsRouter.Handle(reqAction, ctx)
 	}
 }

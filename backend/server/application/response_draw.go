@@ -20,11 +20,11 @@ func NewResponseDrawAction() *ResponseDrawAction {
 	return &ResponseDrawAction{}
 }
 
-func (uc *ResponseDrawAction) Invoke(ctx *wsrouter.Context, p *ResponseDrawParam) error {
-	output := ResponseDrawOutput{
+func (uc *ResponseDrawAction) Invoke(ctx *wsrouter.Context, p *ResponseDrawParam) *ResponseDrawOutput {
+	output := &ResponseDrawOutput{
 		Action:       "draw-response",
 		DrawResponse: p.DrawResponse,
 	}
 
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return output
 }

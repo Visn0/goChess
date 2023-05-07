@@ -3,8 +3,6 @@ package infrastructure
 import (
 	"chess/server/application"
 	"chess/server/shared/wsrouter"
-	"encoding/json"
-	"log"
 )
 
 type MovePieceWsController struct {
@@ -19,9 +17,8 @@ func NewMovePieceWsController() *MovePieceWsController {
 
 func (c *MovePieceWsController) Invoke(ctx *wsrouter.Context) error {
 	var p application.MovePieceParams
-	err := json.Unmarshal(ctx.Body, &p)
+	err := ctx.Bind(&p)
 	if err != nil {
-		log.Println("Error unmarshalling move piece params:", err)
 		return err
 	}
 
@@ -30,9 +27,9 @@ func (c *MovePieceWsController) Invoke(ctx *wsrouter.Context) error {
 		return nil
 	}
 
-	if err := ctx.OwnRepository.SendWebSocketMessage(output); err != nil {
+	if err := ctx.Player.SendWebSocketMessage(output); err != nil {
 		return err
 	}
 
-	return ctx.EnemyRepository.SendWebSocketMessage(output)
+	return ctx.Enemy.SendWebSocketMessage(output)
 }

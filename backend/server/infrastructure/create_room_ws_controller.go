@@ -5,7 +5,6 @@ import (
 	"chess/server/domain"
 	"chess/server/shared/chesserror"
 	"encoding/json"
-	"log"
 )
 
 type CreateRoomWsController struct {
@@ -22,8 +21,8 @@ func (c *CreateRoomWsController) Invoke(body []byte) (*domain.Room, error) {
 	var p application.CreateRoomParams
 	err := json.Unmarshal(body, &p)
 	if err != nil {
-		log.Println("Error unmarshalling request create room:", err)
-		return nil, err
+		return nil, chesserror.NewError(chesserror.GenericError,
+			"Error unmarshalling input parameters.").WithCause(err)
 	}
 
 	room, err := c.uc.Invoke(&p)

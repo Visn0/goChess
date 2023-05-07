@@ -17,15 +17,15 @@ func NewGetTimersAction() *GetTimersAction {
 	return &GetTimersAction{}
 }
 
-func (uc *GetTimersAction) Invoke(ctx *wsrouter.Context) error {
+func (uc *GetTimersAction) Invoke(ctx *wsrouter.Context) *GetTimersOutput {
 	t1 := ctx.Player.TimeLeft()
 	t2 := ctx.Enemy.TimeLeft()
 
-	output := GetTimersOutput{
+	output := &GetTimersOutput{
 		Action:     "get-timers",
 		PlayerTime: t1,
 		EnemyTime:  t2,
 	}
 
-	return ctx.OwnRepository.SendWebSocketMessage(output)
+	return output
 }
